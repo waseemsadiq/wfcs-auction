@@ -1,0 +1,56 @@
+name: CI
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: auction_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: pdo, pdo_mysql, openssl
+          coverage: none
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Set up test database
+        run: mysql -h 127.0.0.1 -u root -proot auction_test < database/schema.sql
+
+      - name: Run unit tests
+        run: vendor/bin/phpunit --testsuite Unit
+        env:
+          DB_HOST: 127.0.0.1
+          DB_DATABASE: auction_test
+          DB_USER: root
+          DB_PASS: root
+          APP_KEY: "0000000000000000000000000000000000000000000000000000000000000001"
+          JWT_SECRET: test_jwt_secret
+
+      - name: Run feature tests
+        run: vendor/bin/phpunit --testsuite Feature
+        env:
+          DB_HOST: 127.0.0.1
+          DB_DATABASE: auction_test
+          DB_USER: root
+          DB_PASS: root
+          APP_KEY: "0000000000000000000000000000000000000000000000000000000000000001"
+          JWT_SECRET: test_jwt_secret

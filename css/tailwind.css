@@ -1,0 +1,45 @@
+@import "tailwindcss";
+
+/* Dark mode via class strategy */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Font Face — Outfit variable (covers weights 100–900) */
+@font-face {
+  font-family: "Outfit";
+  src: url("fonts/Outfit-variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: block;
+}
+
+@theme {
+  --font-sans: "Outfit", system-ui, sans-serif;
+
+  --color-primary: #45a2da;
+  --color-primary-hover: #3b8ec7;
+  --color-surface: #ffffff;
+  --color-border: #e2e8f0;
+
+  /* Toned-down shadow scale — 1-2 layers above surface, not floating */
+  --shadow-sm:  0 1px 2px 0 rgb(0 0 0 / 0.04);
+  --shadow:     0 1px 4px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.04);
+  --shadow-md:  0 2px 6px -1px rgb(0 0 0 / 0.06), 0 1px 3px -1px rgb(0 0 0 / 0.04);
+  --shadow-lg:  0 4px 8px -2px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.04);
+  --shadow-xl:  0 6px 12px -3px rgb(0 0 0 / 0.07), 0 3px 6px -3px rgb(0 0 0 / 0.04);
+  --shadow-2xl: 0 8px 20px -4px rgb(0 0 0 / 0.09);
+}
+
+/* View Transitions API overrides */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-new(root) {
+  z-index: 9999;
+}
+
+.dark {
+  color-scheme: dark;
+}

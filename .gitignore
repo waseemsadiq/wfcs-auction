@@ -1,0 +1,41 @@
+# Environment & secrets
+.env
+.env.test
+php.ini
+
+# Test cache
+.phpunit.result.cache
+
+# Playwright
+.playwright-mcp/
+
+# Composer
+vendor/
+
+# Node
+node_modules/
+
+# CSS build output
+css/output.css
+
+# Uploads (keep directory with gitkeep)
+uploads/*
+!uploads/.gitkeep
+
+# Storage
+storage/logs/
+storage/cache/
+
+# Mockups / design reference images
+docs/mockups/
+/*.png
+/*.jpg
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp

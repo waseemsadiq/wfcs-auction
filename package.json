@@ -1,0 +1,23 @@
+{
+  "name": "wfcs-auction",
+  "version": "1.0.0",
+  "description": "WFCS Auction - charity auction platform for The Well Foundation",
+  "main": "index.php",
+  "scripts": {
+    "build:css": "tailwindcss --input ./css/tailwind.css --output ./css/output.css",
+    "watch:css": "tailwindcss --input ./css/tailwind.css --output ./css/output.css --watch",
+    "dev": "../galvani --server :8080"
+  },
+  "keywords": [
+    "auction",
+    "charity",
+    "gift-aid",
+    "stripe"
+  ],
+  "author": "The Well Foundation",
+  "license": "MIT",
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.1.18",
+    "tailwindcss": "^4.1.18"
+  }
+}

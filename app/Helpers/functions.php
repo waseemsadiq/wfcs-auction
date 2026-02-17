@@ -1,0 +1,246 @@
+<?php
+declare(strict_types=1);
+
+/**
+ * Escape a value for safe HTML output.
+ */
+function e(mixed $value): string
+{
+    return htmlspecialchars((string)$value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+}
+
+/**
+ * Read a dot-notation config value, e.g. config('app.jwt_secret').
+ * The file portion maps to config/<file>.php.
+ */
+function config(string $key, mixed $default = null): mixed
+{
+    static $cache = [];
+
+    [$file, $subkey] = array_pad(explode('.', $key, 2), 2, null);
+
+    if (!isset($cache[$file])) {
+        $path = dirname(__DIR__, 2) . '/config/' . $file . '.php';
+        $cache[$file] = file_exists($path) ? require $path : [];
+    }
+
+    if ($subkey === null) {
+        return $cache[$file] ?? $default;
+    }
+
+    return $cache[$file][$subkey] ?? $default;
+}
+
+/**
+ * Retrieve the authenticated user from a JWT.
+ *
+ * Token lookup order:
+ *   1. auth_token cookie (web sessions)
+ *   2. token POST field  (API with form-body token)
+ *   3. token query param (API GET requests)
+ */
+function getAuthUser(): ?array
+{
+    $token = null;
+
+    if (!empty($_COOKIE['auth_token'])) {
+        $token = $_COOKIE['auth_token'];
+    } elseif (!empty($_POST['token'])) {
+        $token = $_POST['token'];
+    } elseif (!empty($_GET['token'])) {
+        $token = $_GET['token'];
+    }
+
+    if (!$token) {
+        return null;
+    }
+
+    $secret = config('app.jwt_secret');
+    if (!$secret) {
+        return null;
+    }
+
+    return \Core\JWT::decode($token, $secret);
+}
+
+/**
+ * Require an authenticated user. Redirects to /login on failure.
+ */
+function requireAuth(): array
+{
+    global $basePath;
+    $user = getAuthUser();
+    if (!$user) {
+        header('Location: ' . $basePath . '/login');
+        exit;
+    }
+    return $user;
+}
+
+/**
+ * Require an admin user. Renders 403 on failure.
+ */
+function requireAdmin(): array
+{
+    global $basePath;
+    $user = requireAuth();
+    if ($user['role'] !== 'admin') {
+        http_response_code(403);
+        $errorView = dirname(__DIR__, 2) . '/app/Views/errors/403.php';
+        if (file_exists($errorView)) {
+            require $errorView;
+        } else {
+            echo 'Forbidden';
+        }
+        exit;
+    }
+    return $user;
+}
+
+/**
+ * Validate the CSRF token from POST body or query string.
+ * Exits with 403 on mismatch.
+ */
+function validateCsrf(): void
+{
+    $token = $_POST['_csrf_token'] ?? $_GET['_csrf_token'] ?? null;
+    global $csrfToken;
+    if (!$token || !hash_equals($csrfToken, $token)) {
+        http_response_code(403);
+        echo 'Invalid CSRF token';
+        exit;
+    }
+}
+
+/**
+ * Generate a URL-friendly slug from a string.
+ */
+function slugify(string $text): string
+{
+    $text = mb_strtolower($text, 'UTF-8');
+    $text = preg_replace('/[^a-z0-9\s-]/', '', $text);
+    $text = preg_replace('/[\s-]+/', '-', trim($text));
+    return $text;
+}
+
+/**
+ * Format an amount in GBP (£).
+ */
+function formatCurrency(float $amount): string
+{
+    return '£' . number_format($amount, 2);
+}
+
+/**
+ * Render a view atom (small reusable snippet) and return its HTML.
+ * Usage: atom('badge', ['label' => 'Active'])
+ */
+function atom(string $name, array $props = []): string
+{
+    ob_start();
+    extract($props);
+    $path = dirname(__DIR__, 2) . '/app/Views/atoms/' . $name . '.php';
+    if (file_exists($path)) {
+        require $path;
+    }
+    return (string)ob_get_clean();
+}
+
+/**
+ * Render a view partial in-place.
+ * Usage: partial('nav/header', ['user' => $user])
+ */
+function partial(string $name, array $data = []): void
+{
+    extract($data);
+    global $basePath, $csrfToken;
+    require dirname(__DIR__, 2) . '/app/Views/partials/' . $name . '.php';
+}
+
+/**
+ * Generate a unique slug for a given DB table column.
+ * Appends -2, -3, … until the slug is free.
+ */
+function uniqueSlug(string $table, string $text, \Core\Database $db): string
+{
+    $base = slugify($text);
+    $slug = $base;
+    $i    = 2;
+    while ($db->queryOne("SELECT id FROM `{$table}` WHERE slug = ?", [$slug])) {
+        $slug = $base . '-' . $i++;
+    }
+    return $slug;
+}
+
+/**
+ * Validate an email address.
+ */
+function isValidEmail(string $email): bool
+{
+    return (bool)filter_var($email, FILTER_VALIDATE_EMAIL);
+}
+
+/**
+ * Validate password strength: min 8 chars, at least 1 uppercase, at least 1 digit.
+ */
+function isValidPassword(string $password): bool
+{
+    return strlen($password) >= 8
+        && (bool)preg_match('/[A-Z]/', $password)
+        && (bool)preg_match('/[0-9]/', $password);
+}
+
+/**
+ * Store a one-shot flash message in a short-lived cookie.
+ */
+function flash(string $message, string $type = 'success'): void
+{
+    setcookie('flash_message', (string)json_encode(['msg' => $message, 'type' => $type]), [
+        'expires'  => time() + 10,
+        'path'     => '/',
+        'httponly' => true,
+        'samesite' => 'Strict',
+    ]);
+}
+
+/**
+ * Retrieve and clear the stored flash message.
+ */
+function getFlash(): ?array
+{
+    if (empty($_COOKIE['flash_message'])) {
+        return null;
+    }
+    $data = json_decode($_COOKIE['flash_message'], true);
+    // Clear the cookie immediately
+    setcookie('flash_message', '', ['expires' => time() - 3600, 'path' => '/']);
+    return is_array($data) ? $data : null;
+}
+
+/**
+ * Generate or retrieve the CSRF token stored in a same-site cookie.
+ * No PHP sessions — the token lives in a cookie (httponly, SameSite=Strict).
+ */
+function getCsrfToken(): string
+{
+    if (!empty($_COOKIE['csrf_token'])) {
+        return $_COOKIE['csrf_token'];
+    }
+
+    $token = bin2hex(random_bytes(32));
+    setcookie('csrf_token', $token, [
+        'expires'  => 0,          // session cookie
+        'path'     => '/',
+        'httponly' => false,      // JS must NOT read it (form only)
+        'samesite' => 'Strict',
+    ]);
+    return $token;
+}
+
+/**
+ * Return true when running inside Galvani (checks for Galvani-specific env).
+ */
+function isGalvani(): bool
+{
+    return !empty($_SERVER['GALVANI']) || !empty($_ENV['GALVANI']);
+}
