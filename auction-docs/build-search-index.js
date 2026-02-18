@@ -14,12 +14,12 @@ const path = require('path');
 // Page configuration (mirrors index.html PAGES object)
 // Paths are relative to the auction-docs/ folder — docs live one level up
 const PAGES = {
-  'admin-guide':     { src: '../docs/admin/README.md',          title: 'Admin Guide' },
-  'home':            { src: '../docs/wiki/Home.md',             title: 'Overview' },
-  'getting-started': { src: '../docs/wiki/Getting-Started.md',  title: 'Getting Started' },
-  'architecture':    { src: '../docs/wiki/Architecture.md',     title: 'Architecture' },
-  'developer-guide': { src: '../docs/developer/README.md',      title: 'Developer Guide' },
-  'api-reference':   { src: '../docs/api/README.md',            title: 'REST API Reference' },
+  'admin-guide':     { src: './docs/admin/README.md',          title: 'Admin Guide' },
+  'home':            { src: './docs/wiki/Home.md',             title: 'Overview' },
+  'getting-started': { src: './docs/wiki/Getting-Started.md',  title: 'Getting Started' },
+  'architecture':    { src: './docs/wiki/Architecture.md',     title: 'Architecture' },
+  'developer-guide': { src: './docs/developer/README.md',      title: 'Developer Guide' },
+  'api-reference':   { src: './docs/api/README.md',            title: 'REST API Reference' },
 };
 
 /**
