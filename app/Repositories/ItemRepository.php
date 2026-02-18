@@ -523,4 +523,9 @@ class ItemRepository
 
         return [$where, $params];
     }
+
+    public function uniqueSlug(string $text): string
+    {
+        return uniqueSlug('items', $text, $this->db);
+    }
 }

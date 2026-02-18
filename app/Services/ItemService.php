@@ -6,7 +6,6 @@ namespace App\Services;
 use App\Repositories\CategoryRepository;
 use App\Repositories\EventRepository;
 use App\Repositories\ItemRepository;
-use Core\Database;
 
 class ItemService
 {
@@ -48,29 +47,22 @@ class ItemService
             throw new \RuntimeException('Item title is required.');
         }
 
-        $categoryId = (int)($data['category_id'] ?? 0);
-        if ($categoryId === 0 || $this->categories->findById($categoryId) === null) {
-            throw new \RuntimeException('Please select a valid category.');
-        }
-
-        $db   = Database::getInstance();
-        $slug = uniqueSlug('items', $title, $db);
+        $slug = $this->items->uniqueSlug($title);
 
         $id = $this->items->create([
             'slug'          => $slug,
             'event_id'      => null,
-            'category_id'   => $categoryId,
+            'category_id'   => null,
             'donor_id'      => $donorId,
             'title'         => $title,
             'description'   => isset($data['description']) ? trim($data['description']) : null,
             'image'         => $data['image'] ?? null,
             'lot_number'    => null,
-            'starting_bid'  => isset($data['starting_bid']) && $data['starting_bid'] !== ''
-                                ? (float)$data['starting_bid'] : 0.00,
-            'min_increment' => isset($data['min_increment']) && $data['min_increment'] !== ''
-                                ? (float)$data['min_increment'] : 1.00,
-            'buy_now_price' => isset($data['buy_now_price']) && $data['buy_now_price'] !== ''
-                                ? (float)$data['buy_now_price'] : null,
+            'starting_bid'  => 0.00,
+            'min_increment' => 1.00,
+            'buy_now_price' => null,
+            'market_value'  => isset($data['market_value']) && $data['market_value'] !== ''
+                                ? (float)$data['market_value'] : null,
             'status'        => 'pending',
         ]);
 
@@ -126,8 +118,7 @@ class ItemService
             return $this->items->findById($itemId) ?? ['id' => $itemId];
         }
 
-        $db   = Database::getInstance();
-        $slug = uniqueSlug('items', $title, $db);
+        $slug = $this->items->uniqueSlug($title);
 
         $id = $this->items->create([
             'slug'          => $slug,

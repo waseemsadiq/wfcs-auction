@@ -56,21 +56,32 @@ class UserRepository
     {
         $this->db->execute(
             'INSERT INTO users
-                (slug, name, email, password_hash, role,
+                (slug, name, email, password_hash, role, phone,
+                 email_verified_at,
                  email_verification_token, email_verification_expires_at,
                  created_at, updated_at)
-             VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())',
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())',
             [
                 $data['slug'],
                 $data['name'],
                 $data['email'],
                 $data['password_hash'],
                 $data['role'] ?? 'bidder',
+                $data['phone'] ?? null,
+                $data['email_verified_at'] ?? null,
                 $data['email_verification_token'] ?? null,
                 $data['email_verification_expires_at'] ?? null,
             ]
         );
         return (int)$this->db->lastInsertId();
+    }
+
+    public function updatePhone(int $id, string $phone): void
+    {
+        $this->db->execute(
+            'UPDATE users SET phone = ?, updated_at = NOW() WHERE id = ?',
+            [$phone, $id]
+        );
     }
 
     /**
@@ -302,5 +313,10 @@ class UserRepository
              WHERE id = ?',
             [$token, $expires, $id]
         );
+    }
+
+    public function uniqueSlug(string $text): string
+    {
+        return uniqueSlug('users', $text, $this->db);
     }
 }

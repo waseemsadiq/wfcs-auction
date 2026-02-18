@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Repositories\EventRepository;
-use Core\Database;
 
 class EventService
 {
@@ -45,8 +44,7 @@ class EventService
     {
         $this->validate($data);
 
-        $db   = Database::getInstance();
-        $slug = uniqueSlug('events', $data['title'], $db);
+        $slug = $this->events->uniqueSlug($data['title']);
 
         $id = $this->events->create([
             'slug'        => $slug,

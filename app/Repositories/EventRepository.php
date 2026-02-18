@@ -194,4 +194,9 @@ class EventRepository
         );
         return (int)($row['cnt'] ?? 0);
     }
+
+    public function uniqueSlug(string $text): string
+    {
+        return uniqueSlug('events', $text, $this->db);
+    }
 }

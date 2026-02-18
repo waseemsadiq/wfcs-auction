@@ -6,9 +6,13 @@ namespace App\Controllers;
 use Core\Controller;
 use App\Services\ItemService;
 use App\Services\UploadService;
+use App\Services\NotificationService;
 use App\Repositories\ItemRepository;
 use App\Repositories\CategoryRepository;
 use App\Repositories\EventRepository;
+use App\Repositories\UserRepository;
+use App\Repositories\PasswordResetRepository;
+use App\Repositories\SettingsRepository;
 use App\Services\BidService;
 
 class ItemController extends Controller
@@ -17,14 +21,20 @@ class ItemController extends Controller
     private ItemService $itemService;
     private CategoryRepository $categories;
     private EventRepository $eventRepo;
+    private UserRepository $users;
+    private PasswordResetRepository $passwordResets;
+    private SettingsRepository $settings;
 
     public function __construct()
     {
         // No auth checks in constructor — Galvani rule #9
-        $this->itemRepo    = new ItemRepository();
-        $this->itemService = new ItemService();
-        $this->categories  = new CategoryRepository();
-        $this->eventRepo   = new EventRepository();
+        $this->itemRepo       = new ItemRepository();
+        $this->itemService    = new ItemService();
+        $this->categories     = new CategoryRepository();
+        $this->eventRepo      = new EventRepository();
+        $this->users          = new UserRepository();
+        $this->passwordResets = new PasswordResetRepository();
+        $this->settings       = new SettingsRepository();
     }
 
     // -------------------------------------------------------------------------
@@ -68,103 +78,153 @@ class ItemController extends Controller
 
     public function showSubmit(): void
     {
-        global $basePath;
         $user = getAuthUser();
 
-        $categories = $this->categories->all();
-
         $content = $this->renderView('items/submit', [
-            'user'       => $user,
-            'categories' => $categories,
-            'errors'     => [],
-            'old'        => [],
+            'user'   => $user,
+            'errors' => [],
+            'old'    => [],
         ]);
 
         $this->view('layouts/public', [
-            'pageTitle'  => 'Donate an Item',
-            'activeNav'  => 'donate',
-            'user'       => $user,
-            'content'    => $content,
+            'pageTitle' => 'Donate an Item',
+            'activeNav' => 'donate',
+            'user'      => $user,
+            'content'   => $content,
         ]);
     }
 
     // -------------------------------------------------------------------------
-    // POST /submit-item
+    // POST /donate
     // -------------------------------------------------------------------------
 
     public function submit(): void
     {
         global $basePath;
-        $user = getAuthUser();
 
         validateCsrf();
 
-        $categories = $this->categories->all();
+        $firstName = trim($_POST['first_name'] ?? '');
+        $lastName  = trim($_POST['last_name']  ?? '');
+        $email     = trim(strtolower($_POST['email'] ?? ''));
+        $phone     = trim($_POST['phone'] ?? '');
 
         $data = [
-            'title'         => trim($_POST['title'] ?? ''),
-            'description'   => trim($_POST['description'] ?? ''),
-            'category_id'   => (int)($_POST['category_id'] ?? 0),
-            'starting_bid'  => $_POST['starting_bid'] ?? '',
-            'min_increment' => $_POST['min_increment'] ?? '',
-            'buy_now_price' => $_POST['buy_now_price'] ?? '',
-            'market_value'  => $_POST['market_value'] ?? '',
+            'title'        => trim($_POST['title'] ?? ''),
+            'description'  => trim($_POST['description'] ?? ''),
+            'market_value' => $_POST['market_value'] ?? '',
         ];
 
+        // Validate required fields
+        $errors = [];
+        if ($firstName === '') $errors['first_name'] = 'First name is required.';
+        if ($lastName === '')  $errors['last_name']  = 'Last name is required.';
+        if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $errors['email'] = 'A valid email address is required.';
+        }
+        if ($data['title'] === '') $errors['title'] = 'Item title is required.';
+
+        if (!empty($errors)) {
+            $user    = getAuthUser();
+            $content = $this->renderView('items/submit', [
+                'user'   => $user,
+                'errors' => $errors,
+                'old'    => array_merge($data, [
+                    'first_name' => $firstName,
+                    'last_name'  => $lastName,
+                    'email'      => $email,
+                    'phone'      => $phone,
+                ]),
+            ]);
+            $this->view('layouts/public', ['pageTitle' => 'Donate an Item', 'activeNav' => 'donate', 'user' => $user, 'content' => $content]);
+            return;
+        }
+
         // Handle optional image upload
+        $uploadService = new UploadService();
         if (!empty($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
             try {
-                $uploadService = new UploadService();
                 $data['image'] = $uploadService->uploadItemImage($_FILES['photo']);
             } catch (\RuntimeException $e) {
-                $errors  = ['photo' => $e->getMessage()];
+                $user    = getAuthUser();
                 $content = $this->renderView('items/submit', [
-                    'user'       => $user,
-                    'categories' => $categories,
-                    'errors'     => $errors,
-                    'old'        => $data,
+                    'user'   => $user,
+                    'errors' => ['photo' => $e->getMessage()],
+                    'old'    => array_merge($data, compact('firstName', 'lastName', 'email', 'phone')),
                 ]);
-
-                $this->view('layouts/public', [
-                    'pageTitle'  => 'Donate an Item',
-                    'activeNav'  => 'donate',
-                    'user'       => $user,
-                    'content'    => $content,
-                ]);
+                $this->view('layouts/public', ['pageTitle' => 'Donate an Item', 'activeNav' => 'donate', 'user' => $user, 'content' => $content]);
                 return;
             }
         }
 
-        try {
-            $item = $this->itemService->submit($data, (int)$user['id']);
+        // Find or create donor user
+        $fullName    = $firstName . ' ' . $lastName;
+        $existingUser = $this->users->findByEmail($email);
+        $isNewDonor   = false;
 
-            // Notify admin
+        if ($existingUser !== null) {
+            $donorId = (int)$existingUser['id'];
+            if ($phone !== '') {
+                $this->users->updatePhone($donorId, $phone);
+            }
+        } else {
+            $isNewDonor = true;
+            $slug       = $this->users->uniqueSlug($fullName);
+            $donorId    = $this->users->create([
+                'slug'             => $slug,
+                'name'             => $fullName,
+                'email'            => $email,
+                'password_hash'    => '!',   // impossible hash — account locked until password set
+                'role'             => 'donor',
+                'phone'            => $phone !== '' ? $phone : null,
+                'email_verified_at' => date('Y-m-d H:i:s'), // donors are pre-verified
+            ]);
+        }
+
+        try {
+            $item    = $this->itemService->submit($data, $donorId);
+            $baseUrl = (string)($this->settings->get('site_url') ?? ('http://' . ($_SERVER['HTTP_HOST'] ?? 'localhost') . $basePath));
+
+            // Generate a 7-day password set link for the donor
+            $rawToken  = bin2hex(random_bytes(32));
+            $tokenHash = hash('sha256', $rawToken);
+            $this->passwordResets->create($donorId, $tokenHash, 86400 * 7);
+            $setPasswordUrl = rtrim($baseUrl, '/') . '/reset-password?token=' . urlencode($rawToken);
+
+            // Admin notification (with thumbnail attachment if image uploaded)
+            $thumbPath = '';
+            if (!empty($data['image'])) {
+                $thumbPath = dirname(__DIR__, 2) . '/uploads/thumbs/' . basename($data['image']);
+            }
+            $adminEmail = (string)($this->settings->get('admin_email') ?? 'info@wellfoundation.org.uk');
+            $donorRow   = ['first_name' => $firstName, 'last_name' => $lastName, 'email' => $email, 'phone' => $phone];
+
             try {
-                $settingsRepo = new \App\Repositories\SettingsRepository();
-                $adminEmail   = (string)($settingsRepo->get('admin_email') ?? 'info@wellfoundation.org.uk');
-                $baseUrl      = (string)($settingsRepo->get('site_url') ?? ('http://' . ($_SERVER['HTTP_HOST'] ?? 'localhost') . $basePath));
-                (new \App\Services\NotificationService())->sendDonationNotification($item, $user, $adminEmail, $baseUrl);
+                (new NotificationService())->sendDonationNotification($item, $donorRow, $adminEmail, $baseUrl, $thumbPath);
             } catch (\Throwable $e) {
-                error_log('ItemController::submit notification failed: ' . $e->getMessage());
+                error_log('ItemController: admin notification failed: ' . $e->getMessage());
             }
 
-            flash('Thank you! Your item has been submitted for review. Our team will be in touch shortly.');
-            $this->redirect($basePath . '/donate?submitted=1');
-        } catch (\RuntimeException $e) {
-            $errors  = ['general' => $e->getMessage()];
-            $content = $this->renderView('items/submit', [
-                'user'       => $user,
-                'categories' => $categories,
-                'errors'     => $errors,
-                'old'        => $data,
-            ]);
+            // Donor welcome + set-password email (new donors only — existing users already have accounts)
+            if ($isNewDonor) {
+                try {
+                    (new NotificationService())->sendDonorWelcome(['email' => $email], $firstName, $setPasswordUrl);
+                } catch (\Throwable $e) {
+                    error_log('ItemController: donor welcome email failed: ' . $e->getMessage());
+                }
+            }
 
-            $this->view('layouts/public', [
-                'pageTitle'  => 'Donate an Item',
-                'activeNav'  => 'donate',
-                'user'       => $user,
-                'content'    => $content,
+            flash('Thank you! Your donation has been received. Check your email — we\'ve sent you a link to set up your account.');
+            $this->redirect($basePath . '/donate?submitted=1');
+
+        } catch (\RuntimeException $e) {
+            $user    = getAuthUser();
+            $content = $this->renderView('items/submit', [
+                'user'   => $user,
+                'errors' => ['general' => $e->getMessage()],
+                'old'    => array_merge($data, compact('firstName', 'lastName', 'email', 'phone')),
             ]);
+            $this->view('layouts/public', ['pageTitle' => 'Donate an Item', 'activeNav' => 'donate', 'user' => $user, 'content' => $content]);
         }
     }
 
