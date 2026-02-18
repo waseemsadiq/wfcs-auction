@@ -18,6 +18,10 @@
          class="nav-link <?= ($activeNav ?? '') === 'auctions' ? 'active text-primary' : 'text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white' ?> text-sm font-semibold uppercase tracking-widest transition-colors pb-0.5">Auctions</a>
       <a href="<?= $user ? e($basePath) . '/my-bids' : e($basePath) . '/login' ?>"
          class="nav-link <?= ($activeNav ?? '') === 'my-bids' ? 'active text-primary' : 'text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white' ?> text-sm font-semibold uppercase tracking-widest transition-colors pb-0.5">My Bids</a>
+      <?php if ($user !== null): ?>
+      <a href="<?= e($basePath) ?>/my-donations"
+         class="nav-link <?= ($activeNav ?? '') === 'my-donations' ? 'active text-primary' : 'text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white' ?> text-sm font-semibold uppercase tracking-widest transition-colors pb-0.5">My Donations</a>
+      <?php endif; ?>
       <a href="<?= e($basePath) ?>/donate"
          class="nav-link <?= ($activeNav ?? '') === 'donate' ? 'active text-primary' : 'text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white' ?> text-sm font-semibold uppercase tracking-widest transition-colors pb-0.5">Donate an Item</a>
     </nav>

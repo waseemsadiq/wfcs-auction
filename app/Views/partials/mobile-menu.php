@@ -21,6 +21,10 @@
          class="block px-3 py-2.5 text-sm font-semibold rounded-lg <?= ($activeNav ?? '') === 'auctions' ? 'text-primary bg-primary/5' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700' ?> transition-colors">Auctions</a>
       <a href="<?= $user ? e($basePath) . '/my-bids' : e($basePath) . '/login' ?>"
          class="block px-3 py-2.5 text-sm font-semibold rounded-lg <?= ($activeNav ?? '') === 'my-bids' ? 'text-primary bg-primary/5' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700' ?> transition-colors">My Bids</a>
+      <?php if ($user !== null): ?>
+      <a href="<?= e($basePath) ?>/my-donations"
+         class="block px-3 py-2.5 text-sm font-semibold rounded-lg <?= ($activeNav ?? '') === 'my-donations' ? 'text-primary bg-primary/5' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700' ?> transition-colors">My Donations</a>
+      <?php endif; ?>
       <a href="<?= e($basePath) ?>/donate"
          class="block px-3 py-2.5 text-sm font-semibold rounded-lg <?= ($activeNav ?? '') === 'donate' ? 'text-primary bg-primary/5' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700' ?> transition-colors">Donate an Item</a>
     </nav>
