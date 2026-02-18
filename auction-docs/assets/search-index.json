@@ -1,0 +1,1451 @@
+[
+  {
+    "pageId": "admin-guide",
+    "pageTitle": "Admin Guide",
+    "title": "Admin Guide",
+    "level": 1,
+    "anchor": "admin-guide",
+    "snippet": "User guide for charity staff managing the WFCS Auction platform. This guide covers everything you need to run a successful charity auction — from crea",
+    "content": "User guide for charity staff managing the WFCS Auction platform. This guide covers everything you need to run a successful charity auction — from creating events to downloading Gift Aid reports. ---"
+  },
+  {
+    "pageId": "admin-guide",
+    "pageTitle": "Admin Guide",
+    "title": "Table of Contents",
+    "level": 2,
+    "anchor": "table-of-contents",
+    "snippet": "- [Logging In](#logging-in) - [Admin Navigation](#admin-navigation) - [Managing Auctions](#managing-auctions) - [Managing Items](#managing-items) - [M",
+    "content": "- [Logging In](#logging-in) - [Admin Navigation](#admin-navigation) - [Managing Auctions](#managing-auctions) - [Managing Items](#managing-items) - [Managing Users](#managing-users) - [Payments](#payments) - [Gift Aid](#gift-aid) - [Live Events — Auctioneer Panel](#live-events--auctioneer-panel) - [Settings](#settings) ---"
+  },
+  {
+    "pageId": "admin-guide",
+    "pageTitle": "Admin Guide",
+    "title": "Logging In",
+    "level": 2,
+    "anchor": "logging-in",
+    "snippet": "Navigate to `https://yourdomain.com/login` and sign in with your admin credentials. Admin accounts have the `admin` role and are not created via the p",
+    "content": "Navigate to `https://yourdomain.com/login` and sign in with your admin credentials. Admin accounts have the `admin` role and are not created via the public registration page. Contact the system developer to create the first admin account directly in the database, or promote an existing user via Admin → Users. Once logged in as an admin, you will see the full admin navigation bar across the top of every page. ---"
+  },
+  {
+    "pageId": "admin-guide",
+    "pageTitle": "Admin Guide",
+    "title": "Admin Navigation",
+    "level": 2,
+    "anchor": "admin-navigation",
+    "snippet": "The admin panel has eight sections, accessible from the top navigation bar: | Section | What it does | |---------|-------------| | **Dashboard** | Ove",
+    "content": "The admin panel has eight sections, accessible from the top navigation bar: | Section | What it does | |---------|-------------| | **Dashboard** | Overview of active auctions, recent bids, recent payments | | **Auctions** | Create and manage auction events | | **Items** | Approve donor submissions and manage all items | | **Users** | View and manage registered bidders and donors | | **Payments** | Track payment status for all won items | | **Gift Aid** | Download HMRC-compliant Gift Aid report | | **Live Events** | Control the live auctioneer panel and projector display | | **Settings** | Stripe, email, and webhook configuration | ---"
+  },
+  {
+    "pageId": "admin-guide",
+    "pageTitle": "Admin Guide",
+    "title": "Creating a new auction",
+    "level": 3,
+    "anchor": "creating-a-new-auction",
+    "snippet": "1. Go to **Admin → Auctions** 2. Click **Create Auction** 3. Fill in the details: - **Title** — the auction name shown to bidders (e.g. \"WFCS Spring G",
+    "content": "1. Go to **Admin → Auctions** 2. Click **Create Auction** 3. Fill in the details: - **Title** — the auction name shown to bidders (e.g. \"WFCS Spring Gala 2026\") - **Description** — optional text shown on the auction listing page - **Venue** — physical location, if applicable (e.g. \"The Grand Hall, Glasgow\") - **Start date/time** — when bidding opens - **End date/time** — when bidding closes automatically 4. Click **Save** — the auction is created in **Draft** status"
+  },
+  {
+    "pageId": "admin-guide",
+    "pageTitle": "Admin Guide",
+    "title": "Auction status flow",
+    "level": 3,
+    "anchor": "auction-status-flow",
+    "snippet": "Events progress through a defined set of statuses. Each status controls what bidders can see and do. | Status | Visibility | Bidding | |--------|-----",
+    "content": "Events progress through a defined set of statuses. Each status controls what bidders can see and do. | Status | Visibility | Bidding | |--------|-----------|---------| | **Draft** | Admin only | No | | **Published** | Public — listed on the Auctions page | No | | **Active** | Public | Yes — bidding is open | | **Ended** | Public — shown as ended | No — bidding has closed | | **Closed** | Public — archived | No |"
+  },
+  {
+    "pageId": "admin-guide",
+    "pageTitle": "Admin Guide",
+    "title": "When to use each status",
+    "level": 3,
+    "anchor": "when-to-use-each-status",
+    "snippet": "- **Draft** — while you are still setting up the auction and adding items. Bidders cannot see it. - **Published** — when you want to announce the auct",
+    "content": "- **Draft** — while you are still setting up the auction and adding items. Bidders cannot see it. - **Published** — when you want to announce the auction ahead of time. Bidders can browse items and save their interest, but cannot bid yet. - **Active** — when bidding is open. The auction automatically transitions to **Ended** when the end date/time passes (no cron job needed). - **Ended** — bidding is closed. Winners are notified by email and prompted to pay. Admins should review payments. - **Closed** — fully archived. Use this once all payments are resolved."
+  },
+  {
+    "pageId": "admin-guide",
+    "pageTitle": "Admin Guide",
+    "title": "Changing an auction status",
+    "level": 3,
+    "anchor": "changing-an-auction-status",
+    "snippet": "From **Admin → Auctions**, click the action buttons next to each auction: - **Publish** — Draft → Published - **Open** — Published → Active (also usab",
+    "content": "From **Admin → Auctions**, click the action buttons next to each auction: - **Publish** — Draft → Published - **Open** — Published → Active (also usable to start a live event early) - **End** — Active → Ended (use this to close bidding early if needed) The transition to **Ended** also happens automatically when the auction's end date/time passes. ---"
+  },
+  {
+    "pageId": "admin-guide",
+    "pageTitle": "Admin Guide",
+    "title": "Reviewing donor submissions",
+    "level": 3,
+    "anchor": "reviewing-donor-submissions",
+    "snippet": "Donors submit items via the **Donate an Item** page. The form collects the donor's contact details (name, email, and optionally phone number) along wi",
+    "content": "Donors submit items via the **Donate an Item** page. The form collects the donor's contact details (name, email, and optionally phone number) along with the item information. If the email address matches an existing account, the item is linked to that account automatically; otherwise a new donor account is created. When a submission comes in you will receive an **email notification** with a thumbnail of the item image. The donor also receives a thank-you email confirming receipt. Submitted items arrive with status `pending` and must be approved by an admin before they appear in the auction. 1. Go to **Admin → Items** 2. Items with status `pending` are listed at the top 3. Click **Edit** on an item to review its details 4. Set the **Lot Number** if you are running a live event 5. Optionally set the **Market Value** (used for Gift Aid calculations) 6. Click **Approve** to make the item visible in the auction 7. Click **Reject** if the item is not suitable — the donor will be notified by email"
+  },
+  {
+    "pageId": "admin-guide",
+    "pageTitle": "Admin Guide",
+    "title": "Creating items directly",
+    "level": 3,
+    "anchor": "creating-items-directly",
+    "snippet": "Admins can create items without a donor submission: 1. Go to **Admin → Items → Add Item** 2. Fill in all required fields (title, description, starting",
+    "content": "Admins can create items without a donor submission: 1. Go to **Admin → Items → Add Item** 2. Fill in all required fields (title, description, starting bid, category, event) 3. Upload an item image 4. Set the **Market Value** for Gift Aid purposes 5. Click **Save**"
+  },
+  {
+    "pageId": "admin-guide",
+    "pageTitle": "Admin Guide",
+    "title": "Market value and Gift Aid",
+    "level": 3,
+    "anchor": "market-value-and-gift-aid",
+    "snippet": "The **Market Value** field represents the fair market price of the item. This is important for Gift Aid calculations — Gift Aid can only be claimed on",
+    "content": "The **Market Value** field represents the fair market price of the item. This is important for Gift Aid calculations — Gift Aid can only be claimed on the portion of a bid that exceeds the market value of the item received. Always set this accurately."
+  },
+  {
+    "pageId": "admin-guide",
+    "pageTitle": "Admin Guide",
+    "title": "Lot numbers",
+    "level": 3,
+    "anchor": "lot-numbers",
+    "snippet": "Lot numbers are used for live events to identify items during the auctioneer's presentation. Assign sequential numbers before the event starts. Items ",
+    "content": "Lot numbers are used for live events to identify items during the auctioneer's presentation. Assign sequential numbers before the event starts. Items are sorted by lot number in the auctioneer panel and on the projector display. ---"
+  },
+  {
+    "pageId": "admin-guide",
+    "pageTitle": "Admin Guide",
+    "title": "Viewing bidder profiles",
+    "level": 3,
+    "anchor": "viewing-bidder-profiles",
+    "snippet": "1. Go to **Admin → Users** 2. You can search by name or email 3. Click a user's name to view their full profile, including: - Registration date - Emai",
+    "content": "1. Go to **Admin → Users** 2. You can search by name or email 3. Click a user's name to view their full profile, including: - Registration date - Email verification status - Bid history - Payment status"
+  },
+  {
+    "pageId": "admin-guide",
+    "pageTitle": "Admin Guide",
+    "title": "Changing user roles",
+    "level": 3,
+    "anchor": "changing-user-roles",
+    "snippet": "From a user's profile page (**Admin → Users → [User Name]**): 1. Select the new role from the **Role** dropdown: - **Bidder** — standard registered us",
+    "content": "From a user's profile page (**Admin → Users → [User Name]**): 1. Select the new role from the **Role** dropdown: - **Bidder** — standard registered user, can bid - **Donor** — can submit items; can also bid - **Admin** — full admin access 2. Click **Save** > Be careful when granting admin access. Admin accounts have full control over the platform including payment settings. ---"
+  },
+  {
+    "pageId": "admin-guide",
+    "pageTitle": "Admin Guide",
+    "title": "Overview of payment flow",
+    "level": 3,
+    "anchor": "overview-of-payment-flow",
+    "snippet": "When an auction ends: 1. The system identifies winners for each item 2. Winners receive an email with a link to pay 3. The winner visits the payment p",
+    "content": "When an auction ends: 1. The system identifies winners for each item 2. Winners receive an email with a link to pay 3. The winner visits the payment page and is redirected to Stripe Checkout 4. Stripe processes the payment and sends a webhook to confirm 5. The app marks the payment as `completed` and the item as `sold`"
+  },
+  {
+    "pageId": "admin-guide",
+    "pageTitle": "Admin Guide",
+    "title": "Payment statuses",
+    "level": 3,
+    "anchor": "payment-statuses",
+    "snippet": "| Status | Meaning | |--------|---------| | `pending` | Payment record created but winner has not yet paid | | `completed` | Payment received via Stri",
+    "content": "| Status | Meaning | |--------|---------| | `pending` | Payment record created but winner has not yet paid | | `completed` | Payment received via Stripe Checkout | | `failed` | Stripe returned a failure event | | `refunded` | Payment has been refunded (manual process) |"
+  },
+  {
+    "pageId": "admin-guide",
+    "pageTitle": "Admin Guide",
+    "title": "Viewing payments",
+    "level": 3,
+    "anchor": "viewing-payments",
+    "snippet": "Go to **Admin → Payments** to see all payment records with their current status, winner name, item, and amount.",
+    "content": "Go to **Admin → Payments** to see all payment records with their current status, winner name, item, and amount."
+  },
+  {
+    "pageId": "admin-guide",
+    "pageTitle": "Admin Guide",
+    "title": "What to do when a payment is stuck",
+    "level": 3,
+    "anchor": "what-to-do-when-a-payment-is-stuck",
+    "snippet": "If a payment stays in `pending` status for more than a few days: 1. Check that the winner received their email (Admin → Users → check their email) 2. ",
+    "content": "If a payment stays in `pending` status for more than a few days: 1. Check that the winner received their email (Admin → Users → check their email) 2. Resend the payment link manually by copying the URL: `https://yourdomain.com/payment/[item-slug]` 3. Contact the winner directly using their registered email address"
+  },
+  {
+    "pageId": "admin-guide",
+    "pageTitle": "Admin Guide",
+    "title": "Refunds",
+    "level": 3,
+    "anchor": "refunds",
+    "snippet": "The app does not process refunds automatically. To refund a payment: 1. Log in to your **Stripe Dashboard** at dashboard.stripe.com 2. Find the paymen",
+    "content": "The app does not process refunds automatically. To refund a payment: 1. Log in to your **Stripe Dashboard** at dashboard.stripe.com 2. Find the payment by the Stripe Payment Intent ID (visible in Admin → Payments) 3. Issue the refund from the Stripe Dashboard 4. Manually update the payment status in the database, or contact your developer ---"
+  },
+  {
+    "pageId": "admin-guide",
+    "pageTitle": "Admin Guide",
+    "title": "What is Gift Aid?",
+    "level": 3,
+    "anchor": "what-is-gift-aid",
+    "snippet": "Gift Aid is a UK government scheme that allows UK-registered charities to claim an extra 25p for every £1 donated. In an auction context, Gift Aid can",
+    "content": "Gift Aid is a UK government scheme that allows UK-registered charities to claim an extra 25p for every £1 donated. In an auction context, Gift Aid can be claimed on the portion of a winning bid that exceeds the market value of the item — this is the \"Gift Aid-able\" donation element. For example: if a bidder wins an item with a market value of £500 and bids £800, the charity can claim Gift Aid on the £300 difference. To claim Gift Aid, the winning bidder must: - Be a UK taxpayer - Have made a Gift Aid declaration"
+  },
+  {
+    "pageId": "admin-guide",
+    "pageTitle": "Admin Guide",
+    "title": "Enabling Gift Aid for a bidder",
+    "level": 3,
+    "anchor": "enabling-gift-aid-for-a-bidder",
+    "snippet": "Bidders can opt in to Gift Aid and provide their declaration during registration or in their account settings. Admins can also update this from **Admi",
+    "content": "Bidders can opt in to Gift Aid and provide their declaration during registration or in their account settings. Admins can also update this from **Admin → Users → [User Name] → Gift Aid Eligible**."
+  },
+  {
+    "pageId": "admin-guide",
+    "pageTitle": "Admin Guide",
+    "title": "Downloading the HMRC Gift Aid report",
+    "level": 3,
+    "anchor": "downloading-the-hmrc-gift-aid-report",
+    "snippet": "1. Go to **Admin → Gift Aid** 2. Select the date range or auction event 3. Click **Download CSV** 4. The CSV is formatted to HMRC's Gift Aid submissio",
+    "content": "1. Go to **Admin → Gift Aid** 2. Select the date range or auction event 3. Click **Download CSV** 4. The CSV is formatted to HMRC's Gift Aid submission requirements, including: - Donor name - Donor address (if provided) - Amount donated (bid minus market value) - Date of donation Submit this file to HMRC via the Charities Online service at: https://www.gov.uk/claim-gift-aid"
+  },
+  {
+    "pageId": "admin-guide",
+    "pageTitle": "Admin Guide",
+    "title": "Declaration requirements",
+    "level": 3,
+    "anchor": "declaration-requirements",
+    "snippet": "To claim Gift Aid, you need a valid Gift Aid declaration from each donor. The app records a declaration when a bidder: 1. Ticks the Gift Aid checkbox ",
+    "content": "To claim Gift Aid, you need a valid Gift Aid declaration from each donor. The app records a declaration when a bidder: 1. Ticks the Gift Aid checkbox and confirms they are a UK taxpayer 2. Provides their full name (as it appears on their tax record) The declaration is time-stamped and stored against the user record. Keep these records for at least 6 years as required by HMRC. ---"
+  },
+  {
+    "pageId": "admin-guide",
+    "pageTitle": "Admin Guide",
+    "title": "Live Events — Auctioneer Panel",
+    "level": 2,
+    "anchor": "live-events-auctioneer-panel",
+    "snippet": "The live event feature is designed for in-person auctions where an auctioneer manages bidding from a control panel while the current item is displayed",
+    "content": "The live event feature is designed for in-person auctions where an auctioneer manages bidding from a control panel while the current item is displayed on a large screen."
+  },
+  {
+    "pageId": "admin-guide",
+    "pageTitle": "Admin Guide",
+    "title": "Before the event",
+    "level": 3,
+    "anchor": "before-the-event",
+    "snippet": "1. Ensure the auction event is set to **Active** status (or publish it so you can open it) 2. Go to **Admin → Live Events** and confirm the event is r",
+    "content": "1. Ensure the auction event is set to **Active** status (or publish it so you can open it) 2. Go to **Admin → Live Events** and confirm the event is ready 3. Assign lot numbers to all items (Admin → Items) 4. Check that the projector URL is accessible: `https://yourdomain.com/projector`"
+  },
+  {
+    "pageId": "admin-guide",
+    "pageTitle": "Admin Guide",
+    "title": "Starting the live event",
+    "level": 3,
+    "anchor": "starting-the-live-event",
+    "snippet": "1. Go to **Admin → Live Events → Start** 2. The auctioneer panel is available at: `https://yourdomain.com/auctioneer` 3. Share the projector URL with ",
+    "content": "1. Go to **Admin → Live Events → Start** 2. The auctioneer panel is available at: `https://yourdomain.com/auctioneer` 3. Share the projector URL with your AV team: `https://yourdomain.com/projector`"
+  },
+  {
+    "pageId": "admin-guide",
+    "pageTitle": "Admin Guide",
+    "title": "Using the auctioneer panel",
+    "level": 3,
+    "anchor": "using-the-auctioneer-panel",
+    "snippet": "The auctioneer panel at `/auctioneer` provides: - A list of all items in lot-number order - Controls to set the **current item** (the one on display) ",
+    "content": "The auctioneer panel at `/auctioneer` provides: - A list of all items in lot-number order - Controls to set the **current item** (the one on display) - **Open Bidding** / **Close Bidding** buttons for each item - Live bid count and current bid for the active item **Workflow for each lot:** 1. Click **Set as Current Item** to display the item on the projector 2. Click **Open Bidding** when ready — bidders can now bid from their phones 3. Watch bids come in live (the panel auto-refreshes) 4. When the hammer falls, click **Close Bidding** to end bidding on this item 5. Announce the winner, then move to the next lot"
+  },
+  {
+    "pageId": "admin-guide",
+    "pageTitle": "Admin Guide",
+    "title": "The projector display",
+    "level": 3,
+    "anchor": "the-projector-display",
+    "snippet": "The projector view at `/projector` is a clean, full-screen display showing: - The current item's image and title - The current highest bid (updated ev",
+    "content": "The projector view at `/projector` is a clean, full-screen display showing: - The current item's image and title - The current highest bid (updated every few seconds via polling) - A QR code for bidders to scan and place their own bids Share this URL with your AV team before the event. They can open it on a laptop connected to the projector. No login is required for the projector view. ---"
+  },
+  {
+    "pageId": "admin-guide",
+    "pageTitle": "Admin Guide",
+    "title": "Accessing settings",
+    "level": 3,
+    "anchor": "accessing-settings",
+    "snippet": "Go to **Admin → Settings**. Settings are stored in the database and take effect immediately without a server restart.",
+    "content": "Go to **Admin → Settings**. Settings are stored in the database and take effect immediately without a server restart."
+  },
+  {
+    "pageId": "admin-guide",
+    "pageTitle": "Admin Guide",
+    "title": "Stripe configuration",
+    "level": 3,
+    "anchor": "stripe-configuration",
+    "snippet": "Before you can accept payments, you must configure your Stripe keys: 1. Log in to [dashboard.stripe.com](https://dashboard.stripe.com) 2. Navigate to ",
+    "content": "Before you can accept payments, you must configure your Stripe keys: 1. Log in to [dashboard.stripe.com](https://dashboard.stripe.com) 2. Navigate to **Developers → API keys** 3. Copy your **Publishable key** (`pk_live_...` or `pk_test_...` for testing) 4. Copy your **Secret key** (`sk_live_...` or `sk_test_...`) 5. In Admin → Settings: - Paste the Publishable key into **Stripe Publishable Key** - Paste the Secret key into **Stripe Secret Key** > Use `pk_test_` and `sk_test_` keys while testing. Switch to live keys only when you are ready to accept real payments."
+  },
+  {
+    "pageId": "admin-guide",
+    "pageTitle": "Admin Guide",
+    "title": "Stripe webhook setup",
+    "level": 3,
+    "anchor": "stripe-webhook-setup",
+    "snippet": "The webhook tells the app when a payment has been completed. You need to set this up in both Stripe and the app settings. **Step 1: Generate a webhook",
+    "content": "The webhook tells the app when a payment has been completed. You need to set this up in both Stripe and the app settings. **Step 1: Generate a webhook token** Generate a secure random token. You can use your terminal: This produces something like: `a3f8b2c1d4e5f67890abcdef1234567890abcdef1234567890abcdef12345678` **Step 2: Configure in Admin → Settings** Paste the token into **Stripe → Webhook URL Token** and click Save. **Step 3: Configure in Stripe Dashboard** 1. Go to **Stripe Dashboard → Developers → Webhooks** 2. Click **Add endpoint** 3. Enter the URL: ``` https://yourdomain.com/webhook/stripe?webhook_secret=YOUR_TOKEN ``` Replace `YOUR_TOKEN` with the token you generated in Step 1. 4. Under **Events to listen for**, select: `checkout.session.completed` 5. Click **Add endpoint** 6. Note the `whsec_...` signing secret that Stripe shows you — you do not need this (the app uses the URL token instead) > **Why a URL token instead of the Stripe signature?** Some server configurations (including Galvani and certain reverse proxies) strip custom HTTP headers. Stripe normally sends a `Stripe-Signature` header, but the app cannot reliably read it. Instead, the app uses a shared secret in the URL query string to verify webhook authenticity. **Step 4: Test the webhook** In the Stripe Dashboard, find your webhook endpoint and click **Send test event**. Select `checkout.session.completed`. The app should return `200 OK`."
+  },
+  {
+    "pageId": "admin-guide",
+    "pageTitle": "Admin Guide",
+    "title": "SMTP email setup",
+    "level": 3,
+    "anchor": "smtp-email-setup",
+    "snippet": "Email is used for: - Email verification on registration - Password reset links - Donor item submission — admin notification (with thumbnail) and donor",
+    "content": "Email is used for: - Email verification on registration - Password reset links - Donor item submission — admin notification (with thumbnail) and donor thank-you - Item approval and rejection notifications to donors - Payment requests to auction winners - Admin notifications Configure SMTP in **Admin → Settings → Email**: | Field | Description | Example | |-------|-------------|---------| | SMTP Host | Your mail server | `smtp.mailgun.org` | | SMTP Port | Usually 587 (TLS) or 465 (SSL) | `587` | | Username | Your SMTP username | `postmaster@mg.yourdomain.com` | | Password | Your SMTP password | (your mail provider password) | | From Address | The sender email address | `noreply@wellfoundation.org.uk` | | From Name | The sender display name | `WFCS Auction` | > For testing, services like [Mailtrap](https://mailtrap.io) or [Mailpit](https://github.com/axllent/mailpit) let you capture outgoing emails without delivering them to real addresses."
+  },
+  {
+    "pageId": "admin-guide",
+    "pageTitle": "Admin Guide",
+    "title": "Saving settings",
+    "level": 3,
+    "anchor": "saving-settings",
+    "snippet": "All settings forms have a **Save** button. Settings take effect immediately. ---",
+    "content": "All settings forms have a **Save** button. Settings take effect immediately. ---"
+  },
+  {
+    "pageId": "admin-guide",
+    "pageTitle": "Admin Guide",
+    "title": "Charity Information",
+    "level": 2,
+    "anchor": "charity-information",
+    "snippet": "**The Well Foundation (WFCS)** Building 2, Unit C, Ground Floor 4 Parklands Way, Eurocentral Holytown, ML1 4WR Registered office: 211B Main Street, Be",
+    "content": "**The Well Foundation (WFCS)** Building 2, Unit C, Ground Floor 4 Parklands Way, Eurocentral Holytown, ML1 4WR Registered office: 211B Main Street, Bellshill, ML4 1AJ, Scotland Charity No: SC040105 Contact: info@wellfoundation.org.uk"
+  },
+  {
+    "pageId": "home",
+    "pageTitle": "Overview",
+    "title": "WFCS Auction — Wiki Home",
+    "level": 1,
+    "anchor": "wfcs-auction-wiki-home",
+    "snippet": "Welcome to the WFCS Auction wiki. This is the central reference for contributors, developers, and administrators. ---",
+    "content": "Welcome to the WFCS Auction wiki. This is the central reference for contributors, developers, and administrators. ---"
+  },
+  {
+    "pageId": "home",
+    "pageTitle": "Overview",
+    "title": "What this app does",
+    "level": 2,
+    "anchor": "what-this-app-does",
+    "snippet": "WFCS Auction is a charity auction platform built for [The Well Foundation (WFCS)](https://wellfoundation.org.uk). It enables the charity to run both o",
+    "content": "WFCS Auction is a charity auction platform built for [The Well Foundation (WFCS)](https://wellfoundation.org.uk). It enables the charity to run both online and live in-person auctions, accept payments via Stripe, and claim Gift Aid on eligible donations. **Key features:** - Public auction browsing and online bidding - Donor submission portal for item donations - Stripe Checkout integration for winner payments - Gift Aid tracking with HMRC-compatible CSV export - Live event auctioneer panel with projector display - Admin panel for managing events, items, users, and payments - REST API for external integrations ---"
+  },
+  {
+    "pageId": "home",
+    "pageTitle": "Overview",
+    "title": "Tech stack",
+    "level": 2,
+    "anchor": "tech-stack",
+    "snippet": "| Layer | Technology | |-------|-----------| | Backend | PHP 8.2+, MVC pattern | | Runtime (dev) | Galvani (async multi-threaded PHP + embedded MariaD",
+    "content": "| Layer | Technology | |-------|-----------| | Backend | PHP 8.2+, MVC pattern | | Runtime (dev) | Galvani (async multi-threaded PHP + embedded MariaDB) | | Runtime (prod) | LAMP (Apache + MySQL + PHP) | | Frontend | TailwindCSS v4, Vanilla JS | | Payments | Stripe Checkout | | Email | PHPMailer (SMTP) | | Auth | JWT (stored in HttpOnly cookie) | | Tests | PHPUnit 11 | ---"
+  },
+  {
+    "pageId": "home",
+    "pageTitle": "Overview",
+    "title": "Quick links",
+    "level": 2,
+    "anchor": "quick-links",
+    "snippet": "| Document | Description | |----------|-------------| | [Getting Started](Getting-Started.md) | Set up your local development environment | | [Archite",
+    "content": "| Document | Description | |----------|-------------| | [Getting Started](Getting-Started.md) | Set up your local development environment | | [Architecture](Architecture.md) | Technical overview of the system design | | [Developer Guide](../developer/README.md) | Full developer reference | | [Admin Guide](../admin/README.md) | Guide for charity staff running the platform | | [REST API Reference](../api/README.md) | API endpoints, authentication, error codes | ---"
+  },
+  {
+    "pageId": "home",
+    "pageTitle": "Overview",
+    "title": "Charity details",
+    "level": 2,
+    "anchor": "charity-details",
+    "snippet": "**The Well Foundation (WFCS)** Registered charity in Scotland — No: SC040105 Contact: info@wellfoundation.org.uk ---",
+    "content": "**The Well Foundation (WFCS)** Registered charity in Scotland — No: SC040105 Contact: info@wellfoundation.org.uk ---"
+  },
+  {
+    "pageId": "home",
+    "pageTitle": "Overview",
+    "title": "Content guidelines",
+    "level": 2,
+    "anchor": "content-guidelines",
+    "snippet": "This is a Muslim charity auction. The platform must never list items involving alcohol, pork, gambling, or anything inconsistent with Islamic values. ",
+    "content": "This is a Muslim charity auction. The platform must never list items involving alcohol, pork, gambling, or anything inconsistent with Islamic values. All currency is displayed in **pounds sterling (£)**. No other currency symbol is ever used."
+  },
+  {
+    "pageId": "getting-started",
+    "pageTitle": "Getting Started",
+    "title": "Getting Started",
+    "level": 1,
+    "anchor": "getting-started",
+    "snippet": "This guide gets you up and running with WFCS Auction in about 10 minutes. For the full developer reference, see [Developer Guide](../developer/README.",
+    "content": "This guide gets you up and running with WFCS Auction in about 10 minutes. For the full developer reference, see [Developer Guide](../developer/README.md). ---"
+  },
+  {
+    "pageId": "getting-started",
+    "pageTitle": "Getting Started",
+    "title": "What you need",
+    "level": 2,
+    "anchor": "what-you-need",
+    "snippet": "- PHP 8.2+ - Composer - Node.js 18+ and npm - Galvani binary (download separately — local dev only) - Git ---",
+    "content": "- PHP 8.2+ - Composer - Node.js 18+ and npm - Galvani binary (download separately — local dev only) - Git ---"
+  },
+  {
+    "pageId": "getting-started",
+    "pageTitle": "Getting Started",
+    "title": "Workspace layout",
+    "level": 2,
+    "anchor": "workspace-layout",
+    "snippet": "Galvani requires a specific folder structure. The binary and embedded database sit one level above the app: ├── galvani # Galvani binary (gitignored) ",
+    "content": "Galvani requires a specific folder structure. The binary and embedded database sit one level above the app: ├── galvani               # Galvani binary (gitignored) ├── data/                 # embedded MariaDB data (gitignored) ├── .env                  # root env with GALVANI_MYSQL=1 └── auction/              # this repo If you already have a `galvani-workspace/` folder, clone this repo into it: git clone git@github.com:yourorg/auction.git auction ---"
+  },
+  {
+    "pageId": "getting-started",
+    "pageTitle": "Getting Started",
+    "title": "1. Install dependencies",
+    "level": 3,
+    "anchor": "1-install-dependencies",
+    "snippet": "composer install npm install",
+    "content": "composer install npm install"
+  },
+  {
+    "pageId": "getting-started",
+    "pageTitle": "Getting Started",
+    "title": "2. Configure environment",
+    "level": 3,
+    "anchor": "2-configure-environment",
+    "snippet": "Open `.env` and set at minimum: APP_DEBUG=1 APP_URL=http://localhost:8080 APP_KEY=any-long-random-string JWT_SECRET=another-long-random-string DB_NAME",
+    "content": "Open `.env` and set at minimum: APP_DEBUG=1 APP_URL=http://localhost:8080 APP_KEY=any-long-random-string JWT_SECRET=another-long-random-string DB_NAME=auction DB_USER=root DB_PASS= GALVANI_MYSQL=1 For payment testing, add your Stripe test keys: STRIPE_SECRET_KEY=sk_test_... STRIPE_WEBHOOK_SECRET=any-random-token"
+  },
+  {
+    "pageId": "getting-started",
+    "pageTitle": "Getting Started",
+    "title": "From galvani-workspace root (one level up from auction/)",
+    "level": 1,
+    "anchor": "from-galvani-workspace-root-one-level-up-from-auction",
+    "snippet": "./galvani auction/db-init.php This creates all tables and loads demo data (seed items for development).",
+    "content": "./galvani auction/db-init.php This creates all tables and loads demo data (seed items for development)."
+  },
+  {
+    "pageId": "getting-started",
+    "pageTitle": "Getting Started",
+    "title": "From galvani-workspace root",
+    "level": 1,
+    "anchor": "from-galvani-workspace-root",
+    "snippet": "./galvani -t ./auction Open `http://localhost:8080/` — you should see the auction home page. ---",
+    "content": "./galvani -t ./auction Open `http://localhost:8080/` — you should see the auction home page. ---"
+  },
+  {
+    "pageId": "getting-started",
+    "pageTitle": "Getting Started",
+    "title": "Default accounts (after seeding)",
+    "level": 2,
+    "anchor": "default-accounts-after-seeding",
+    "snippet": "| Role | Email | Password | |------|-------|----------| | Admin | admin@example.com | password | | Bidder | bidder@example.com | password | > These ar",
+    "content": "| Role | Email | Password | |------|-------|----------| | Admin | admin@example.com | password | | Bidder | bidder@example.com | password | > These are demo accounts from `database/seeds.sql`. Never use these credentials in production. ---"
+  },
+  {
+    "pageId": "getting-started",
+    "pageTitle": "Getting Started",
+    "title": "Run tests",
+    "level": 3,
+    "anchor": "run-tests",
+    "snippet": "vendor/bin/phpunit tests/Unit/ --no-coverage",
+    "content": "vendor/bin/phpunit tests/Unit/ --no-coverage"
+  },
+  {
+    "pageId": "getting-started",
+    "pageTitle": "Getting Started",
+    "title": "Restart Galvani (after PHP class changes)",
+    "level": 3,
+    "anchor": "restart-galvani-after-php-class-changes",
+    "snippet": "---",
+    "content": "---"
+  },
+  {
+    "pageId": "getting-started",
+    "pageTitle": "Getting Started",
+    "title": "Next steps",
+    "level": 2,
+    "anchor": "next-steps",
+    "snippet": "- Read the [Architecture overview](Architecture.md) to understand the codebase structure - Check the [Developer Guide](../developer/README.md) for a w",
+    "content": "- Read the [Architecture overview](Architecture.md) to understand the codebase structure - Check the [Developer Guide](../developer/README.md) for a walkthrough of adding new features - Read [Galvani-specific rules](../developer/README.md#galvani-specific-rules) — these are critical and easy to get wrong"
+  },
+  {
+    "pageId": "architecture",
+    "pageTitle": "Architecture",
+    "title": "Architecture",
+    "level": 1,
+    "anchor": "architecture",
+    "snippet": "Technical overview of the WFCS Auction codebase. ---",
+    "content": "Technical overview of the WFCS Auction codebase. ---"
+  },
+  {
+    "pageId": "architecture",
+    "pageTitle": "Architecture",
+    "title": "Overview",
+    "level": 2,
+    "anchor": "overview",
+    "snippet": "WFCS Auction is a PHP MVC application following the **Repository pattern**. It has no framework dependency — the core router, database wrapper, and JW",
+    "content": "WFCS Auction is a PHP MVC application following the **Repository pattern**. It has no framework dependency — the core router, database wrapper, and JWT utilities are lightweight classes in the `core/` directory. │ ▼ index.php                 ← single entry point │ ├── Load .env ├── Load config/ ├── Load helpers ├── Instantiate controllers │ ▼ Core\\Router               ← matches URI pattern to a controller method │ ▼ Controller                ← validates input, checks auth, calls services │ ▼ Service                   ← business logic, no SQL │ ▼ Repository                ← all SQL lives here │ ▼ Core\\Database             ← PDO singleton, READ COMMITTED isolation │ ▼ MariaDB (via socket) ---"
+  },
+  {
+    "pageId": "architecture",
+    "pageTitle": "Architecture",
+    "title": "Controllers (`app/Controllers/`)",
+    "level": 3,
+    "anchor": "controllers-app-controllers",
+    "snippet": "- Handle HTTP input (`$_GET`, `$_POST`, route params) - Validate user input - Check authentication and authorisation - Call one or more services - Ret",
+    "content": "- Handle HTTP input (`$_GET`, `$_POST`, route params) - Validate user input - Check authentication and authorisation - Call one or more services - Return a rendered view (HTML) or JSON response - No SQL, no direct DB calls"
+  },
+  {
+    "pageId": "architecture",
+    "pageTitle": "Architecture",
+    "title": "Services (`app/Services/`)",
+    "level": 3,
+    "anchor": "services-app-services",
+    "snippet": "- Contain all business logic - Orchestrate calls to one or more repositories - Throw `\\RuntimeException` for business rule violations - Return plain a",
+    "content": "- Contain all business logic - Orchestrate calls to one or more repositories - Throw `\\RuntimeException` for business rule violations - Return plain arrays or scalars - No SQL, no HTTP knowledge"
+  },
+  {
+    "pageId": "architecture",
+    "pageTitle": "Architecture",
+    "title": "Repositories (`app/Repositories/`)",
+    "level": 3,
+    "anchor": "repositories-app-repositories",
+    "snippet": "- All SQL is written here — nowhere else - Accept and return plain PHP arrays - Never called directly from controllers - Use `Core\\Database::getInstan",
+    "content": "- All SQL is written here — nowhere else - Accept and return plain PHP arrays - Never called directly from controllers - Use `Core\\Database::getInstance()` always"
+  },
+  {
+    "pageId": "architecture",
+    "pageTitle": "Architecture",
+    "title": "Views (`app/Views/`)",
+    "level": 3,
+    "anchor": "views-app-views",
+    "snippet": "Three-tier hierarchy: partials/ ← reusable sections (header, footer, nav, sidebar) atoms/ ← small UI components (badges, buttons, form fields) [page]/",
+    "content": "Three-tier hierarchy: partials/       ← reusable sections (header, footer, nav, sidebar) atoms/          ← small UI components (badges, buttons, form fields) [page]/         ← page-specific content views Views are PHP files. The `view()` helper in `functions.php` buffers the content view and injects it into the layout. ---"
+  },
+  {
+    "pageId": "architecture",
+    "pageTitle": "Architecture",
+    "title": "Database schema",
+    "level": 2,
+    "anchor": "database-schema",
+    "snippet": "Nine tables: | Table | Purpose | |-------|---------| | `users` | Registered bidders, donors, and admins | | `categories` | Item categories (e.g. Art, ",
+    "content": "Nine tables: | Table | Purpose | |-------|---------| | `users` | Registered bidders, donors, and admins | | `categories` | Item categories (e.g. Art, Jewellery, Travel) | | `events` | Auction events with status lifecycle | | `items` | Auction items linked to an event and category | | `bids` | All bids placed by users on items | | `payments` | Stripe payment records for auction winners | | `password_reset_tokens` | Tokens for the forgot-password flow | | `rate_limits` | DB-based rate limiting (works in multi-threaded env) | | `settings` | Key-value store for admin-configurable app settings | ---"
+  },
+  {
+    "pageId": "architecture",
+    "pageTitle": "Architecture",
+    "title": "Authentication",
+    "level": 2,
+    "anchor": "authentication",
+    "snippet": "- JWT-based. No PHP sessions. - **Web (browser):** JWT stored in an `HttpOnly` cookie (`auth_token`). Set on login, cleared on logout. - **API:** JWT ",
+    "content": "- JWT-based. No PHP sessions. - **Web (browser):** JWT stored in an `HttpOnly` cookie (`auth_token`). Set on login, cleared on logout. - **API:** JWT passed as `?token=` query parameter or `token` POST field. - JWT payload: `{ id, email, name, role, slug, verified, exp }` - Web session tokens expire in 24 hours. API tokens expire in 1 year. - The `getAuthUser()` helper decodes the JWT from the cookie or request parameter and returns the user array, or `null` if unauthenticated. ---"
+  },
+  {
+    "pageId": "architecture",
+    "pageTitle": "Architecture",
+    "title": "Event (auction) status machine",
+    "level": 2,
+    "anchor": "event-auction-status-machine",
+    "snippet": "- Status transitions are triggered by admin action (publish, open, end) or automatically when the `ends_at` timestamp passes. - Automatic transitions ",
+    "content": "- Status transitions are triggered by admin action (publish, open, end) or automatically when the `ends_at` timestamp passes. - Automatic transitions run on every non-API web request (lightweight check in `index.php` — no cron required). ---"
+  },
+  {
+    "pageId": "architecture",
+    "pageTitle": "Architecture",
+    "title": "Item status machine",
+    "level": 2,
+    "anchor": "item-status-machine",
+    "snippet": "│ └──reject──► (deleted / not shown) ---",
+    "content": "│ └──reject──► (deleted / not shown) ---"
+  },
+  {
+    "pageId": "architecture",
+    "pageTitle": "Architecture",
+    "title": "CSRF protection",
+    "level": 2,
+    "anchor": "csrf-protection",
+    "snippet": "- A CSRF token is stored in an `HttpOnly` cookie (generated if absent). - All HTML form POSTs must include `_csrf_token` as a hidden field or query pa",
+    "content": "- A CSRF token is stored in an `HttpOnly` cookie (generated if absent). - All HTML form POSTs must include `_csrf_token` as a hidden field or query parameter. - API routes and the Stripe webhook are exempt. ---"
+  },
+  {
+    "pageId": "architecture",
+    "pageTitle": "Architecture",
+    "title": "Rate limiting",
+    "level": 2,
+    "anchor": "rate-limiting",
+    "snippet": "Rate limits are stored in the `rate_limits` database table. This is intentional — Galvani is multi-threaded, so in-memory counters (like APCu) would o",
+    "content": "Rate limits are stored in the `rate_limits` database table. This is intentional — Galvani is multi-threaded, so in-memory counters (like APCu) would only apply per-thread. DB-based limits are consistent across all threads. Six actions are rate-limited: `login`, `register`, `bid`, `api_token`, `password_reset`, `resend_verification`. ---"
+  },
+  {
+    "pageId": "architecture",
+    "pageTitle": "Architecture",
+    "title": "Galvani runtime notes",
+    "level": 2,
+    "anchor": "galvani-runtime-notes",
+    "snippet": "Galvani is the local development runtime. It is an async, multi-threaded PHP server with an embedded MariaDB. It is **not** used in production. Key im",
+    "content": "Galvani is the local development runtime. It is an async, multi-threaded PHP server with an embedded MariaDB. It is **not** used in production. Key implications: 1. No PHP sessions (they would not persist across threads). JWT is used instead. 2. No explicit transactions (`beginTransaction` / `commit`). Autocommit only. 3. `PDO::ATTR_EMULATE_PREPARES => true` — native prepares corrupt date values. 4. `LIMIT`/`OFFSET` must be string-interpolated, not bound parameters. 5. `READ COMMITTED` transaction isolation — ensures writes in one thread are visible to others. 6. All controllers are instantiated once at startup in `index.php`. Auth checks must be in controller methods, not constructors. 7. After editing any PHP class, Galvani must be restarted. Views are re-read per request and do not require a restart. ---"
+  },
+  {
+    "pageId": "architecture",
+    "pageTitle": "Architecture",
+    "title": "CSS build",
+    "level": 2,
+    "anchor": "css-build",
+    "snippet": "TailwindCSS v4. Source: `css/tailwind.css`. Output: `css/output.css` (committed). Custom theme: - Primary colour: `#45a2da` - Font: Outfit variable (`",
+    "content": "TailwindCSS v4. Source: `css/tailwind.css`. Output: `css/output.css` (committed). Custom theme: - Primary colour: `#45a2da` - Font: Outfit variable (`css/fonts/Outfit-variable.woff2`) - Dark mode: `.dark` class on `<html>`, toggled with View Transitions API animation ---"
+  },
+  {
+    "pageId": "architecture",
+    "pageTitle": "Architecture",
+    "title": "REST API",
+    "level": 2,
+    "anchor": "rest-api",
+    "snippet": "Base path: `/api/v1/` All responses use an envelope: Authentication: JWT via `?token=` or POST `token` field. **Not** via `Authorization` header (Galv",
+    "content": "Base path: `/api/v1/` All responses use an envelope: Authentication: JWT via `?token=` or POST `token` field. **Not** via `Authorization` header (Galvani drops custom headers). See [API Reference](../api/README.md) for full endpoint documentation. ---"
+  },
+  {
+    "pageId": "architecture",
+    "pageTitle": "Architecture",
+    "title": "Payments",
+    "level": 2,
+    "anchor": "payments",
+    "snippet": "Stripe Checkout is used for payment collection: 1. Admin ends the auction — winners are identified 2. Winner receives a payment email with a link to `",
+    "content": "Stripe Checkout is used for payment collection: 1. Admin ends the auction — winners are identified 2. Winner receives a payment email with a link to `/payment/:item-slug` 3. App creates a Stripe Checkout session and redirects the winner to Stripe 4. Stripe processes payment and sends a `checkout.session.completed` webhook 5. Webhook is received at `POST /webhook/stripe?webhook_secret=TOKEN` 6. App marks the payment `completed` and item `sold` The webhook uses a query-parameter token instead of the Stripe signature header because headers are stripped by the runtime. ---"
+  },
+  {
+    "pageId": "architecture",
+    "pageTitle": "Architecture",
+    "title": "Directory structure (top level)",
+    "level": 2,
+    "anchor": "directory-structure-top-level",
+    "snippet": "├── app/ # MVC: Controllers, Services, Repositories, Views, Helpers ├── config/ # app.php, database.php, stripe.php ├── core/ # Router, Database, JWT,",
+    "content": "├── app/            # MVC: Controllers, Services, Repositories, Views, Helpers ├── config/         # app.php, database.php, stripe.php ├── core/           # Router, Database, JWT, Controller base ├── css/            # Tailwind source + compiled output ├── database/       # schema.sql + seeds.sql ├── docs/           # Documentation ├── images/         # Static assets (logos) ├── tests/          # PHPUnit Unit + Feature suites ├── uploads/        # User-uploaded images (gitignored in prod) ├── composer.json ├── db-init.php     # DB reset script ├── index.php       # Single entry point └── package.json"
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "Developer Guide",
+    "level": 1,
+    "anchor": "developer-guide",
+    "snippet": "Complete onboarding guide for developers working on the WFCS Auction platform. ---",
+    "content": "Complete onboarding guide for developers working on the WFCS Auction platform. ---"
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "Table of Contents",
+    "level": 2,
+    "anchor": "table-of-contents",
+    "snippet": "- [Prerequisites](#prerequisites) - [Setup](#setup) - [Environment Variables](#environment-variables) - [Architecture Overview](#architecture-overview",
+    "content": "- [Prerequisites](#prerequisites) - [Setup](#setup) - [Environment Variables](#environment-variables) - [Architecture Overview](#architecture-overview) - [Directory Structure](#directory-structure) - [Request Lifecycle](#request-lifecycle) - [Adding a New Feature](#adding-a-new-feature) - [Galvani-Specific Rules](#galvani-specific-rules) - [CSS Build](#css-build) - [Running Tests](#running-tests) - [Deployment to LAMP Hosting](#deployment-to-lamp-hosting) ---"
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "Prerequisites",
+    "level": 2,
+    "anchor": "prerequisites",
+    "snippet": "| Requirement | Version | Notes | |-------------|---------|-------| | PHP | 8.2+ | Must be on PATH | | Composer | 2.x | For PHP dependencies | | Node.",
+    "content": "| Requirement | Version | Notes | |-------------|---------|-------| | PHP | 8.2+ | Must be on PATH | | Composer | 2.x | For PHP dependencies | | Node.js | 18+ | For CSS build only | | npm | 9+ | Bundled with Node | | Galvani | latest | Local dev runtime only — not deployed | **Galvani** is a multi-threaded PHP runtime with an embedded MariaDB. It is used for local development only. Production runs on a standard LAMP stack. ---"
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "Setup",
+    "level": 2,
+    "anchor": "setup",
+    "snippet": "The workspace has the following structure on disk. The `galvani` binary and `data/` directory live at the git-root level (one level above the `auction",
+    "content": "The workspace has the following structure on disk. The `galvani` binary and `data/` directory live at the git-root level (one level above the `auction/` app folder) and are never committed. ├── galvani               # binary (gitignored) ├── data/                 # embedded MariaDB data (gitignored) ├── .env                  # root env: GALVANI_MYSQL=1 └── auction/              # THIS repo (its own GitHub repo) ├── .env              # app secrets ├── index.php └── ..."
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "Place it inside your galvani-workspace folder",
+    "level": 1,
+    "anchor": "place-it-inside-your-galvani-workspace-folder",
+    "snippet": "git clone git@github.com:yourorg/auction.git auction",
+    "content": "git clone git@github.com:yourorg/auction.git auction"
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "2. Install PHP dependencies",
+    "level": 3,
+    "anchor": "2-install-php-dependencies",
+    "snippet": "composer install",
+    "content": "composer install"
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "Run from the galvani-workspace root (one level up from auction/)",
+    "level": 1,
+    "anchor": "run-from-the-galvani-workspace-root-one-level-up-from-auction",
+    "snippet": "./galvani auction/db-init.php",
+    "content": "./galvani auction/db-init.php"
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "Option A: app served at http://localhost:8080/auction/",
+    "level": 1,
+    "anchor": "option-a-app-served-at-http-localhost-8080-auction",
+    "snippet": "./galvani",
+    "content": "./galvani"
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "Option B (recommended): app served at http://localhost:8080/",
+    "level": 1,
+    "anchor": "option-b-recommended-app-served-at-http-localhost-8080",
+    "snippet": "./galvani -t ./auction",
+    "content": "./galvani -t ./auction"
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "8. Verify",
+    "level": 3,
+    "anchor": "8-verify",
+    "snippet": "Open `http://localhost:8080/` in your browser. You should see the auction home page. ---",
+    "content": "Open `http://localhost:8080/` in your browser. You should see the auction home page. ---"
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "Environment Variables",
+    "level": 2,
+    "anchor": "environment-variables",
+    "snippet": "All variables go in `auction/.env`. Relative paths resolve from the **galvani-workspace root** (one level up from the app folder) because that is Galv",
+    "content": "All variables go in `auction/.env`. Relative paths resolve from the **galvani-workspace root** (one level up from the app folder) because that is Galvani's working directory. | Variable | Required | Description | |----------|----------|-------------| | `APP_ENV` | Yes | Environment name: `development` or `production` | | `APP_DEBUG` | No | Set to `1` to enable debug output (development only) | | `APP_URL` | Yes | Full base URL, e.g. `http://localhost:8080` | | `APP_KEY` | Yes | Random string for misc encryption | | `JWT_SECRET` | Yes | Secret key for signing JWT tokens — keep this private | | `DB_SOCKET` | Yes | Path to MariaDB socket. See auto-detection note below | | `DB_NAME` | Yes | Database name, e.g. `auction` | | `DB_USER` | Yes | Database user | | `DB_PASS` | Yes | Database password | | `STRIPE_PUBLIC_KEY` | Yes | Stripe publishable key (`pk_test_...` or `pk_live_...`) | | `STRIPE_SECRET_KEY` | Yes | Stripe secret key (`sk_test_...` or `sk_live_...`) | | `STRIPE_WEBHOOK_SECRET` | Yes | Token used to verify Stripe webhooks (your own random string) | | `MAIL_HOST` | Yes | SMTP host, e.g. `smtp.mailgun.org` | | `MAIL_PORT` | Yes | SMTP port, e.g. `587` | | `MAIL_USERNAME` | Yes | SMTP username | | `MAIL_PASSWORD` | Yes | SMTP password | | `MAIL_FROM_ADDRESS` | Yes | Sender email, e.g. `noreply@wellfoundation.org.uk` | | `MAIL_FROM_NAME` | Yes | Sender display name, e.g. `WFCS Auction` | | `GALVANI_MYSQL` | Dev only | Set to `1` in `.env` when using `-t` flag |"
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "Socket path auto-detection",
+    "level": 3,
+    "anchor": "socket-path-auto-detection",
+    "snippet": "The database config at `config/database.php` detects whether it is running as a web request (Galvani sets cwd to the app subfolder) or a CLI script (c",
+    "content": "The database config at `config/database.php` detects whether it is running as a web request (Galvani sets cwd to the app subfolder) or a CLI script (cwd is the git root): ? dirname(getcwd()) . '/data/mysql.sock'   // web request : getcwd() . '/data/mysql.sock',            // CLI / db-init Never hardcode the socket path as an absolute path — it will break on other machines."
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "Example `.env`",
+    "level": 3,
+    "anchor": "example-env",
+    "snippet": "APP_DEBUG=1 APP_URL=http://localhost:8080 APP_KEY=change-me-to-a-long-random-string JWT_SECRET=another-long-random-string DB_NAME=auction DB_USER=root",
+    "content": "APP_DEBUG=1 APP_URL=http://localhost:8080 APP_KEY=change-me-to-a-long-random-string JWT_SECRET=another-long-random-string DB_NAME=auction DB_USER=root DB_PASS= STRIPE_PUBLIC_KEY=pk_test_... STRIPE_SECRET_KEY=sk_test_... STRIPE_WEBHOOK_SECRET=my-secure-random-webhook-token MAIL_HOST=smtp.mailtrap.io MAIL_PORT=587 MAIL_USERNAME=yourmailtrapuser MAIL_PASSWORD=yourmailtrappassword MAIL_FROM_ADDRESS=noreply@wellfoundation.org.uk MAIL_FROM_NAME=\"WFCS Auction\" GALVANI_MYSQL=1 ---"
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "Architecture Overview",
+    "level": 2,
+    "anchor": "architecture-overview",
+    "snippet": "The app follows a strict **MVC + Repository pattern**: │ ▼ index.php ← single entry point; loads .env, config, helpers, router │ ▼ Core\\Router ← match",
+    "content": "The app follows a strict **MVC + Repository pattern**: │ ▼ index.php           ← single entry point; loads .env, config, helpers, router │ ▼ Core\\Router         ← matches URI to a [Controller, method] tuple │ ▼ Controller          ← validates input, calls services, returns a view or JSON │ ▼ Service             ← business logic; calls repositories; never touches DB directly │ ▼ Repository          ← ALL SQL lives here; returns plain arrays │ ▼ Core\\Database       ← singleton PDO wrapper"
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "Layer responsibilities",
+    "level": 3,
+    "anchor": "layer-responsibilities",
+    "snippet": "| Layer | Responsibility | May call | |-------|---------------|----------| | Controller | HTTP in/out, auth checks, input validation | Services, view ",
+    "content": "| Layer | Responsibility | May call | |-------|---------------|----------| | Controller | HTTP in/out, auth checks, input validation | Services, view helpers | | Service | Business logic, orchestration | Repositories, other services | | Repository | SQL queries only | Database singleton | | View | HTML output | Helper functions, atoms | ---"
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "Directory Structure",
+    "level": 2,
+    "anchor": "directory-structure",
+    "snippet": "├── app/ │ ├── Controllers/ # HTTP handlers │ │ ├── AccountController.php │ │ ├── AdminController.php │ │ ├── ApiController.php │ │ ├── AuctioneerCont",
+    "content": "├── app/ │   ├── Controllers/        # HTTP handlers │   │   ├── AccountController.php │   │   ├── AdminController.php │   │   ├── ApiController.php │   │   ├── AuctioneerController.php │   │   ├── AuthController.php │   │   ├── BidController.php │   │   ├── DonorController.php │   │   ├── EventController.php │   │   ├── HomeController.php │   │   ├── ItemController.php │   │   └── PaymentController.php │   │ │   ├── Helpers/ │   │   ├── functions.php   # Global helper functions (view(), redirect(), auth(), etc.) │   │   └── validation.php  # Validation helpers │   │ │   ├── Repositories/       # All SQL lives here │   │   ├── BidRepository.php │   │   ├── CategoryRepository.php │   │   ├── EventRepository.php │   │   ├── GiftAidRepository.php │   │   ├── ItemRepository.php │   │   ├── PasswordResetRepository.php │   │   ├── PaymentRepository.php │   │   ├── RateLimitRepository.php │   │   ├── SettingsRepository.php │   │   └── UserRepository.php │   │ │   ├── Services/           # Business logic │   │   ├── AccountService.php │   │   ├── ApiTokenService.php │   │   ├── AuctionService.php │   │   ├── AuthService.php │   │   ├── BidService.php │   │   ├── EventService.php │   │   ├── GiftAidService.php │   │   ├── ItemService.php │   │   ├── NotificationService.php │   │   ├── PasswordResetService.php │   │   ├── PaymentService.php │   │   ├── RateLimitService.php │   │   ├── StripeService.php │   │   └── UploadService.php │   │ │   └── Views/              # PHP view templates │       ├── layouts/        # Base page layouts (public, admin, auth, auctioneer, projector) │       ├── partials/       # Reusable page sections (header, footer, nav) │       ├── atoms/          # Small reusable UI components │       ├── home/           # Home page views │       ├── auth/           # Login, register, reset password views │       ├── account/        # Account settings views │       ├── events/         # Auction listing views │       ├── items/          # Item detail views │       ├── bids/           # Bid history views │       ├── donor/          # Donor dashboard views │       ├── payment/        # Payment checkout views │       ├── admin/          # Admin panel views │       ├── auctioneer/     # Auctioneer control panel │       ├── projector/      # Projector display view │       └── errors/         # 404, 500 error views │ ├── config/ │   ├── app.php             # App name, URL, JWT secret, timezone │   ├── database.php        # DB connection (socket, name, user, pass) │   └── stripe.php          # Stripe keys and webhook secret │ ├── core/                   # Framework core (not namespaced under App\\) │   ├── Controller.php      # Base controller with view(), json(), redirect() │   ├── Database.php        # PDO singleton wrapper │   ├── JWT.php             # JWT encode/decode │   └── Router.php          # Simple HTTP router │ ├── css/ │   ├── tailwind.css        # Tailwind v4 source │   └── output.css          # Compiled CSS (committed to repo) │ ├── database/ │   ├── schema.sql          # Table definitions (source of truth) │   └── seeds.sql           # Demo data for development │ ├── docs/                   # Documentation (this folder) ├── images/                 # Static images (logo, etc.) ├── tests/                  # PHPUnit test suite │   ├── Unit/               # Unit tests (no DB, no HTTP) │   └── Feature/            # Feature tests (full request simulation) │ ├── uploads/                # User-uploaded item images (gitignored in prod) ├── composer.json ├── db-init.php             # DB reset script ├── index.php               # Single entry point ├── package.json └── phpunit.xml ---"
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "Request Lifecycle",
+    "level": 2,
+    "anchor": "request-lifecycle",
+    "snippet": "1. **`index.php`** — Galvani routes all requests to `index.php` 2. **Load `.env`** — parse key=value lines into `$_ENV` 3. **Config** — load `config/a",
+    "content": "1. **`index.php`** — Galvani routes all requests to `index.php` 2. **Load `.env`** — parse key=value lines into `$_ENV` 3. **Config** — load `config/app.php`, set timezone 4. **Autoloader** — Composer PSR-4: `App\\` maps to `app/`, `Core\\` maps to `core/` 5. **Helpers** — `functions.php` and `validation.php` loaded globally 6. **CORS headers** — set on `/api/*` routes before any output 7. **CSRF validation** — all HTML form POSTs validated against cookie token 8. **Controllers instantiated** — all controllers created once at the top of `index.php` (not inside route closures) 9. **Router dispatch** — `Core\\Router` matches the request method + URI and calls the appropriate controller method 10. **Controller** — validates input, checks auth, calls services 11. **Service** — executes business logic via repositories 12. **View** — PHP template buffered with `ob_start()`, injected into layout"
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "Auth flow",
+    "level": 3,
+    "anchor": "auth-flow",
+    "snippet": "- **Web (browser):** JWT stored in an `HttpOnly` cookie called `auth_token`. Set on login. Validated on every request via `getAuthUser()` helper. - **",
+    "content": "- **Web (browser):** JWT stored in an `HttpOnly` cookie called `auth_token`. Set on login. Validated on every request via `getAuthUser()` helper. - **API:** JWT passed as `?token=` query param or `token` POST field. Same JWT format, longer expiry. - **JWT payload:** `id`, `email`, `name`, `role`, `slug`, `verified`, `exp`"
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "View system",
+    "level": 3,
+    "anchor": "view-system",
+    "snippet": "return $this->view('items/show', [ 'item' => $item, 'basePath' => $basePath, ]); // view() helper in functions.php: // 1. Extracts variables into scop",
+    "content": "return $this->view('items/show', [ 'item'     => $item, 'basePath' => $basePath, ]); // view() helper in functions.php: // 1. Extracts variables into scope // 2. ob_start() // 3. require the view file (e.g. app/Views/items/show.php) // 4. Captures output → $content // 5. Requires the layout (app/Views/layouts/main.php) // 6. Layout echoes $content in the appropriate slot **Atoms** are small, reusable UI components. They are loaded via the `atom()` helper: ---"
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "Adding a New Feature",
+    "level": 2,
+    "anchor": "adding-a-new-feature",
+    "snippet": "This walkthrough adds a hypothetical \"Testimonials\" entity.",
+    "content": "This walkthrough adds a hypothetical \"Testimonials\" entity."
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "Step 1: Schema",
+    "level": 3,
+    "anchor": "step-1-schema",
+    "snippet": "Add your table to `database/schema.sql`: id INT AUTO_INCREMENT PRIMARY KEY, slug VARCHAR(100) NOT NULL UNIQUE, author VARCHAR(255) NOT NULL, body TEXT",
+    "content": "Add your table to `database/schema.sql`: id INT AUTO_INCREMENT PRIMARY KEY, slug VARCHAR(100) NOT NULL UNIQUE, author VARCHAR(255) NOT NULL, body TEXT NOT NULL, published TINYINT(1) NOT NULL DEFAULT 0, created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci; Reset the DB: `./galvani auction/db-init.php`"
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "Step 2: Repository",
+    "level": 3,
+    "anchor": "step-2-repository",
+    "snippet": "Create `app/Repositories/TestimonialRepository.php`: declare(strict_types=1); namespace App\\Repositories; use Core\\Database; class TestimonialReposito",
+    "content": "Create `app/Repositories/TestimonialRepository.php`: declare(strict_types=1); namespace App\\Repositories; use Core\\Database; class TestimonialRepository { private \\PDO $db; public function __construct() { $this->db = Database::getInstance()->pdo(); } public function all(int $limit = 20, int $offset = 0): array { return Database::getInstance()->query( 'SELECT * FROM testimonials WHERE published = 1 ORDER BY created_at DESC LIMIT ' . (int)$limit . ' OFFSET ' . (int)$offset ); } public function findBySlug(string $slug): ?array { return Database::getInstance()->queryOne( 'SELECT * FROM testimonials WHERE slug = ?', [$slug] ) ?: null; } public function create(array $data): int { $db = Database::getInstance(); $db->execute( 'INSERT INTO testimonials (slug, author, body, published) VALUES (?, ?, ?, ?)', [$data['slug'], $data['author'], $data['body'], $data['published'] ? 1 : 0] ); return (int)$db->lastInsertId(); } }"
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "Step 3: Service",
+    "level": 3,
+    "anchor": "step-3-service",
+    "snippet": "Create `app/Services/TestimonialService.php`: declare(strict_types=1); namespace App\\Services; use App\\Repositories\\TestimonialRepository; class Testi",
+    "content": "Create `app/Services/TestimonialService.php`: declare(strict_types=1); namespace App\\Services; use App\\Repositories\\TestimonialRepository; class TestimonialService { private TestimonialRepository $repo; public function __construct(?TestimonialRepository $repo = null) { $this->repo = $repo ?? new TestimonialRepository(); } public function getPublished(int $page = 1, int $perPage = 10): array { $offset = ($page - 1) * $perPage; return $this->repo->all($perPage, $offset); } }"
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "Step 4: Controller",
+    "level": 3,
+    "anchor": "step-4-controller",
+    "snippet": "Create `app/Controllers/TestimonialController.php`: declare(strict_types=1); namespace App\\Controllers; use Core\\Controller; use App\\Services\\Testimon",
+    "content": "Create `app/Controllers/TestimonialController.php`: declare(strict_types=1); namespace App\\Controllers; use Core\\Controller; use App\\Services\\TestimonialService; class TestimonialController extends Controller { // No auth checks in __construct — Galvani rule 9 public function index(): void { $service      = new TestimonialService(); $testimonials = $service->getPublished(); $this->view('testimonials/index', compact('testimonials')); } }"
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "Step 5: View",
+    "level": 3,
+    "anchor": "step-5-view",
+    "snippet": "Create `app/Views/testimonials/index.php`: // $testimonials is available from the controller foreach ($testimonials as $t): ?> <div class=\"bg-white ro",
+    "content": "Create `app/Views/testimonials/index.php`: // $testimonials is available from the controller foreach ($testimonials as $t): ?> <div class=\"bg-white rounded-lg p-6\"> <p class=\"text-gray-700\"><?= htmlspecialchars($t['body']) ?></p> <p class=\"mt-2 font-semibold\"><?= htmlspecialchars($t['author']) ?></p> </div> <?php endforeach; ?>"
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "Step 6: Register routes in `index.php`",
+    "level": 3,
+    "anchor": "step-6-register-routes-in-index-php",
+    "snippet": "$testimonialController = new \\App\\Controllers\\TestimonialController(); // In the router section: $router->get('/testimonials', [$testimonialController",
+    "content": "$testimonialController = new \\App\\Controllers\\TestimonialController(); // In the router section: $router->get('/testimonials', [$testimonialController, 'index']);"
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "Step 7: Tests",
+    "level": 3,
+    "anchor": "step-7-tests",
+    "snippet": "Add unit tests in `tests/Unit/TestimonialServiceTest.php` (mock the repository), and feature tests in `tests/Feature/TestimonialsTest.php` (test the f",
+    "content": "Add unit tests in `tests/Unit/TestimonialServiceTest.php` (mock the repository), and feature tests in `tests/Feature/TestimonialsTest.php` (test the full HTTP flow). After editing PHP classes, **restart Galvani** — controllers and services are cached between requests. ---"
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "Galvani-Specific Rules",
+    "level": 2,
+    "anchor": "galvani-specific-rules",
+    "snippet": "These rules are critical. Violating them causes silent data loss, deadlocks, or broken routes.",
+    "content": "These rules are critical. Violating them causes silent data loss, deadlocks, or broken routes."
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "1. No explicit transactions",
+    "level": 3,
+    "anchor": "1-no-explicit-transactions",
+    "snippet": "$db->beginTransaction(); $db->execute(...); $db->commit(); // CORRECT — autocommit only $db->execute(...);",
+    "content": "$db->beginTransaction(); $db->execute(...); $db->commit(); // CORRECT — autocommit only $db->execute(...);"
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "2. Use the DB singleton",
+    "level": 3,
+    "anchor": "2-use-the-db-singleton",
+    "snippet": "$db = new Database(); // CORRECT — always $db = Database::getInstance();",
+    "content": "$db = new Database(); // CORRECT — always $db = Database::getInstance();"
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "3. Emulated prepares",
+    "level": 3,
+    "anchor": "3-emulated-prepares",
+    "snippet": "The PDO connection must have `PDO::ATTR_EMULATE_PREPARES => true`. Native prepares corrupt `DATE`/`TIME` values. This is set in `config/database.php` ",
+    "content": "The PDO connection must have `PDO::ATTR_EMULATE_PREPARES => true`. Native prepares corrupt `DATE`/`TIME` values. This is set in `config/database.php` — do not change it."
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "4. No PHP booleans in SQL",
+    "level": 3,
+    "anchor": "4-no-php-booleans-in-sql",
+    "snippet": "$db->execute('UPDATE items SET active = ?', [true]); // CORRECT $db->execute('UPDATE items SET active = ?', [1]);",
+    "content": "$db->execute('UPDATE items SET active = ?', [true]); // CORRECT $db->execute('UPDATE items SET active = ?', [1]);"
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "5. LIMIT/OFFSET must be interpolated",
+    "level": 3,
+    "anchor": "5-limit-offset-must-be-interpolated",
+    "snippet": "$db->query('SELECT * FROM items LIMIT ?', [20]); // CORRECT $db->query('SELECT * FROM items LIMIT ' . (int)$limit . ' OFFSET ' . (int)$offset);",
+    "content": "$db->query('SELECT * FROM items LIMIT ?', [20]); // CORRECT $db->query('SELECT * FROM items LIMIT ' . (int)$limit . ' OFFSET ' . (int)$offset);"
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "6. READ COMMITTED isolation",
+    "level": 3,
+    "anchor": "6-read-committed-isolation",
+    "snippet": "`SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED` is applied in the DB constructor. This ensures that writes committed in one thread are visibl",
+    "content": "`SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED` is applied in the DB constructor. This ensures that writes committed in one thread are visible to other threads. Do not change this."
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "7. Restart after PHP class changes",
+    "level": 3,
+    "anchor": "7-restart-after-php-class-changes",
+    "snippet": "Controllers, services, and repositories are cached after first load. **You must restart Galvani** after editing any PHP class. Views are re-read on ev",
+    "content": "Controllers, services, and repositories are cached after first load. **You must restart Galvani** after editing any PHP class. Views are re-read on every request, so view changes are live immediately."
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "Ctrl+C to stop, then:",
+    "level": 1,
+    "anchor": "ctrl-c-to-stop-then",
+    "snippet": "./galvani -t ./auction",
+    "content": "./galvani -t ./auction"
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "8. Minimum 4 threads",
+    "level": 3,
+    "anchor": "8-minimum-4-threads",
+    "snippet": "Do not use `--threads 1`. Galvani needs at least 4 threads for normal operation. The default is fine.",
+    "content": "Do not use `--threads 1`. Galvani needs at least 4 threads for normal operation. The default is fine."
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "9. No auth checks in controller constructors",
+    "level": 3,
+    "anchor": "9-no-auth-checks-in-controller-constructors",
+    "snippet": "The router instantiates all controllers at registration time. Any `exit()` or `die()` inside a constructor will kill all routes. public function __con",
+    "content": "The router instantiates all controllers at registration time. Any `exit()` or `die()` inside a constructor will kill all routes. public function __construct() { if (!getAuthUser()) { exit; }  // kills all routes! } // CORRECT — check auth inside each method public function sensitiveAction(): void { if (!getAuthUser()) { $this->redirect('/login'); } // ... }"
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "14. Do not call parent::__construct()",
+    "level": 3,
+    "anchor": "14-do-not-call-parent-construct",
+    "snippet": "`Core\\Controller` has **no constructor**. Calling `parent::__construct()` from a subclass will throw a fatal \"Cannot call constructor\" error at runtim",
+    "content": "`Core\\Controller` has **no constructor**. Calling `parent::__construct()` from a subclass will throw a fatal \"Cannot call constructor\" error at runtime. No controller in the codebase calls it — don't add it. class MyController extends Controller { public function __construct() { parent::__construct();  // Core\\Controller has no __construct! $this->repo = new MyRepository(); } } // CORRECT class MyController extends Controller { public function __construct() { $this->repo = new MyRepository(); } }"
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "10. Multi-step writes in one request",
+    "level": 3,
+    "anchor": "10-multi-step-writes-in-one-request",
+    "snippet": "All related DB writes must happen in a single request handler. You cannot split a multi-step write across multiple requests and rely on the intermedia",
+    "content": "All related DB writes must happen in a single request handler. You cannot split a multi-step write across multiple requests and rely on the intermediate state being visible."
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "11. DELETE bodies are stripped",
+    "level": 3,
+    "anchor": "11-delete-bodies-are-stripped",
+    "snippet": "Do not put data in the body of `DELETE` requests. Proxies strip it. Use query string params and read from `$_GET`.",
+    "content": "Do not put data in the body of `DELETE` requests. Proxies strip it. Use query string params and read from `$_GET`."
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "12. CSRF via query params",
+    "level": 3,
+    "anchor": "12-csrf-via-query-params",
+    "snippet": "For multipart forms and DELETE routes, pass `_csrf_token` as a query parameter rather than in the request body. Galvani may drop it otherwise.",
+    "content": "For multipart forms and DELETE routes, pass `_csrf_token` as a query parameter rather than in the request body. Galvani may drop it otherwise."
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "13. Socket path auto-detection",
+    "level": 3,
+    "anchor": "13-socket-path-auto-detection",
+    "snippet": "Use the pattern in `config/database.php`. Never use absolute paths or `dirname(__DIR__)`. See the Environment Variables section for details. ---",
+    "content": "Use the pattern in `config/database.php`. Never use absolute paths or `dirname(__DIR__)`. See the Environment Variables section for details. ---"
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "CSS Build",
+    "level": 2,
+    "anchor": "css-build",
+    "snippet": "The app uses **Tailwind CSS v4** with a custom theme.",
+    "content": "The app uses **Tailwind CSS v4** with a custom theme."
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "Build once",
+    "level": 1,
+    "anchor": "build-once",
+    "snippet": "npm run build:css",
+    "content": "npm run build:css"
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "Watch for changes (development)",
+    "level": 1,
+    "anchor": "watch-for-changes-development",
+    "snippet": "npm run watch:css",
+    "content": "npm run watch:css"
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "Source files",
+    "level": 3,
+    "anchor": "source-files",
+    "snippet": "| File | Purpose | |------|---------| | `css/tailwind.css` | Tailwind source — custom theme vars, fonts, component classes | | `css/output.css` | Comp",
+    "content": "| File | Purpose | |------|---------| | `css/tailwind.css` | Tailwind source — custom theme vars, fonts, component classes | | `css/output.css` | Compiled CSS — **gitignored**, generated by the build step |"
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "Theme tokens",
+    "level": 3,
+    "anchor": "theme-tokens",
+    "snippet": "--color-primary-hover: #3b8ec7;",
+    "content": "--color-primary-hover: #3b8ec7;"
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "Dark mode",
+    "level": 3,
+    "anchor": "dark-mode",
+    "snippet": "Dark mode uses the `.dark` class on `<html>` with a View Transitions API circle animation. Toggle is in the header of every page. The CSS uses:",
+    "content": "Dark mode uses the `.dark` class on `<html>` with a View Transitions API circle animation. Toggle is in the header of every page. The CSS uses:"
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "Font",
+    "level": 3,
+    "anchor": "font",
+    "snippet": "Outfit variable font: `css/fonts/Outfit-variable.woff2`. Loaded via `@font-face` in `tailwind.css`. ---",
+    "content": "Outfit variable font: `css/fonts/Outfit-variable.woff2`. Loaded via `@font-face` in `tailwind.css`. ---"
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "Running Tests",
+    "level": 2,
+    "anchor": "running-tests",
+    "snippet": "The test suite uses PHPUnit 11 with two suites: Unit and Feature. > **Important:** Always use `run-tests.php` — never `vendor/bin/phpunit` directly. G",
+    "content": "The test suite uses PHPUnit 11 with two suites: Unit and Feature. > **Important:** Always use `run-tests.php` — never `vendor/bin/phpunit` directly. Galvani cannot strip the shebang line from the Composer proxy binary and will fail with a compile error on line 13."
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "Run unit tests only (no DB, no HTTP) — from the galvani-workspace root",
+    "level": 1,
+    "anchor": "run-unit-tests-only-no-db-no-http-from-the-galvani-workspace-root",
+    "snippet": "./galvani auction/run-tests.php -- tests/Unit/",
+    "content": "./galvani auction/run-tests.php -- tests/Unit/"
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "Run feature tests only (requires Galvani + DB running)",
+    "level": 1,
+    "anchor": "run-feature-tests-only-requires-galvani-db-running",
+    "snippet": "./galvani auction/run-tests.php -- tests/Feature/",
+    "content": "./galvani auction/run-tests.php -- tests/Feature/"
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "Run all tests",
+    "level": 1,
+    "anchor": "run-all-tests",
+    "snippet": "./galvani auction/run-tests.php",
+    "content": "./galvani auction/run-tests.php"
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "Test structure",
+    "level": 3,
+    "anchor": "test-structure",
+    "snippet": "├── bootstrap.php # Loads .env.test, autoloader, functions.php ├── Unit/ # Pure unit tests — no DB, repositories mocked │ ├── AuthServiceTest.php │ ├─",
+    "content": "├── bootstrap.php             # Loads .env.test, autoloader, functions.php ├── Unit/                     # Pure unit tests — no DB, repositories mocked │   ├── AuthServiceTest.php │   ├── AuctionServiceTest.php │   ├── BidServiceTest.php │   ├── DonorControllerTest.php │   ├── GiftAidServiceTest.php │   ├── HelpersTest.php │   ├── PaymentServiceTest.php │   ├── RateLimitServiceTest.php │   └── UploadServiceTest.php └── Feature/                  # Integration tests — real DB, full HTTP flow ├── AdminPanelTest.php ├── ApiEndpointsTest.php ├── AuthFlowTest.php ├── BiddingFlowTest.php └── PaymentFlowTest.php"
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "Test environment",
+    "level": 3,
+    "anchor": "test-environment",
+    "snippet": "Tests use `.env.test` for configuration. The CI pipeline (`.github/workflows/ci.yml`) spins up a MySQL service container. ---",
+    "content": "Tests use `.env.test` for configuration. The CI pipeline (`.github/workflows/ci.yml`) spins up a MySQL service container. ---"
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "Deployment to LAMP Hosting",
+    "level": 2,
+    "anchor": "deployment-to-lamp-hosting",
+    "snippet": "Production deployments use `build.sh` to produce a self-contained `dist/` folder ready to upload to any shared LAMP host (tested on IONOS).",
+    "content": "Production deployments use `build.sh` to produce a self-contained `dist/` folder ready to upload to any shared LAMP host (tested on IONOS)."
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "1. Run the build script",
+    "level": 3,
+    "anchor": "1-run-the-build-script",
+    "snippet": "From the `auction/` directory: The script will: - Build fresh Tailwind CSS - Copy all runtime files to `dist/` (excluding dev files listed in `.distig",
+    "content": "From the `auction/` directory: The script will: - Build fresh Tailwind CSS - Copy all runtime files to `dist/` (excluding dev files listed in `.distignore`) - Run `composer install --no-dev` inside `dist/` - Swap `core/Database-shared.php` in as `core/Database.php` (uses TCP + native prepares, compatible with standard MySQL/MariaDB) - Apply shared hosting config templates (`config/app.php`, `config/database.php`, `config/env.php`) - Prompt you for the database installer option: - **Option 1** — Seed data (development demo data from `database/seeds.sql`) - **Option 2** — Live snapshot (dumps your running Galvani DB — also updates `database/schema.sql` and `seeds.sql` in source) - **Option 3** — Schema only (no data — safe to roll over a live production database) - Create `dist/auction-install.sql` and `dist/auction-install.sql.gz` - Copy any uploaded item images from `uploads/`"
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "2. Edit the three config files in `dist/config/`",
+    "level": 3,
+    "anchor": "2-edit-the-three-config-files-in-dist-config",
+    "snippet": "| File | What to set | |------|-------------| | `dist/config/app.php` | `APP_URL`, `APP_KEY` (random string), `JWT_SECRET` (random string), `APP_ENV=p",
+    "content": "| File | What to set | |------|-------------| | `dist/config/app.php` | `APP_URL`, `APP_KEY` (random string), `JWT_SECRET` (random string), `APP_ENV=production` | | `dist/config/database.php` | MySQL host, port, DB name, username, password | | `dist/config/env.php` | Stripe live keys, SMTP credentials, `STRIPE_WEBHOOK_SECRET` |"
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "3. Upload `dist/` to your server",
+    "level": 3,
+    "anchor": "3-upload-dist-to-your-server",
+    "snippet": "Upload the contents of `dist/` to your hosting root (e.g. `public_html/bid/`) via FTP, SFTP, or your host's file manager. The `.htaccess` is included ",
+    "content": "Upload the contents of `dist/` to your hosting root (e.g. `public_html/bid/`) via FTP, SFTP, or your host's file manager. The `.htaccess` is included in `dist/` and handles URL rewriting automatically."
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "4. Import the database",
+    "level": 3,
+    "anchor": "4-import-the-database",
+    "snippet": "Import `dist/auction-install.sql.gz` via phpMyAdmin (upload the `.gz` file directly — phpMyAdmin accepts it natively and it bypasses upload size limit",
+    "content": "Import `dist/auction-install.sql.gz` via phpMyAdmin (upload the `.gz` file directly — phpMyAdmin accepts it natively and it bypasses upload size limits). Alternatively via CLI:"
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "5. Set directory permissions",
+    "level": 3,
+    "anchor": "5-set-directory-permissions",
+    "snippet": "Most shared hosts set these correctly by default. If item images fail to upload, check that `uploads/` is writable by the web server.",
+    "content": "Most shared hosts set these correctly by default. If item images fail to upload, check that `uploads/` is writable by the web server."
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "6. Configure Stripe webhook",
+    "level": 3,
+    "anchor": "6-configure-stripe-webhook",
+    "snippet": "1. In the Stripe Dashboard, go to **Developers → Webhooks → Add endpoint** 2. Endpoint URL: `https://yourdomain.com/webhook/stripe?webhook_secret=YOUR",
+    "content": "1. In the Stripe Dashboard, go to **Developers → Webhooks → Add endpoint** 2. Endpoint URL: `https://yourdomain.com/webhook/stripe?webhook_secret=YOUR_TOKEN` 3. Event: `checkout.session.completed` 4. Set the same `YOUR_TOKEN` in **Admin → Settings → Stripe → Webhook URL Token** > After importing the database, log back in as admin and **re-save your Stripe keys** at Admin → Settings → Payments. The installer contains keys encrypted with your local `APP_KEY`; the live server needs its own encryption."
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "7. SSL",
+    "level": 3,
+    "anchor": "7-ssl",
+    "snippet": "All production deployments must use HTTPS. Stripe requires it for webhooks and the Checkout redirect. Most shared hosts provide free SSL via Let's Enc",
+    "content": "All production deployments must use HTTPS. Stripe requires it for webhooks and the Checkout redirect. Most shared hosts provide free SSL via Let's Encrypt through their control panel."
+  },
+  {
+    "pageId": "developer-guide",
+    "pageTitle": "Developer Guide",
+    "title": "8. No cron required",
+    "level": 3,
+    "anchor": "8-no-cron-required",
+    "snippet": "The app auto-processes expired auctions on every non-API web request (a lightweight check in `index.php`). No cron job is needed for status transition",
+    "content": "The app auto-processes expired auctions on every non-API web request (a lightweight check in `index.php`). No cron job is needed for status transitions."
+  },
+  {
+    "pageId": "api-reference",
+    "pageTitle": "REST API Reference",
+    "title": "REST API Reference",
+    "level": 1,
+    "anchor": "rest-api-reference",
+    "snippet": "WFCS Auction exposes a versioned REST API at `/api/v1/` and a separate internal AJAX polling endpoint at `/api/`. All responses are JSON. ---",
+    "content": "WFCS Auction exposes a versioned REST API at `/api/v1/` and a separate internal AJAX polling endpoint at `/api/`. All responses are JSON. ---"
+  },
+  {
+    "pageId": "api-reference",
+    "pageTitle": "REST API Reference",
+    "title": "Table of Contents",
+    "level": 2,
+    "anchor": "table-of-contents",
+    "snippet": "- [Authentication](#authentication) - [Endpoints](#endpoints) - [Items](#items) - [Events](#events) - [Bids](#bids) - [Users](#users) - [Token](#token",
+    "content": "- [Authentication](#authentication) - [Endpoints](#endpoints) - [Items](#items) - [Events](#events) - [Bids](#bids) - [Users](#users) - [Token](#token) - [Internal AJAX](#internal-ajax) - [Error Responses](#error-responses) - [Rate Limiting](#rate-limiting) - [Webhooks](#webhooks) ---"
+  },
+  {
+    "pageId": "api-reference",
+    "pageTitle": "REST API Reference",
+    "title": "How tokens work",
+    "level": 3,
+    "anchor": "how-tokens-work",
+    "snippet": "The API uses **JWT tokens** for authentication. Tokens are passed in one of two ways: | Method | How to send | |--------|-------------| | POST body | ",
+    "content": "The API uses **JWT tokens** for authentication. Tokens are passed in one of two ways: | Method | How to send | |--------|-------------| | POST body | Include a `token` field in the request body | | Query string | Append `?token=YOUR_TOKEN` to the URL | > **Important:** Do NOT use the `Authorization` header. The Galvani runtime drops custom HTTP headers before they reach PHP. Always pass the token as a query parameter or in the POST body."
+  },
+  {
+    "pageId": "api-reference",
+    "pageTitle": "REST API Reference",
+    "title": "Token format",
+    "level": 3,
+    "anchor": "token-format",
+    "snippet": "- JWT signed with HMAC-SHA256 - Payload includes: `id`, `email`, `name`, `role`, `slug`, `verified`, `exp` - API tokens have a **1-year expiry** (365 ",
+    "content": "- JWT signed with HMAC-SHA256 - Payload includes: `id`, `email`, `name`, `role`, `slug`, `verified`, `exp` - API tokens have a **1-year expiry** (365 days from generation) - Web session tokens (stored in cookie) have a shorter expiry"
+  },
+  {
+    "pageId": "api-reference",
+    "pageTitle": "REST API Reference",
+    "title": "Getting a token",
+    "level": 3,
+    "anchor": "getting-a-token",
+    "snippet": "You must first authenticate via the web interface (log in at `/login`), then call the token generation endpoint: This requires an active web session (",
+    "content": "You must first authenticate via the web interface (log in at `/login`), then call the token generation endpoint: This requires an active web session (cookie-based auth). The response contains a long-lived token you can use for API calls."
+  },
+  {
+    "pageId": "api-reference",
+    "pageTitle": "REST API Reference",
+    "title": "1. Log in via web and capture the auth cookie",
+    "level": 1,
+    "anchor": "1-log-in-via-web-and-capture-the-auth-cookie",
+    "snippet": "curl -c cookies.txt -X POST https://example.com/login \\ -d \"email=you@example.com&password=secret&_csrf_token=TOKEN\"",
+    "content": "curl -c cookies.txt -X POST https://example.com/login \\ -d \"email=you@example.com&password=secret&_csrf_token=TOKEN\""
+  },
+  {
+    "pageId": "api-reference",
+    "pageTitle": "REST API Reference",
+    "title": "2. Use the cookie session to get an API token",
+    "level": 1,
+    "anchor": "2-use-the-cookie-session-to-get-an-api-token",
+    "snippet": "curl -b cookies.txt https://example.com/api/v1/token Response: \"data\": { \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\", \"expires_in\": 31536000 } ",
+    "content": "curl -b cookies.txt https://example.com/api/v1/token Response: \"data\": { \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\", \"expires_in\": 31536000 } }"
+  },
+  {
+    "pageId": "api-reference",
+    "pageTitle": "REST API Reference",
+    "title": "Via query string (GET requests)",
+    "level": 1,
+    "anchor": "via-query-string-get-requests",
+    "snippet": "curl \"https://example.com/api/v1/users/me?token=eyJ...\"",
+    "content": "curl \"https://example.com/api/v1/users/me?token=eyJ...\""
+  },
+  {
+    "pageId": "api-reference",
+    "pageTitle": "REST API Reference",
+    "title": "Via POST body",
+    "level": 1,
+    "anchor": "via-post-body",
+    "snippet": "curl -X POST https://example.com/api/v1/bids \\ -d \"item_slug=rolex-submariner&amount=4500&buy_now=0&token=eyJ...\" ---",
+    "content": "curl -X POST https://example.com/api/v1/bids \\ -d \"item_slug=rolex-submariner&amount=4500&buy_now=0&token=eyJ...\" ---"
+  },
+  {
+    "pageId": "api-reference",
+    "pageTitle": "REST API Reference",
+    "title": "Response envelope",
+    "level": 3,
+    "anchor": "response-envelope",
+    "snippet": "All successful responses use this envelope: \"data\": { ... }, \"meta\": { ... } } Paginated responses include a `meta` object: \"data\": [ ... ], \"meta\": {",
+    "content": "All successful responses use this envelope: \"data\": { ... }, \"meta\": { ... } } Paginated responses include a `meta` object: \"data\": [ ... ], \"meta\": { \"total\": 42, \"page\": 1, \"per_page\": 20, \"pages\": 3 } } ---"
+  },
+  {
+    "pageId": "api-reference",
+    "pageTitle": "REST API Reference",
+    "title": "List items",
+    "level": 3,
+    "anchor": "list-items",
+    "snippet": "Returns a paginated list of publicly visible items (status: `active`, `ended`, or `sold`). **Authentication:** Not required **Query parameters:** | Pa",
+    "content": "Returns a paginated list of publicly visible items (status: `active`, `ended`, or `sold`). **Authentication:** Not required **Query parameters:** | Parameter | Type | Default | Description | |-----------|------|---------|-------------| | `q` | string | — | Search query (matches item title using LIKE) | | `category` | string | — | Filter by category slug | | `event` | string | — | Filter by event slug | | `page` | integer | `1` | Page number | | `per_page` | integer | `20` | Results per page (max 100) | **Example request:** **Example response:** \"data\": [ { \"id\": 1, \"slug\": \"rolex-submariner\", \"title\": \"Rolex Submariner\", \"description\": \"A stunning timepiece donated by a generous supporter.\", \"image\": \"/uploads/rolex.jpg\", \"lot_number\": 1, \"starting_bid\": \"500.00\", \"min_increment\": \"50.00\", \"buy_now_price\": \"4200.00\", \"market_value\": \"4200.00\", \"current_bid\": \"1250.00\", \"bid_count\": 7, \"status\": \"active\", \"ends_at\": \"2026-03-01 20:00:00\", \"category_name\": \"Jewellery & Watches\", \"event_title\": \"WFCS Spring Gala 2026\", \"event_slug\": \"spring-gala-2026\" } ], \"meta\": { \"total\": 1, \"page\": 1, \"per_page\": 10, \"pages\": 1 } } ---"
+  },
+  {
+    "pageId": "api-reference",
+    "pageTitle": "REST API Reference",
+    "title": "Get item detail",
+    "level": 3,
+    "anchor": "get-item-detail",
+    "snippet": "Returns full detail for a single item, including the last 5 bids in its history (with masked bidder names). **Authentication:** Not required **Path pa",
+    "content": "Returns full detail for a single item, including the last 5 bids in its history (with masked bidder names). **Authentication:** Not required **Path parameters:** | Parameter | Description | |-----------|-------------| | `slug` | Item slug (e.g. `rolex-submariner`) | **Example request:** **Example response:** \"data\": { \"id\": 1, \"slug\": \"rolex-submariner\", \"title\": \"Rolex Submariner\", \"description\": \"A stunning timepiece...\", \"image\": \"/uploads/rolex.jpg\", \"lot_number\": 1, \"starting_bid\": \"500.00\", \"min_increment\": \"50.00\", \"buy_now_price\": \"4200.00\", \"market_value\": \"4200.00\", \"current_bid\": \"1250.00\", \"bid_count\": 7, \"status\": \"active\", \"ends_at\": \"2026-03-01 20:00:00\", \"bid_history\": [ { \"amount\": \"1250.00\", \"bidder\": \"Ah***\", \"created_at\": \"2026-02-15 14:22:11\" } ] } } ---"
+  },
+  {
+    "pageId": "api-reference",
+    "pageTitle": "REST API Reference",
+    "title": "List events",
+    "level": 3,
+    "anchor": "list-events",
+    "snippet": "Returns a paginated list of publicly visible events (status: `published` or `active`). **Authentication:** Not required **Query parameters:** | Parame",
+    "content": "Returns a paginated list of publicly visible events (status: `published` or `active`). **Authentication:** Not required **Query parameters:** | Parameter | Type | Default | Description | |-----------|------|---------|-------------| | `status` | string | — | Filter by status: `published` or `active` | | `page` | integer | `1` | Page number | | `per_page` | integer | `20` | Results per page (max 100) | **Example request:** **Example response:** \"data\": [ { \"id\": 1, \"slug\": \"spring-gala-2026\", \"title\": \"WFCS Spring Gala 2026\", \"description\": \"Our annual charity gala auction.\", \"status\": \"active\", \"starts_at\": \"2026-03-01 18:00:00\", \"ends_at\": \"2026-03-01 22:00:00\", \"venue\": \"The Grand Hall, Glasgow\" } ], \"meta\": { \"total\": 1, \"page\": 1, \"per_page\": 20, \"pages\": 1 } } ---"
+  },
+  {
+    "pageId": "api-reference",
+    "pageTitle": "REST API Reference",
+    "title": "Get event detail",
+    "level": 3,
+    "anchor": "get-event-detail",
+    "snippet": "Returns full detail for a single event. Events with status `draft` return 404. **Authentication:** Not required **Path parameters:** | Parameter | Des",
+    "content": "Returns full detail for a single event. Events with status `draft` return 404. **Authentication:** Not required **Path parameters:** | Parameter | Description | |-----------|-------------| | `slug` | Event slug (e.g. `spring-gala-2026`) | **Example request:** ---"
+  },
+  {
+    "pageId": "api-reference",
+    "pageTitle": "REST API Reference",
+    "title": "Get event items",
+    "level": 3,
+    "anchor": "get-event-items",
+    "snippet": "Returns all items belonging to a specific event, paginated. **Authentication:** Not required **Path parameters:** | Parameter | Description | |-------",
+    "content": "Returns all items belonging to a specific event, paginated. **Authentication:** Not required **Path parameters:** | Parameter | Description | |-----------|-------------| | `slug` | Event slug | **Query parameters:** | Parameter | Type | Default | Description | |-----------|------|---------|-------------| | `page` | integer | `1` | Page number | | `per_page` | integer | `50` | Results per page (max 100) | **Example request:** **Example response:** \"data\": [ ... ], \"meta\": { \"event_slug\": \"spring-gala-2026\", \"event_title\": \"WFCS Spring Gala 2026\", \"total\": 12, \"page\": 1, \"per_page\": 50 } } ---"
+  },
+  {
+    "pageId": "api-reference",
+    "pageTitle": "REST API Reference",
+    "title": "Place a bid",
+    "level": 3,
+    "anchor": "place-a-bid",
+    "snippet": "Places a bid on an item. Requires authentication and a verified email address. **Authentication:** Required **Request body (application/x-www-form-url",
+    "content": "Places a bid on an item. Requires authentication and a verified email address. **Authentication:** Required **Request body (application/x-www-form-urlencoded):** | Parameter | Type | Required | Description | |-----------|------|----------|-------------| | `item_slug` | string | Yes | Slug of the item to bid on | | `amount` | float | Yes | Bid amount in pounds (e.g. `1300.00`) | | `buy_now` | integer | No | Pass `1` to use the Buy Now price | | `token` | string | Yes | Your API token | **Example request:** -d \"item_slug=rolex-submariner&amount=1300&buy_now=0&token=eyJ...\" **Example response (201 Created):** \"data\": { \"bid_id\": 8, \"item_slug\": \"rolex-submariner\", \"amount\": \"1300.00\", \"is_buy_now\": false, \"new_current_bid\": \"1300.00\", \"bid_count\": 8 } } **Validation rules:** - The item must be in `active` status - The bid amount must exceed the current bid plus the minimum increment - The user's email must be verified - The user cannot bid on their own donated item - Rate limited: 30 bids per minute per user ---"
+  },
+  {
+    "pageId": "api-reference",
+    "pageTitle": "REST API Reference",
+    "title": "Get current user",
+    "level": 3,
+    "anchor": "get-current-user",
+    "snippet": "Returns the authenticated user's profile. Password hash is never included. **Authentication:** Required **Query parameters:** | Parameter | Type | Req",
+    "content": "Returns the authenticated user's profile. Password hash is never included. **Authentication:** Required **Query parameters:** | Parameter | Type | Required | Description | |-----------|------|----------|-------------| | `token` | string | Yes | Your API token | **Example request:** **Example response:** \"data\": { \"id\": 42, \"slug\": \"ahmed-khan\", \"name\": \"Ahmed Khan\", \"email\": \"ahmed@example.com\", \"role\": \"bidder\", \"email_verified\": true, \"gift_aid_eligible\": false, \"created_at\": \"2026-01-15 10:30:00\" } } ---"
+  },
+  {
+    "pageId": "api-reference",
+    "pageTitle": "REST API Reference",
+    "title": "Get my bids",
+    "level": 3,
+    "anchor": "get-my-bids",
+    "snippet": "Returns the authenticated user's bid history, paginated. **Authentication:** Required **Query parameters:** | Parameter | Type | Required | Descriptio",
+    "content": "Returns the authenticated user's bid history, paginated. **Authentication:** Required **Query parameters:** | Parameter | Type | Required | Description | |-----------|------|----------|-------------| | `token` | string | Yes | Your API token | | `page` | integer | No | Page number (default: 1) | | `per_page` | integer | No | Results per page (default: 20, max: 100) | **Example request:** **Example response:** \"data\": [ { \"bid_id\": 8, \"item_slug\": \"rolex-submariner\", \"item_title\": \"Rolex Submariner\", \"amount\": \"1300.00\", \"is_buy_now\": false, \"is_winning\": true, \"item_status\": \"active\", \"created_at\": \"2026-02-15 14:22:11\" } ], \"meta\": { \"total\": 1, \"page\": 1, \"per_page\": 20, \"pages\": 1 } } ---"
+  },
+  {
+    "pageId": "api-reference",
+    "pageTitle": "REST API Reference",
+    "title": "Generate API token",
+    "level": 3,
+    "anchor": "generate-api-token",
+    "snippet": "Generates a long-lived API token (1-year expiry). Requires an active web session (browser cookie). This endpoint is intended for first-time setup — us",
+    "content": "Generates a long-lived API token (1-year expiry). Requires an active web session (browser cookie). This endpoint is intended for first-time setup — use the browser to log in, then call this once to get a token for ongoing API use. **Authentication:** Requires active web session (cookie) **Example request:** **Example response:** \"data\": { \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\", \"expires_in\": 31536000 } } The `expires_in` value is in seconds (31,536,000 = 365 days). ---"
+  },
+  {
+    "pageId": "api-reference",
+    "pageTitle": "REST API Reference",
+    "title": "Get current bid (polling)",
+    "level": 3,
+    "anchor": "get-current-bid-polling",
+    "snippet": "Returns the live current bid and bid count for an item. Used by the item detail page for real-time polling. No authentication required. **Path paramet",
+    "content": "Returns the live current bid and bid count for an item. Used by the item detail page for real-time polling. No authentication required. **Path parameters:** | Parameter | Description | |-----------|-------------| | `slug` | Item slug | **Example request:** **Example response:** \"data\": { \"slug\": \"rolex-submariner\", \"current_bid\": 1300.00, \"bid_count\": 8, \"status\": \"active\" } } ---"
+  },
+  {
+    "pageId": "api-reference",
+    "pageTitle": "REST API Reference",
+    "title": "Error Responses",
+    "level": 2,
+    "anchor": "error-responses",
+    "snippet": "All errors return JSON with an `error` key: \"error\": \"Human-readable error message.\" }",
+    "content": "All errors return JSON with an `error` key: \"error\": \"Human-readable error message.\" }"
+  },
+  {
+    "pageId": "api-reference",
+    "pageTitle": "REST API Reference",
+    "title": "HTTP status codes",
+    "level": 3,
+    "anchor": "http-status-codes",
+    "snippet": "| Code | Meaning | Common causes | |------|---------|---------------| | `400` | Bad Request | Missing required field, invalid parameter format | | `40",
+    "content": "| Code | Meaning | Common causes | |------|---------|---------------| | `400` | Bad Request | Missing required field, invalid parameter format | | `401` | Unauthorised | No token provided, token missing or invalid | | `403` | Forbidden | Token valid but insufficient permissions (e.g. not an admin) | | `404` | Not Found | Item/event/user does not exist or is not publicly visible | | `422` | Unprocessable Entity | Business rule violation (e.g. bid too low, item not active, email not verified) | | `429` | Too Many Requests | Rate limit exceeded — see retry message for wait time |"
+  },
+  {
+    "pageId": "api-reference",
+    "pageTitle": "REST API Reference",
+    "title": "Example 401 response",
+    "level": 3,
+    "anchor": "example-401-response",
+    "snippet": "\"error\": \"Authentication required.\" }",
+    "content": "\"error\": \"Authentication required.\" }"
+  },
+  {
+    "pageId": "api-reference",
+    "pageTitle": "REST API Reference",
+    "title": "Example 422 response",
+    "level": 3,
+    "anchor": "example-422-response",
+    "snippet": "\"error\": \"Your bid must be at least £1,350.00 (current bid £1,300.00 + minimum increment £50.00).\" }",
+    "content": "\"error\": \"Your bid must be at least £1,350.00 (current bid £1,300.00 + minimum increment £50.00).\" }"
+  },
+  {
+    "pageId": "api-reference",
+    "pageTitle": "REST API Reference",
+    "title": "Example 429 response",
+    "level": 3,
+    "anchor": "example-429-response",
+    "snippet": "\"error\": \"Too many attempts. Please try again in 5 minutes.\" } ---",
+    "content": "\"error\": \"Too many attempts. Please try again in 5 minutes.\" } ---"
+  },
+  {
+    "pageId": "api-reference",
+    "pageTitle": "REST API Reference",
+    "title": "Rate Limiting",
+    "level": 2,
+    "anchor": "rate-limiting",
+    "snippet": "Rate limits are enforced at the database level (DB-based `rate_limits` table). This works correctly in Galvani's multi-threaded environment where in-m",
+    "content": "Rate limits are enforced at the database level (DB-based `rate_limits` table). This works correctly in Galvani's multi-threaded environment where in-memory state is not shared between threads. Identifiers are typically the user's slug (for authenticated requests) or IP address (for unauthenticated requests)."
+  },
+  {
+    "pageId": "api-reference",
+    "pageTitle": "REST API Reference",
+    "title": "Rate limit thresholds",
+    "level": 3,
+    "anchor": "rate-limit-thresholds",
+    "snippet": "| Action | Max attempts | Window | Block duration | |--------|-------------|--------|----------------| | `login` | 5 | 15 minutes | 30 minutes | | `re",
+    "content": "| Action | Max attempts | Window | Block duration | |--------|-------------|--------|----------------| | `login` | 5 | 15 minutes | 30 minutes | | `register` | 3 | 60 minutes | 60 minutes | | `bid` | 30 | 60 seconds | 5 minutes | | `api_token` | 10 | 60 minutes | 60 minutes | | `password_reset` | 3 | 60 minutes | 60 minutes | | `resend_verification` | 3 | 60 minutes | 60 minutes | When a rate limit is exceeded, the API returns HTTP `429` with a message indicating how long to wait. ---"
+  },
+  {
+    "pageId": "api-reference",
+    "pageTitle": "REST API Reference",
+    "title": "Stripe webhook",
+    "level": 3,
+    "anchor": "stripe-webhook",
+    "snippet": "WFCS Auction handles Stripe webhooks to confirm payments after a successful Stripe Checkout session. **Webhook URL format:** > **Why a query parameter",
+    "content": "WFCS Auction handles Stripe webhooks to confirm payments after a successful Stripe Checkout session. **Webhook URL format:** > **Why a query parameter?** Stripe typically sends a `Stripe-Signature` header. However, the Galvani runtime (and some production reverse proxies) strip custom HTTP headers before they reach PHP. Instead, the app uses a shared secret passed as a query parameter to verify the webhook origin. **Setting up the webhook in Stripe Dashboard:** 1. Go to **Stripe Dashboard → Developers → Webhooks** 2. Click **Add endpoint** 3. Enter your URL: `https://yourdomain.com/webhook/stripe?webhook_secret=YOUR_TOKEN` 4. Under \"Events to listen for\", select: `checkout.session.completed` 5. Generate a secure random token (e.g. `openssl rand -hex 32`) and use it as `YOUR_TOKEN` 6. Configure the same token in **Admin → Settings → Stripe → Webhook URL Token** **Events handled:** | Event | Action taken | |-------|-------------| | `checkout.session.completed` | Marks the payment as `completed`, marks the item as `sold`, triggers Gift Aid calculation if applicable | **Webhook request body:** The request body is the raw Stripe event JSON. The app extracts `checkout.session.completed` events and uses `client_reference_id` to match them to internal payment records. **Response:** - `200 OK` — event processed successfully - `400 Bad Request` — missing or invalid webhook secret - `404 Not Found` — no matching payment record found"
+  }
+]
