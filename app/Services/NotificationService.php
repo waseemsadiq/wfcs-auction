@@ -21,13 +21,20 @@ class NotificationService
         $smtpHost = $settings->get('smtp_host') ?: '';
 
         if (!empty($smtpHost)) {
+            $smtpUsername = $settings->get('smtp_username') ?: '';
             $mail->isSMTP();
-            $mail->Host       = $smtpHost;
-            $mail->SMTPAuth   = true;
-            $mail->Username   = $settings->get('smtp_username') ?: '';
-            $mail->Password   = $settings->get('smtp_password') ?: '';
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            $mail->Port       = (int)($settings->get('smtp_port') ?: 587);
+            $mail->Host = $smtpHost;
+            $mail->Port = (int)($settings->get('smtp_port') ?: 587);
+            if ($smtpUsername !== '') {
+                $mail->SMTPAuth   = true;
+                $mail->Username   = $smtpUsername;
+                $mail->Password   = $settings->get('smtp_password') ?: '';
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            } else {
+                // No-auth SMTP (e.g. Mailpit local dev)
+                $mail->SMTPAuth   = false;
+                $mail->SMTPSecure = '';
+            }
         } else {
             // Fallback to PHP mail() function
             $mail->isMail();
@@ -217,6 +224,37 @@ class NotificationService
               . $this->footerText();
 
         $this->send($email, $name, $subject, $html, $text);
+    }
+
+    /**
+     * Notify admin of a new item donation submission.
+     */
+    public function sendDonationNotification(array $item, array $donor, string $adminEmail, string $baseUrl): void
+    {
+        $donorName  = trim(($donor['first_name'] ?? '') . ' ' . ($donor['last_name'] ?? ''));
+        $donorEmail = $donor['email'] ?? '';
+        $itemTitle  = $item['title'] ?? 'Untitled';
+        $adminUrl   = rtrim($baseUrl, '/') . '/admin/items';
+
+        $imageHtml = '';
+        if (!empty($item['image'])) {
+            $filename     = basename((string)$item['image']);
+            $thumbUrl     = rtrim($baseUrl, '/') . '/uploads/thumbs/' . rawurlencode($filename);
+            $imageHtml    = '<p><img src="' . htmlspecialchars($thumbUrl) . '" alt="' . htmlspecialchars($itemTitle)
+                          . '" style="border-radius:4px;margin-top:12px;"></p>';
+        }
+
+        $html = "<p>A new item has been submitted for review.</p>
+<ul>
+  <li><strong>Item:</strong> " . htmlspecialchars($itemTitle) . "</li>
+  <li><strong>Donor:</strong> " . htmlspecialchars($donorName) . " (" . htmlspecialchars($donorEmail) . ")</li>
+</ul>
+{$imageHtml}
+<p><a href='" . htmlspecialchars($adminUrl) . "'>Review in admin &rarr;</a></p>";
+
+        $text = "New donation submitted: {$itemTitle}\nDonor: {$donorName} ({$donorEmail})\nReview: {$adminUrl}";
+
+        $this->send($adminEmail, 'WFCS Auction Admin', "New donation: {$itemTitle}", $html, $text);
     }
 
     /**

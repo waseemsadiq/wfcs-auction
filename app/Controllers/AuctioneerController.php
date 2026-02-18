@@ -240,12 +240,41 @@ class AuctioneerController extends Controller
 
     /**
      * GET /projector
-     * Full-screen projector display (public, no auth required).
+     * Full-screen projector display.
+     * ?event=slug → standalone gala mode (no auctioneer required)
+     * (no ?event)  → auctioneer-driven mode (existing behaviour)
      */
     public function projector(): void
     {
         global $basePath;
 
+        // ── Standalone gala mode ─────────────────────────────────────────────
+        if (!empty($_GET['event'])) {
+            $slug      = trim((string)$_GET['event']);
+            $eventRepo = new EventRepository();
+            $event     = $eventRepo->findBySlug($slug);
+
+            if ($event === null) {
+                $this->abort(404);
+            }
+
+            $itemRepo = new ItemRepository();
+            $items    = $itemRepo->allForEvent((int)$event['id']);
+
+            $content = $this->renderView('projector/standalone', [
+                'event' => $event,
+                'items' => $items,
+            ]);
+
+            $this->view('layouts/projector', [
+                'pageTitle' => e($event['title']) . ' — Live Auction — WFCS Auction',
+                'content'   => $content,
+            ]);
+
+            return;
+        }
+
+        // ── Auctioneer-driven mode ───────────────────────────────────────────
         $settingsRepo = new SettingsRepository();
         $liveEventId  = (int)($settingsRepo->get('live_event_id') ?? 0);
 
@@ -369,6 +398,52 @@ class AuctioneerController extends Controller
             'live_status'           => $liveItemStatus,
             'image'                 => (string)($item['image'] ?? ''),
             'recent_bids'           => $recentBids,
+        ]);
+    }
+
+    // -------------------------------------------------------------------------
+    // GET /api/event-bids?event={slug} — Standalone gala projector polling
+    // -------------------------------------------------------------------------
+
+    /**
+     * GET /api/event-bids?event={slug}
+     * Returns all items with current bids for a given event (no auth required).
+     * Used by the standalone gala projector for real-time bid updates.
+     */
+    public function eventBids(): void
+    {
+        $slug = trim($_GET['event'] ?? '');
+        if ($slug === '') {
+            $this->json(['error' => 'event slug required'], 400);
+        }
+
+        $eventRepo = new EventRepository();
+        $event     = $eventRepo->findBySlug($slug);
+        if ($event === null) {
+            $this->json(['error' => 'not found'], 404);
+        }
+
+        $itemRepo = new ItemRepository();
+        $items    = $itemRepo->allForEvent((int)$event['id']);
+
+        $payload = [];
+        foreach ($items as $item) {
+            $payload[] = [
+                'id'          => (int)$item['id'],
+                'slug'        => (string)$item['slug'],
+                'title'       => (string)$item['title'],
+                'status'      => (string)$item['status'],
+                'lot_number'  => (int)($item['lot_number'] ?? 0),
+                'current_bid' => (float)($item['current_bid'] ?? 0),
+                'bid_count'   => (int)($item['bid_count'] ?? 0),
+                'ends_at'     => (string)($item['ends_at'] ?? ''),
+            ];
+        }
+
+        $this->json([
+            'event_id'    => (int)$event['id'],
+            'event_title' => (string)$event['title'],
+            'items'       => $payload,
         ]);
     }
 

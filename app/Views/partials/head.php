@@ -66,6 +66,14 @@
     header nav { scrollbar-width: none; }
     header nav::-webkit-scrollbar { display: none; }
 
+    /* ─── Full-bleed hero (breaks out of max-w-6xl container) ─── */
+    .hero-full-bleed {
+      margin-left: calc(50% - 50vw);
+      margin-right: calc(50% - 50vw);
+      margin-top: -2.5rem;
+      width: 100vw;
+    }
+
     /* ─── Scrollbar ─── */
     ::-webkit-scrollbar { width: 5px; height: 5px; }
     ::-webkit-scrollbar-track { background: transparent; }

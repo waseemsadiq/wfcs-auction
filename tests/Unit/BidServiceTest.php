@@ -24,8 +24,8 @@ class BidServiceTest extends TestCase
     private function makeUser(array $overrides = []): array
     {
         return array_merge([
-            'id'                => 3,
-            'email_verified_at' => date('Y-m-d H:i:s'),
+            'id'       => 3,
+            'verified' => true,
         ], $overrides);
     }
 
@@ -103,7 +103,7 @@ class BidServiceTest extends TestCase
 
         $service = $this->makeService();
         $item    = $this->makeItem();
-        $user    = $this->makeUser(['email_verified_at' => null]);
+        $user    = $this->makeUser(['verified' => false]);
 
         $service->place($item, $user, 120.00, false, []);
     }

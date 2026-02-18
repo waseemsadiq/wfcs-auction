@@ -558,8 +558,7 @@ $outbidActive = array_filter($tabOutbid, fn($b) => ($b['item_status'] ?? '') ===
   <a href="<?= e($basePath . '/account/settings') ?>" class="text-primary hover:underline font-medium">Manage notification preferences</a> in account settings.
 </p>
 
-<?php
-$pageScripts = <<<'JS'
+<script>
   // ── Tab switching ──
   function switchTab(name, btn) {
     document.querySelectorAll('.tab-btn').forEach(b => {
@@ -572,5 +571,4 @@ $pageScripts = <<<'JS'
     const panel = document.getElementById('tab-' + name);
     if (panel) panel.classList.add('active');
   }
-JS;
-?>
+</script>

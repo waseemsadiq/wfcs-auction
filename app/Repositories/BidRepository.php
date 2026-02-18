@@ -30,9 +30,10 @@ class BidRepository
             [$itemId]
         );
 
-        // Mask bidder name: "John Smith" → "John S."
+        // Mask bidder name and compute time_ago
         foreach ($rows as &$row) {
             $row['bidder_name'] = $this->maskName((string)($row['bidder_name'] ?? ''));
+            $row['time_ago']    = $this->timeAgo((string)($row['created_at'] ?? ''));
         }
         unset($row);
 
@@ -216,5 +217,19 @@ class BidRepository
         $last  = $parts[count($parts) - 1];
 
         return $first . ' ' . mb_strtoupper(mb_substr($last, 0, 1)) . '.';
+    }
+
+    private function timeAgo(string $datetime): string
+    {
+        if ($datetime === '') {
+            return '';
+        }
+
+        $diff = time() - strtotime($datetime);
+
+        if ($diff < 60)  return 'just now';
+        if ($diff < 3600) return floor($diff / 60) . 'm ago';
+        if ($diff < 86400) return floor($diff / 3600) . 'h ago';
+        return floor($diff / 86400) . 'd ago';
     }
 }

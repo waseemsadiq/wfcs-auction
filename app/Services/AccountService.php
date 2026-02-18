@@ -71,15 +71,22 @@ class AccountService
         }
 
         // -- Persist ----------------------------------------------------------
-        $profileData = [
-            'name'              => $name,
-            'phone'             => $phone !== '' ? $phone : null,
-            'gift_aid_eligible' => $giftAidEligible,
-            'gift_aid_name'     => $giftAidEligible === 1 ? $giftAidName     : null,
-            'gift_aid_address'  => $giftAidEligible === 1 ? $giftAidAddress  : null,
-            'gift_aid_city'     => $giftAidEligible === 1 ? $giftAidCity     : null,
-            'gift_aid_postcode' => $giftAidEligible === 1 ? $giftAidPostcode : null,
-        ];
+        // Only include a field group if the form actually sent it, so the
+        // profile form doesn't wipe gift_aid and the gift-aid form doesn't
+        // wipe phone.
+        $profileData = ['name' => $name];
+
+        if (array_key_exists('phone', $data)) {
+            $profileData['phone'] = $phone !== '' ? $phone : null;
+        }
+
+        if (array_key_exists('gift_aid_eligible', $data)) {
+            $profileData['gift_aid_eligible'] = $giftAidEligible;
+            $profileData['gift_aid_name']     = $giftAidEligible === 1 ? $giftAidName     : null;
+            $profileData['gift_aid_address']  = $giftAidEligible === 1 ? $giftAidAddress  : null;
+            $profileData['gift_aid_city']     = $giftAidEligible === 1 ? $giftAidCity     : null;
+            $profileData['gift_aid_postcode'] = $giftAidEligible === 1 ? $giftAidPostcode : null;
+        }
 
         if ($email !== '') {
             $profileData['email'] = $email;

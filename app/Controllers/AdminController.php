@@ -45,7 +45,6 @@ class AdminController extends Controller
 
         $eventCount          = $eventRepo->countAll();
         $activeItemCount     = $itemRepo->countAll(['status' => 'active']);
-        $pendingItemCount    = $itemRepo->countAll(['status' => 'pending']);
         $bidCountToday       = $bidRepo->countToday();
         $totalRevenue        = $paymentRepo->totalRevenue();
         $giftAidStats        = $giftRepo->stats();
@@ -58,7 +57,6 @@ class AdminController extends Controller
         $stats = [
             'event_count'           => $eventCount,
             'active_item_count'     => $activeItemCount,
-            'pending_item_count'    => $pendingItemCount,
             'bid_count_today'       => $bidCountToday,
             'total_revenue'         => $totalRevenue,
             'gift_aid_total'        => $giftAidTotal,
@@ -407,58 +405,6 @@ class AdminController extends Controller
             flash($e->getMessage(), 'error');
             $this->redirect($basePath . '/admin/items/' . $slug . '/edit');
             return;
-        }
-
-        $this->redirect($basePath . '/admin/items');
-    }
-
-    /**
-     * POST /admin/items/:slug/approve
-     */
-    public function approveItem(string $slug): void
-    {
-        global $basePath;
-        requireAdmin();
-
-        $itemRepo = new ItemRepository();
-        $item     = $itemRepo->findBySlug($slug);
-
-        if ($item === null) {
-            $this->abort(404);
-        }
-
-        try {
-            $itemService = new ItemService();
-            $itemService->approve((int)$item['id'], $_POST);
-            flash('Item approved and is now active.');
-        } catch (\RuntimeException $e) {
-            flash($e->getMessage(), 'error');
-        }
-
-        $this->redirect($basePath . '/admin/items');
-    }
-
-    /**
-     * POST /admin/items/:slug/reject
-     */
-    public function rejectItem(string $slug): void
-    {
-        global $basePath;
-        requireAdmin();
-
-        $itemRepo = new ItemRepository();
-        $item     = $itemRepo->findBySlug($slug);
-
-        if ($item === null) {
-            $this->abort(404);
-        }
-
-        try {
-            $itemService = new ItemService();
-            $itemService->reject((int)$item['id']);
-            flash('Item rejected.');
-        } catch (\RuntimeException $e) {
-            flash($e->getMessage(), 'error');
         }
 
         $this->redirect($basePath . '/admin/items');
@@ -817,6 +763,14 @@ class AdminController extends Controller
         $settingsRepo = new SettingsRepository();
         $settings     = $settingsRepo->all();
 
+        // Decrypt sensitive values so the view can show masked placeholders with real last-4 chars
+        $sensitiveKeys = ['stripe_publishable_key', 'stripe_secret_key', 'stripe_webhook_url_token', 'smtp_password'];
+        foreach ($sensitiveKeys as $k) {
+            if (!empty($settings[$k])) {
+                $settings[$k] = decryptSetting($settings[$k]);
+            }
+        }
+
         $content = $this->renderView('admin/settings', [
             'settings' => $settings,
         ]);
@@ -855,13 +809,18 @@ class AdminController extends Controller
             'payment_reminder_days',
         ];
 
+        $sensitiveKeys = ['stripe_publishable_key', 'stripe_secret_key', 'stripe_webhook_url_token', 'smtp_password'];
+
         foreach ($allowedKeys as $key) {
             if (array_key_exists($key, $_POST)) {
                 $value = trim((string)($_POST[$key] ?? ''));
-                // Keep existing value if field submitted blank
-                $keepIfEmpty = ['stripe_publishable_key', 'stripe_secret_key', 'stripe_webhook_url_token', 'smtp_password'];
-                if (in_array($key, $keepIfEmpty, true) && $value === '') {
+                // Keep existing value if field submitted blank (so *** placeholders don't wipe real values)
+                if (in_array($key, $sensitiveKeys, true) && $value === '') {
                     continue;
+                }
+                // Encrypt sensitive values before storing
+                if (in_array($key, $sensitiveKeys, true) && $value !== '') {
+                    $value = encryptSetting($value);
                 }
                 $settingsRepo->set($key, $value);
             }

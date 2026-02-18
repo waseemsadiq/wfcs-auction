@@ -134,11 +134,11 @@ $v = function(string $key, string $default = '') use ($item, $old): string {
         <div>
           <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Status</label>
           <?php
-          $currStatus = $old['status'] ?? $item['status'] ?? 'pending';
+          $currStatus = $old['status'] ?? $item['status'] ?? 'draft';
           ?>
           <select name="status"
             class="w-full px-4 py-3 text-sm bg-white dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
-            <option value="pending" <?= $currStatus === 'pending' ? 'selected' : '' ?>>Pending</option>
+            <option value="draft"   <?= $currStatus === 'draft'   ? 'selected' : '' ?>>Draft</option>
             <option value="active"  <?= $currStatus === 'active'  ? 'selected' : '' ?>>Active</option>
             <option value="ended"   <?= $currStatus === 'ended'   ? 'selected' : '' ?>>Ended</option>
             <option value="sold"    <?= $currStatus === 'sold'    ? 'selected' : '' ?>>Sold</option>

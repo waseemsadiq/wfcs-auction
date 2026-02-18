@@ -34,11 +34,21 @@ class HomeController extends Controller
         $browseData = $this->itemService->browse(['status' => 'active'], 1, 6);
         $categories = $this->categories->all();
 
+        // Find the first active event slug so the search form can target it
+        $activeEventSlug = null;
+        foreach ($eventData['events'] as $evt) {
+            if ($evt['status'] === 'active') {
+                $activeEventSlug = $evt['slug'];
+                break;
+            }
+        }
+
         $content = $this->renderView('home/index', [
-            'user'       => $user,
-            'events'     => $eventData['events'],
-            'items'      => $browseData['items'],
-            'categories' => $categories,
+            'user'            => $user,
+            'events'          => $eventData['events'],
+            'items'           => $browseData['items'],
+            'categories'      => $categories,
+            'activeEventSlug' => $activeEventSlug,
         ]);
 
         $this->view('layouts/public', [

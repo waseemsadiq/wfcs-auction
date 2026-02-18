@@ -24,7 +24,7 @@ class BidController extends Controller
         $user = requireAuth();
 
         // Must have verified email
-        if (empty($user['email_verified_at'])) {
+        if (empty($user['verified'])) {
             $this->redirect($basePath . '/verify-email');
         }
 
@@ -60,7 +60,7 @@ class BidController extends Controller
         $user = requireAuth();
 
         // Must have verified email
-        if (empty($user['email_verified_at'])) {
+        if (empty($user['verified'])) {
             flash('Please verify your email address before placing a bid.', 'error');
             $this->redirect($basePath . '/verify-email');
         }

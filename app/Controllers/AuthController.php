@@ -168,13 +168,48 @@ class AuthController extends Controller
             $this->redirect($basePath . '/register');
         }
 
-        $name     = trim($_POST['name'] ?? '');
-        $email    = trim($_POST['email'] ?? '');
-        $password = $_POST['password'] ?? '';
+        // Name — same pattern as AccountService::updateProfile()
+        $firstName = trim($_POST['first_name'] ?? '');
+        $lastName  = trim($_POST['last_name']  ?? '');
+        $name      = trim($firstName . ' ' . $lastName);
+
+        $email           = trim($_POST['email'] ?? '');
+        $password        = $_POST['password'] ?? '';
+        $passwordConfirm = $_POST['password_confirm'] ?? '';
+
+        // Required consents
+        if (empty($_POST['terms']) || empty($_POST['privacy']) || empty($_POST['data_processing'])) {
+            flash('You must accept the Terms, Privacy Policy, and data processing consent to register.', 'error');
+            $this->redirect($basePath . '/register');
+        }
+
+        // Password confirmation
+        if ($password !== $passwordConfirm) {
+            flash('Passwords do not match.', 'error');
+            $this->redirect($basePath . '/register');
+        }
 
         try {
             $result = $this->authService->register($name, $email, $password);
             $user   = $result['user'];
+
+            // Gift Aid — persist if opted in
+            $userRepo = new \App\Repositories\UserRepository();
+            if (!empty($_POST['gift_aid'])) {
+                $userRepo->updateProfile((int)$user['id'], [
+                    'gift_aid_eligible' => 1,
+                    'gift_aid_name'     => $name,
+                    'gift_aid_address'  => trim($_POST['addr1'] ?? ''),
+                    'gift_aid_city'     => trim($_POST['city'] ?? ''),
+                    'gift_aid_postcode' => trim($_POST['postcode'] ?? ''),
+                ]);
+            }
+
+            // Phone — persist if provided
+            $phone = trim($_POST['phone'] ?? '');
+            if ($phone !== '') {
+                $userRepo->updateProfile((int)$user['id'], ['phone' => $phone]);
+            }
 
             $token = $this->authService->generateToken($user);
 

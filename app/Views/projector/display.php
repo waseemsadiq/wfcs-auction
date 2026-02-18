@@ -12,6 +12,7 @@
 global $basePath;
 
 $currentBid     = $liveItem !== null ? (float)($liveItem['current_bid'] ?? 0.0) : 0.0;
+$bidCount       = $liveItem !== null ? (int)($liveItem['bid_count'] ?? 0) : 0;
 $lotNumber      = $liveItem !== null ? (int)($liveItem['lot_number'] ?? 0) : 0;
 $totalLots      = count($items);
 $eventTitle     = $liveEvent !== null ? (string)($liveEvent['title'] ?? '') : '';
@@ -129,17 +130,18 @@ $marketValue    = $liveItem  !== null ? (float)($liveItem['market_value'] ?? 0.0
 
   <!-- Bid amount (hero) -->
   <div class="flex flex-col items-center gap-2 mb-2">
-    <p class="text-sm font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Current Highest Bid</p>
+    <p id="bidLabel" class="text-sm font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest"><?= $bidCount > 0 ? 'Current Highest Bid' : 'Opening Bid' ?></p>
     <p id="bidAmount" class="bid-flash font-black text-slate-900 dark:text-white leading-none tabular-nums tracking-tight">
       £<?= number_format($currentBid, 0) ?>
     </p>
   </div>
 
-  <!-- Bidder info -->
-  <div class="flex items-center gap-6 mt-4 mb-8" id="bidderInfo">
-    <div class="text-center">
+  <!-- Bid count / first-bid prompt -->
+  <div class="mt-4 mb-8 text-center">
+    <p id="noBidsMsg" class="text-lg font-semibold text-slate-400 dark:text-slate-500 <?= $bidCount > 0 ? 'hidden' : '' ?>">Be the first to bid!</p>
+    <div id="bidCountWrap" class="<?= $bidCount > 0 ? '' : 'hidden' ?>">
       <p class="text-xs text-slate-400 dark:text-slate-600 uppercase tracking-widest mb-1">Total Bids</p>
-      <p id="bidCount" class="text-2xl font-bold text-slate-600 dark:text-slate-300 font-mono">0</p>
+      <p id="bidCount" class="text-2xl font-bold text-slate-600 dark:text-slate-300 font-mono"><?= $bidCount ?></p>
     </div>
   </div>
 
@@ -314,6 +316,19 @@ function showStatus(status) {
   }
 }
 
+// Update bid count display — shows "Be the first to bid!" when count is 0
+function updateBidDisplay(count) {
+  var noBids   = document.getElementById('noBidsMsg');
+  var wrap     = document.getElementById('bidCountWrap');
+  var countEl  = document.getElementById('bidCount');
+  var labelEl  = document.getElementById('bidLabel');
+  var hasBids  = count > 0;
+  if (noBids)  noBids.classList.toggle('hidden', hasBids);
+  if (wrap)    wrap.classList.toggle('hidden', !hasBids);
+  if (countEl) countEl.textContent = count;
+  if (labelEl) labelEl.textContent = hasBids ? 'Current Highest Bid' : 'Opening Bid';
+}
+
 // Polling
 function poll() {
   fetch(basePath + '/api/live-status')
@@ -347,10 +362,9 @@ function poll() {
         }
       }
 
-      // Bid count
-      var countEl = document.getElementById('bidCount');
-      if (countEl && data.bid_count !== undefined) {
-        countEl.textContent = data.bid_count;
+      // Bid count + label
+      if (data.bid_count !== undefined) {
+        updateBidDisplay(data.bid_count);
       }
     })
     .catch(function() { /* silent */ });

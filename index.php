@@ -183,7 +183,7 @@ $router->get('/admin/dashboard',    [$adminController, 'dashboard']);
 // Admin — Auctions
 $router->get('/admin/auctions',                    [$adminController, 'auctions']);
 $router->get('/admin/auctions/create',             [$adminController, 'createAuction']);
-$router->post('/admin/auctions/create',            [$adminController, 'storeAuction']);
+$router->post('/admin/auctions',                   [$adminController, 'createAuction']);
 $router->get('/admin/auctions/:slug/edit',         [$adminController, 'editAuction']);
 $router->post('/admin/auctions/:slug/edit',        [$adminController, 'updateAuction']);
 $router->post('/admin/auctions/:slug/publish',     [$adminController, 'publishAuction']);
@@ -194,8 +194,6 @@ $router->post('/admin/auctions/:slug/end',         [$adminController, 'endAuctio
 $router->get('/admin/items',                       [$adminController, 'items']);
 $router->get('/admin/items/:slug/edit',            [$adminController, 'editItem']);
 $router->post('/admin/items/:slug/edit',           [$adminController, 'updateItem']);
-$router->post('/admin/items/:slug/approve',        [$adminController, 'approveItem']);
-$router->post('/admin/items/:slug/reject',         [$adminController, 'rejectItem']);
 
 // Admin — Users
 $router->get('/admin/users',                       [$adminController, 'users']);
@@ -237,6 +235,7 @@ $router->post('/auctioneer/pause',       [$auctioneerController, 'pauseBidding']
 $router->post('/auctioneer/resume',      [$auctioneerController, 'resumeBidding']);
 $router->get('/projector',               [$auctioneerController, 'projector']);
 $router->get('/api/live-status',         [$auctioneerController, 'liveStatus']);
+$router->get('/api/event-bids',          [$auctioneerController, 'eventBids']);
 
 // ---- Internal AJAX polling -------------------------------------------------
 $router->get('/api/current-bid/:slug',             [$apiController, 'currentBid']);

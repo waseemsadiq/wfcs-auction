@@ -72,12 +72,10 @@ class ItemController extends Controller
         $user = getAuthUser();
 
         $categories = $this->categories->all();
-        $events     = $this->eventRepo->allPublic(50, 0);
 
         $content = $this->renderView('items/submit', [
             'user'       => $user,
             'categories' => $categories,
-            'events'     => $events,
             'errors'     => [],
             'old'        => [],
         ]);
@@ -102,29 +100,27 @@ class ItemController extends Controller
         validateCsrf();
 
         $categories = $this->categories->all();
-        $events     = $this->eventRepo->allPublic(50, 0);
 
         $data = [
             'title'         => trim($_POST['title'] ?? ''),
             'description'   => trim($_POST['description'] ?? ''),
             'category_id'   => (int)($_POST['category_id'] ?? 0),
-            'event_id'      => (int)($_POST['event_id'] ?? 0),
             'starting_bid'  => $_POST['starting_bid'] ?? '',
             'min_increment' => $_POST['min_increment'] ?? '',
             'buy_now_price' => $_POST['buy_now_price'] ?? '',
+            'market_value'  => $_POST['market_value'] ?? '',
         ];
 
         // Handle optional image upload
         if (!empty($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
             try {
-                $uploadService  = new UploadService();
-                $data['image']  = $uploadService->uploadItemImage($_FILES['photo']);
+                $uploadService = new UploadService();
+                $data['image'] = $uploadService->uploadItemImage($_FILES['photo']);
             } catch (\RuntimeException $e) {
                 $errors  = ['photo' => $e->getMessage()];
                 $content = $this->renderView('items/submit', [
                     'user'       => $user,
                     'categories' => $categories,
-                    'events'     => $events,
                     'errors'     => $errors,
                     'old'        => $data,
                 ]);
@@ -140,15 +136,25 @@ class ItemController extends Controller
         }
 
         try {
-            $this->itemService->submit($data, (int)$user['id']);
+            $item = $this->itemService->submit($data, (int)$user['id']);
+
+            // Notify admin
+            try {
+                $settingsRepo = new \App\Repositories\SettingsRepository();
+                $adminEmail   = (string)($settingsRepo->get('admin_email') ?? 'info@wellfoundation.org.uk');
+                $baseUrl      = (string)($settingsRepo->get('site_url') ?? ('http://' . ($_SERVER['HTTP_HOST'] ?? 'localhost') . $basePath));
+                (new \App\Services\NotificationService())->sendDonationNotification($item, $user, $adminEmail, $baseUrl);
+            } catch (\Throwable $e) {
+                error_log('ItemController::submit notification failed: ' . $e->getMessage());
+            }
+
             flash('Thank you! Your item has been submitted for review. Our team will be in touch shortly.');
-            $this->redirect($basePath . '/my-bids');
+            $this->redirect($basePath . '/donate?submitted=1');
         } catch (\RuntimeException $e) {
             $errors  = ['general' => $e->getMessage()];
             $content = $this->renderView('items/submit', [
                 'user'       => $user,
                 'categories' => $categories,
-                'events'     => $events,
                 'errors'     => $errors,
                 'old'        => $data,
             ]);

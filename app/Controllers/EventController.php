@@ -69,14 +69,21 @@ class EventController extends Controller
             $this->abort(404);
         }
 
-        $items      = $this->itemRepo->byEvent((int)$event['id'], 50, 0);
+        $filters = [
+            'category_name' => trim($_GET['category'] ?? ''),
+            'search'        => trim($_GET['q']        ?? ''),
+        ];
+
+        $items      = $this->itemRepo->byEvent((int)$event['id'], 50, 0, $filters);
         $categories = $this->categories->all();
 
         $content = $this->renderView('events/show', [
-            'user'       => $user,
-            'event'      => $event,
-            'items'      => $items,
-            'categories' => $categories,
+            'user'         => $user,
+            'event'        => $event,
+            'items'        => $items,
+            'categories'   => $categories,
+            'activeCategory' => $filters['category_name'],
+            'searchQuery'    => $filters['search'],
         ]);
 
         $this->view('layouts/public', [

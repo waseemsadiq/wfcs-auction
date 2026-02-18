@@ -82,7 +82,7 @@ class ApiController extends Controller
             $filters['search'] = $q;
         }
 
-        // For the API we want active, ended and sold — not pending
+        // For the API we want active, ended and sold — not draft
         // The browse() method defaults to active. We need a broader status set.
         // Use the search/browse infrastructure with a multi-status override.
         // Borrowing the 'status' filter key to inject a multi-value condition
@@ -109,7 +109,7 @@ class ApiController extends Controller
         $items = new ItemRepository();
         $item  = $items->findBySlug($slug);
 
-        if (!$item || $item['status'] === 'pending') {
+        if (!$item || $item['status'] === 'draft') {
             $this->apiError('Item not found.', 404);
         }
 

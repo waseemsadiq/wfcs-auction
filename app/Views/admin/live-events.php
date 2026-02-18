@@ -142,9 +142,12 @@ global $basePath, $csrfToken;
           <p class="text-xs text-slate-400 mt-0.5"><?= e($ev['venue']) ?></p>
           <?php endif; ?>
         </div>
-        <span class="text-xs font-semibold px-2.5 py-1 rounded-full <?= $ev['status'] === 'active' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' ?>">
-          <?= e(ucfirst($ev['status'])) ?>
-        </span>
+        <div class="flex items-center gap-2 flex-shrink-0">
+          <a href="<?= e($basePath) ?>/projector?event=<?= e($ev['slug']) ?>" target="_blank" class="px-2.5 py-1 text-xs font-semibold text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">Gala Display</a>
+          <span class="text-xs font-semibold px-2.5 py-1 rounded-full <?= $ev['status'] === 'active' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' ?>">
+            <?= e(ucfirst($ev['status'])) ?>
+          </span>
+        </div>
       </div>
       <?php endforeach; ?>
     </div>

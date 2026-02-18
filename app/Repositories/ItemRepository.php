@@ -54,18 +54,33 @@ class ItemRepository
 
     /**
      * Items in an event for public display (active/ended/sold), ordered by lot_number.
+     * Optional filters: category_name (string), search (LIKE on title)
      */
-    public function byEvent(int $eventId, int $limit = 50, int $offset = 0): array
+    public function byEvent(int $eventId, int $limit = 50, int $offset = 0, array $filters = []): array
     {
+        $conditions = ["i.event_id = ?", "i.status IN ('active', 'ended', 'sold')"];
+        $params     = [$eventId];
+
+        if (!empty($filters['category_name'])) {
+            $conditions[] = 'c.name = ?';
+            $params[]     = $filters['category_name'];
+        }
+
+        if (!empty($filters['search'])) {
+            $conditions[] = 'i.title LIKE ?';
+            $params[]     = '%' . $filters['search'] . '%';
+        }
+
+        $where = ' WHERE ' . implode(' AND ', $conditions);
+
         return $this->db->query(
             'SELECT i.*, c.name AS category_name
              FROM items i
-             LEFT JOIN categories c ON c.id = i.category_id
-             WHERE i.event_id = ?
-               AND i.status IN (\'active\', \'ended\', \'sold\')
-             ORDER BY i.lot_number ASC
+             LEFT JOIN categories c ON c.id = i.category_id'
+            . $where .
+            ' ORDER BY i.lot_number ASC
              LIMIT ' . (int)$limit . ' OFFSET ' . (int)$offset,
-            [$eventId]
+            $params
         );
     }
 
@@ -205,7 +220,7 @@ class ItemRepository
                 $data['min_increment'] ?? 1.00,
                 $data['buy_now_price'] ?? null,
                 $data['market_value'] ?? null,
-                $data['status'] ?? 'pending',
+                $data['status'] ?? 'draft',
             ]
         );
         return (int)$this->db->lastInsertId();

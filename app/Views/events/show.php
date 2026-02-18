@@ -57,7 +57,7 @@ $statusClasses = match($status) {
 <!-- Breadcrumb -->
 <?= atom('breadcrumb', [
     'items' => [
-        ['label' => 'Auctions', 'url' => $basePath . '/auctions'],
+        ['label' => 'Auctions', 'url' => '/auctions'],
         ['label' => $event['title'] ?? ''],
     ],
 ]) ?>

@@ -19,7 +19,7 @@ global $basePath, $csrfToken;
 $statusBadge = function(string $status): string {
     return match($status) {
         'active'  => '<span class="inline-flex px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">Active</span>',
-        'pending' => '<span class="inline-flex px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">Pending Approval</span>',
+        'draft'   => '<span class="inline-flex px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">Draft</span>',
         'sold'    => '<span class="inline-flex px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300">Sold</span>',
         'ended'   => '<span class="inline-flex px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300">Ended</span>',
         default   => '<span class="inline-flex px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-400">' . e($status) . '</span>',
@@ -51,9 +51,6 @@ $filterQ        = $filters['q'] ?? '';
 
   /* Item row */
   .item-row { transition: background-color 0.12s ease; }
-  .item-row.pending-row { background-color: rgba(255,251,235,0.3); }
-  .dark .item-row.pending-row { background-color: rgba(120,60,0,0.05); }
-
   /* Toggle switch */
   .toggle-input ~ .toggle-track .toggle-knob { transform: translateX(0); }
   .toggle-input:checked ~ .toggle-track { background-color: #45a2da; }
@@ -107,7 +104,7 @@ $filterQ        = $filters['q'] ?? '';
   <div class="flex items-center gap-1.5 flex-wrap">
     <button onclick="setStatusFilter(this,'all')" class="status-filter-btn active-filter px-3 py-1.5 text-xs font-semibold rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors">All</button>
     <button onclick="setStatusFilter(this,'active')" class="status-filter-btn px-3 py-1.5 text-xs font-semibold rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors">Active</button>
-    <button onclick="setStatusFilter(this,'pending')" class="status-filter-btn px-3 py-1.5 text-xs font-semibold rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors">Pending</button>
+    <button onclick="setStatusFilter(this,'draft')" class="status-filter-btn px-3 py-1.5 text-xs font-semibold rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors">Draft</button>
     <button onclick="setStatusFilter(this,'ended')" class="status-filter-btn px-3 py-1.5 text-xs font-semibold rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors">Ended</button>
     <button onclick="setStatusFilter(this,'sold')" class="status-filter-btn px-3 py-1.5 text-xs font-semibold rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors">Sold</button>
   </div>
@@ -116,11 +113,7 @@ $filterQ        = $filters['q'] ?? '';
 <!-- Batch actions bar (hidden by default) -->
 <div id="batchBar" class="hidden fade-up mb-3 bg-slate-900 dark:bg-slate-700 rounded-xl px-4 py-3 flex items-center gap-3 flex-wrap">
   <span id="batchCount" class="text-xs font-bold text-slate-300 mr-1">0 selected</span>
-  <button class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-green-300 bg-green-900/40 hover:bg-green-900/70 rounded-lg transition-colors border border-green-700/50">
-    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-    Approve Selected
-  </button>
-  <button class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-amber-300 bg-amber-900/40 hover:bg-amber-900/70 rounded-lg transition-colors border border-amber-700/50">
+<button class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-amber-300 bg-amber-900/40 hover:bg-amber-900/70 rounded-lg transition-colors border border-amber-700/50">
     <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
     End Selected
   </button>
@@ -166,9 +159,8 @@ $filterQ        = $filters['q'] ?? '';
       </thead>
       <tbody class="divide-y divide-slate-50 dark:divide-slate-700/30">
         <?php foreach ($items as $item): ?>
-        <?php $isPending = ($item['status'] ?? '') === 'pending'; ?>
         <?php $reserveMet = !empty($item['reserve_price']) && ((float)($item['current_bid'] ?? 0)) >= (float)$item['reserve_price']; ?>
-        <tr class="item-row <?= $isPending ? 'pending-row hover:bg-amber-50/50 dark:hover:bg-amber-900/10' : 'hover:bg-slate-50 dark:hover:bg-slate-700/30' ?> transition-colors"
+        <tr class="item-row hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors"
             data-status="<?= e($item['status'] ?? '') ?>">
           <td class="px-4 py-3.5">
             <label class="flex items-center cursor-pointer">
@@ -216,7 +208,7 @@ $filterQ        = $filters['q'] ?? '';
           </td>
           <td class="px-3 py-3.5">
             <div class="flex items-center gap-1.5 flex-wrap">
-              <?= $statusBadge($item['status'] ?? 'pending') ?>
+              <?= $statusBadge($item['status'] ?? 'draft') ?>
               <?php if ($reserveMet): ?>
               <span class="inline-flex items-center gap-1 text-xs font-semibold text-green-600 dark:text-green-400">
                 <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
@@ -229,18 +221,9 @@ $filterQ        = $filters['q'] ?? '';
           </td>
           <td class="px-4 py-3.5">
             <div class="flex items-center justify-end gap-1.5">
-              <?php if ($isPending): ?>
-              <form method="POST" action="<?= e($basePath) ?>/admin/items/<?= e($item['slug']) ?>/approve">
-                <input type="hidden" name="_csrf_token" value="<?= e($csrfToken) ?>">
-                <button type="submit" class="px-2.5 py-1.5 text-xs font-semibold text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700/40 hover:bg-green-100 dark:hover:bg-green-900/40 rounded-lg transition-colors">Approve</button>
-              </form>
-              <form method="POST" action="<?= e($basePath) ?>/admin/items/<?= e($item['slug']) ?>/reject">
-                <input type="hidden" name="_csrf_token" value="<?= e($csrfToken) ?>">
-                <button type="submit" class="px-2.5 py-1.5 text-xs font-semibold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700/40 hover:bg-red-100 dark:hover:bg-red-900/40 rounded-lg transition-colors">Reject</button>
-              </form>
-              <?php else: ?>
               <a href="<?= e($basePath) ?>/admin/items/<?= e($item['slug']) ?>/edit" class="px-2.5 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg transition-colors">Edit</a>
-              <a href="<?= e($basePath) ?>/auctions/<?= e($item['event_slug'] ?? '') ?>/<?= e($item['slug']) ?>" target="_blank" class="px-2.5 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg transition-colors">View</a>
+              <?php if (!empty($item['event_slug'])): ?>
+              <a href="<?= e($basePath) ?>/auctions/<?= e($item['event_slug']) ?>/<?= e($item['slug']) ?>" target="_blank" class="px-2.5 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg transition-colors">View</a>
               <?php endif; ?>
             </div>
           </td>
@@ -284,51 +267,6 @@ $filterQ        = $filters['q'] ?? '';
       <button onclick="document.getElementById('confirm-delete-popover').hidePopover()" class="px-4 py-2 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white border border-slate-200 dark:border-slate-600 rounded-lg transition-colors">Cancel</button>
       <button onclick="document.getElementById('confirm-delete-popover').hidePopover()" class="px-4 py-2 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors">Delete</button>
     </div>
-  </div>
-</div>
-
-<!-- Confirm Approve -->
-<div id="confirm-approve-popover" popover="manual" class="form-popover popover-sm rounded-2xl shadow-2xl p-0 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-  <div class="p-6">
-    <div class="flex items-start gap-4 mb-5">
-      <div class="flex-shrink-0 w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-        <svg class="w-5 h-5 text-green-600 dark:text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-      </div>
-      <div>
-        <h3 class="text-sm font-bold text-slate-900 dark:text-white mb-1">Approve <span id="approve-item-name"></span>?</h3>
-        <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">This lot will go live for bidding immediately. The donor will be notified.</p>
-      </div>
-    </div>
-    <div class="flex items-center justify-end gap-3">
-      <button onclick="document.getElementById('confirm-approve-popover').hidePopover()" class="px-4 py-2 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white border border-slate-200 dark:border-slate-600 rounded-lg transition-colors">Cancel</button>
-      <form id="approve-form" method="POST" action="" class="inline">
-        <input type="hidden" name="_csrf_token" value="<?= e($csrfToken) ?>">
-        <button type="submit" class="px-4 py-2 text-sm font-semibold text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors">Approve</button>
-      </form>
-    </div>
-  </div>
-</div>
-
-<!-- Confirm Reject -->
-<div id="confirm-reject-popover" popover="manual" class="form-popover popover-sm rounded-2xl shadow-2xl p-0 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-  <div class="p-6">
-    <div class="flex items-start gap-4 mb-4">
-      <div class="flex-shrink-0 w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-        <svg class="w-5 h-5 text-red-600 dark:text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-      </div>
-      <div>
-        <h3 class="text-sm font-bold text-slate-900 dark:text-white mb-1">Reject <span id="reject-item-name"></span>?</h3>
-        <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">The donor will be notified. Optionally add a reason below.</p>
-      </div>
-    </div>
-    <form id="reject-form" method="POST" action="">
-      <input type="hidden" name="_csrf_token" value="<?= e($csrfToken) ?>">
-      <textarea id="reject-reason" name="reason" rows="3" placeholder="Reason for rejection (optional)&hellip;" class="w-full px-3 py-2 text-sm border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary resize-none mb-4"></textarea>
-      <div class="flex items-center justify-end gap-3">
-        <button type="button" onclick="document.getElementById('confirm-reject-popover').hidePopover()" class="px-4 py-2 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white border border-slate-200 dark:border-slate-600 rounded-lg transition-colors">Cancel</button>
-        <button type="submit" class="px-4 py-2 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors">Reject</button>
-      </div>
-    </form>
   </div>
 </div>
 

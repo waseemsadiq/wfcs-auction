@@ -6,7 +6,6 @@
  *   $basePath   (global), $csrfToken (global)
  *   $user       — authenticated user (required)
  *   $categories — all categories for dropdown
- *   $events     — public events for dropdown
  *   $errors     — validation error messages
  *   $old        — old POST data for re-fill
  */
@@ -88,10 +87,11 @@ $old    = $old ?? [];
   input[type="number"]::-webkit-outer-spin-button,
   input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
   input[type="number"] { -moz-appearance: textfield; }
+
 </style>
 
 <!-- Hero banner (full-bleed) -->
-<div class="-mx-6 -mt-10 mb-10">
+<div class="hero-full-bleed mb-10">
   <section class="relative overflow-hidden bg-slate-900 hero-grain">
     <div class="absolute top-0 left-1/3 w-[600px] h-[300px] bg-primary/15 rounded-full blur-3xl pointer-events-none"></div>
     <div class="absolute bottom-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none"></div>
@@ -106,7 +106,7 @@ $old    = $old ?? [];
             Offer an Item for Auction
           </h1>
           <p class="text-slate-400 text-base leading-relaxed max-w-xl">
-            Got something you'd like to donate to the auction? Tell us about it and our team will be in touch. We handle all the listing, pricing, and logistics.
+            Got something you'd like to donate? Tell us about it — our team will be in touch to confirm the details, assign it to the right auction, and handle all the logistics.
           </p>
         </div>
         <div class="flex md:flex-col gap-3">
@@ -232,47 +232,24 @@ $old    = $old ?? [];
       </div>
     </div>
 
-    <!-- ── SECTION 3: CATEGORY + EVENT ── -->
+    <!-- ── SECTION 3: CATEGORY ── -->
     <div class="form-section fade-up delay-2">
-      <p class="section-title">Auction details</p>
-      <div class="space-y-4">
-
-        <!-- Category -->
-        <div>
-          <label for="category_id" class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Category <span class="text-red-500">*</span></label>
-          <select
-            id="category_id"
-            name="category_id"
-            class="field w-full px-4 py-3 text-sm bg-slate-50 dark:bg-slate-700/50 border <?= !empty($errors['category_id']) ? 'border-red-400' : 'border-slate-200 dark:border-slate-600' ?> rounded-xl text-slate-900 dark:text-white"
-          >
-            <option value="">Select a category&hellip;</option>
-            <?php foreach ($categories as $cat): ?>
-            <option value="<?= e($cat['id']) ?>" <?= (int)($old['category_id'] ?? 0) === (int)$cat['id'] ? 'selected' : '' ?>><?= e($cat['name']) ?></option>
-            <?php endforeach; ?>
-          </select>
-          <?php if (!empty($errors['category_id'])): ?>
-          <p class="text-xs text-red-500 mt-1"><?= e($errors['category_id']) ?></p>
-          <?php endif; ?>
-        </div>
-
-        <!-- Event -->
-        <div>
-          <label for="event_id" class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Auction event <span class="text-red-500">*</span></label>
-          <select
-            id="event_id"
-            name="event_id"
-            class="field w-full px-4 py-3 text-sm bg-slate-50 dark:bg-slate-700/50 border <?= !empty($errors['event_id']) ? 'border-red-400' : 'border-slate-200 dark:border-slate-600' ?> rounded-xl text-slate-900 dark:text-white"
-          >
-            <option value="">Select an event&hellip;</option>
-            <?php foreach ($events as $evt): ?>
-            <option value="<?= e($evt['id']) ?>" <?= (int)($old['event_id'] ?? 0) === (int)$evt['id'] ? 'selected' : '' ?>><?= e($evt['title']) ?></option>
-            <?php endforeach; ?>
-          </select>
-          <?php if (!empty($errors['event_id'])): ?>
-          <p class="text-xs text-red-500 mt-1"><?= e($errors['event_id']) ?></p>
-          <?php endif; ?>
-        </div>
-
+      <p class="section-title">Category</p>
+      <div>
+        <label for="category_id" class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Category <span class="text-red-500">*</span></label>
+        <select
+          id="category_id"
+          name="category_id"
+          class="field w-full px-4 py-3 text-sm bg-slate-50 dark:bg-slate-700/50 border <?= !empty($errors['category_id']) ? 'border-red-400' : 'border-slate-200 dark:border-slate-600' ?> rounded-xl text-slate-900 dark:text-white"
+        >
+          <option value="">Select a category&hellip;</option>
+          <?php foreach ($categories as $cat): ?>
+          <option value="<?= e($cat['id']) ?>" <?= (int)($old['category_id'] ?? 0) === (int)$cat['id'] ? 'selected' : '' ?>><?= e($cat['name']) ?></option>
+          <?php endforeach; ?>
+        </select>
+        <?php if (!empty($errors['category_id'])): ?>
+        <p class="text-xs text-red-500 mt-1"><?= e($errors['category_id']) ?></p>
+        <?php endif; ?>
       </div>
     </div>
 

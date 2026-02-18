@@ -127,6 +127,20 @@ $currentBid = $liveItem !== null ? (float)($liveItem['current_bid'] ?? 0.0) : 0.
         </div>
       </div>
 
+      <!-- Open Bidding -->
+      <div class="mb-5">
+        <div id="openBiddingWrap" class="<?= $liveItemStatus === 'pending' ? '' : 'hidden' ?>">
+          <button onclick="openBidding()" class="w-full flex items-center justify-center gap-2.5 px-4 py-4 bg-green-600 hover:bg-green-700 text-white text-base font-black rounded-xl transition-colors">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Open Bidding
+          </button>
+        </div>
+        <div id="biddingOpenBadge" class="<?= $liveItemStatus === 'open' ? 'flex' : 'hidden' ?> items-center justify-center gap-2 py-2.5 rounded-xl bg-green-500/10 border border-green-500/20">
+          <span class="live-dot w-2 h-2 rounded-full bg-green-400 flex-shrink-0"></span>
+          <span class="text-sm font-bold text-green-400 uppercase tracking-widest">Bidding is Open</span>
+        </div>
+      </div>
+
       <!-- State buttons -->
       <div class="mb-5">
         <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Advance Auction State</p>
@@ -365,8 +379,12 @@ function openBidding() {
   .then(function(data) {
     if (data.ok) {
       showToast('Bidding is now open', 'success');
-      var ss = document.getElementById('sidebarStatus');
-      if (ss) { ss.textContent = 'Open'; ss.className = 'text-xs font-semibold text-green-600 dark:text-green-400'; }
+      var ss  = document.getElementById('sidebarStatus');
+      var ob  = document.getElementById('openBiddingWrap');
+      var bod = document.getElementById('biddingOpenBadge');
+      if (ss)  { ss.textContent = 'Open'; ss.className = 'text-xs font-semibold text-green-600 dark:text-green-400'; }
+      if (ob)  { ob.classList.add('hidden'); }
+      if (bod) { bod.classList.remove('hidden'); bod.classList.add('flex'); }
     } else {
       showToast(data.error || 'Failed to open bidding', 'error');
     }

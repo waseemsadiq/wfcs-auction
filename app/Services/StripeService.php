@@ -3,16 +3,32 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Repositories\SettingsRepository;
+
 /**
  * StripeService — thin curl wrapper around the Stripe REST API.
  *
  * No Composer SDK. All calls use PHP curl with Basic auth (secret key as user, empty password).
+ *
+ * Key resolution order: settings DB table → .env / environment variables.
+ * The admin settings page is the canonical place to set Stripe keys.
  *
  * Galvani note: Stripe-Signature header is dropped by Galvani. Webhook verification
  * falls back to a URL-based shared token stored in the settings table.
  */
 class StripeService
 {
+    private function secretKey(): string
+    {
+        $stored = (new SettingsRepository())->get('stripe_secret_key') ?? '';
+        return $stored !== '' ? decryptSetting($stored) : config('stripe.secret_key', '');
+    }
+
+    private function publishableKey(): string
+    {
+        $stored = (new SettingsRepository())->get('stripe_publishable_key') ?? '';
+        return $stored !== '' ? decryptSetting($stored) : config('stripe.publishable_key', '');
+    }
     /**
      * Create a Stripe Checkout Session.
      *
@@ -131,10 +147,7 @@ class StripeService
      */
     public function isConfigured(): bool
     {
-        $secret = config('stripe.secret_key');
-        $pub    = config('stripe.publishable_key');
-
-        return !empty($secret) && !empty($pub);
+        return $this->secretKey() !== '' && $this->publishableKey() !== '';
     }
 
     // -------------------------------------------------------------------------
@@ -152,7 +165,7 @@ class StripeService
      */
     private function stripeRequest(string $method, string $endpoint, array $params = []): array
     {
-        $secretKey = config('stripe.secret_key');
+        $secretKey = $this->secretKey();
         $url       = 'https://api.stripe.com/v1/' . $endpoint;
 
         $ch = curl_init($url);

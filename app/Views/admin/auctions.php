@@ -253,10 +253,10 @@ $statusBadge = function(string $status): string {
   </div>
 </div>
 
-<?php
-$pageScripts = <<<'JS'
+<script>
+window._basePath = '<?= e($basePath) ?>';
 function openEditAuction(slug, name, venue, description, starts, ends) {
-  document.getElementById('edit-event-form').action = window._basePath + '/admin/auctions/' + slug;
+  document.getElementById('edit-event-form').action = window._basePath + '/admin/auctions/' + slug + '/edit';
   document.getElementById('edit-event-name').value = name;
   document.getElementById('edit-event-venue').value = venue;
   document.getElementById('edit-event-description').value = description;
@@ -264,6 +264,4 @@ function openEditAuction(slug, name, venue, description, starts, ends) {
   document.getElementById('edit-event-ends').value = ends ? ends + 'T00:00' : '';
   document.getElementById('edit-event-popover').showPopover();
 }
-JS;
-?>
-<script>window._basePath = '<?= e($basePath) ?>';</script>
+</script>

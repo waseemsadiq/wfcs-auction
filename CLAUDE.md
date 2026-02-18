@@ -15,13 +15,14 @@ NEVER auth checks in constructors — check in each method.
 NEVER multi-step writes across requests — do dependent writes in one handler.
 DELETE request bodies are stripped — pass params via `$_GET` / query string only.
 CSRF token via `csrfUrl()` → `_csrf_token` query param (headers dropped on multipart/DELETE).
-Restart Galvani after editing any PHP class file. Views don't need a restart.
-Min 4 threads — `--threads 1` will fail.
 CLI scripts: raw mysqli only — copy db-init.php pattern. No framework classes, no Dotenv.
 NEVER use system `php` to generate password hashes — Galvani's PHP build is incompatible with system PHP bcrypt; hashes will silently fail `password_verify()`. Always generate hashes via Galvani: `./galvani auction/hash.php` where `hash.php` runs `echo password_hash('secret', PASSWORD_DEFAULT);`.
-NEVER use `rowCount()` to verify UPDATE success — trust `execute()` returning bool. `rowCount()` is unreliable in Galvani web requests. Full detail: `galvani-development` skill.
-ALWAYS add `ob_start()` as the first line of `index.php` (after `declare`) — Galvani keep-alive reuses thread "headers sent" state across requests; without it, `setcookie()`/`header()` silently fail on redirect targets (flash messages never appear). Full detail: `galvani-development` skill.
 mysql CLI direct SQL: always `--skip-ssl` — `--ssl-mode=DISABLED` does not exist on this build; omitting it causes an SSL error. Pattern: `echo "SQL;" | mysql --socket=../data/mysql.sock -u root --skip-ssl [dbname]`
+
+## PHP — HARD RULES
+
+ALWAYS `ob_start()` as first line of `index.php` (after `declare`) — any output before `setcookie()`/`header()` silently drops them. Standard PHP buffering.
+NEVER `rowCount()` to verify UPDATE success — trust `execute()` bool. With emulated prepares, `rowCount()` returns 0 when rows matched but weren't changed. Standard PDO behaviour.
 
 ## ARCHITECTURE — HARD RULES
 
@@ -107,7 +108,7 @@ These exist in `app/Views/atoms/` — use them, don't recreate them:
 # From /Users/waseem/Sites/www/
 ./galvani                                             # start server
 ./galvani auction/db-init.php                        # wipe + reimport schema + seeds
-./galvani auction/vendor/bin/phpunit auction/tests/  # run tests
+./galvani auction/run-tests.php                      # run tests (shebang-free wrapper — vendor/bin/phpunit has shebang Galvani can't strip)
 ```
 
 ## Reference files (read on demand)

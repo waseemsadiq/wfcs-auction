@@ -77,7 +77,7 @@ $statusClasses = match($item['status'] ?? '') {
 </style>
 
 <!-- Hero image (full-bleed, breaks out of layout max-w) -->
-<div class="-mx-6 -mt-10 mb-8 relative hero-image-overlay">
+<div class="hero-full-bleed mb-8 relative hero-image-overlay">
   <div class="w-full h-[42vh] min-h-64 max-h-96 overflow-hidden bg-slate-900 lg:h-[48vh] lg:max-h-[520px]">
     <?php if (!empty($item['image'])): ?>
     <img
@@ -100,9 +100,9 @@ $statusClasses = match($item['status'] ?? '') {
 
 <!-- Breadcrumb -->
 <?php
-$breadcrumbItems = [['label' => 'Auctions', 'url' => $basePath . '/auctions']];
+$breadcrumbItems = [['label' => 'Auctions', 'url' => '/auctions']];
 if (!empty($item['event_slug'])) {
-    $breadcrumbItems[] = ['label' => $item['event_title'] ?? 'Event', 'url' => $basePath . '/auctions/' . $item['event_slug']];
+    $breadcrumbItems[] = ['label' => $item['event_title'] ?? 'Event', 'url' => '/auctions/' . $item['event_slug']];
 }
 $breadcrumbItems[] = ['label' => $item['title'] ?? ''];
 echo atom('breadcrumb', ['items' => $breadcrumbItems]);
@@ -457,14 +457,14 @@ echo atom('breadcrumb', ['items' => $breadcrumbItems]);
 
 <?php
 // Page-specific scripts for countdown and AJAX polling
-$itemSlug  = e($item['slug'] ?? '');
-$endsAt    = e($item['ends_at'] ?? '');
+$itemSlug   = e($item['slug'] ?? '');
+$endsAt     = e($item['ends_at'] ?? '');
 $isActiveJs = $isActive ? 'true' : 'false';
-$pageScripts = <<<JS
-
+?>
+<script>
 // ── Countdown ──
 (function() {
-  const endsAt = {$isActiveJs} ? new Date('{$endsAt}').getTime() : 0;
+  const endsAt = <?= $isActiveJs ?> ? new Date('<?= $endsAt ?>').getTime() : 0;
   if (!endsAt) return;
 
   function fmt(ms) {
@@ -491,18 +491,22 @@ $pageScripts = <<<JS
 
 // ── AJAX bid polling (every 10s on active items) ──
 (function() {
-  if (!{$isActiveJs}) return;
-  const basePath = '{$basePath}';
+  if (!<?= $isActiveJs ?>) return;
+  const basePath = '<?= e($basePath) ?>';
   setInterval(function() {
-    fetch(basePath + '/api/current-bid/{$itemSlug}')
+    fetch(basePath + '/api/current-bid/<?= $itemSlug ?>')
       .then(function(r) { return r.json(); })
       .then(function(d) {
+        const item = d.data || d;
+        const formatted = item.current_bid != null
+          ? '£' + parseFloat(item.current_bid).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+          : null;
         const cbEl = document.getElementById('current-bid');
-        if (cbEl) cbEl.textContent = d.current_bid;
+        if (cbEl && formatted) cbEl.textContent = formatted;
         const mbEl = document.getElementById('mobile-current-bid');
-        if (mbEl) mbEl.textContent = d.current_bid;
+        if (mbEl && formatted) mbEl.textContent = formatted;
         const bcEl = document.getElementById('bid-count');
-        if (bcEl) bcEl.textContent = d.bid_count + ' bid' + (d.bid_count !== 1 ? 's' : '');
+        if (bcEl && item.bid_count != null) bcEl.textContent = item.bid_count + ' bid' + (item.bid_count !== 1 ? 's' : '');
       })
       .catch(function() {});
   }, 10000);
@@ -514,5 +518,4 @@ function copyLink() {
     showToast('Link copied to clipboard', 'success');
   }).catch(function() {});
 }
-JS;
-?>
+</script>

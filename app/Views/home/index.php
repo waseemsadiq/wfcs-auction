@@ -47,13 +47,6 @@ global $basePath, $csrfToken;
   }
   .tick { animation: tickPulse 1s ease-in-out infinite; }
 
-  /* ─── Full-bleed (breaks out of max-w-6xl container) ─── */
-  .hero-full-bleed {
-    margin-left: calc(50% - 50vw);
-    margin-right: calc(50% - 50vw);
-    margin-top: -2.5rem;
-    width: 100vw;
-  }
   .filter-full-bleed {
     margin-left: calc(50% - 50vw);
     margin-right: calc(50% - 50vw);
@@ -140,8 +133,8 @@ global $basePath, $csrfToken;
 <div id="auctions" class="filter-full-bleed mb-8 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700/30 shadow-sm sticky top-20 z-30">
   <div class="max-w-6xl mx-auto px-6 py-3.5 flex flex-wrap gap-3 items-center">
 
-    <!-- Search — GET form targeting auctions list -->
-    <form action="<?= e($basePath) ?>/auctions" method="GET" class="relative flex items-center gap-3 flex-wrap">
+    <!-- Search — GET form: if there's an active event, search within it; else browse all -->
+    <form action="<?= e($basePath) ?>/<?= !empty($activeEventSlug) ? 'auctions/' . e($activeEventSlug) : 'auctions' ?>" method="GET" class="relative flex items-center gap-3 flex-wrap">
       <div class="relative">
         <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input
@@ -153,7 +146,7 @@ global $basePath, $csrfToken;
       </div>
 
       <?php if (!empty($categories)): ?>
-      <select name="category" class="px-3 py-2 text-sm border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50">
+      <select name="category" onchange="this.form.submit()" class="px-3 py-2 text-sm border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50">
         <option value="">All Categories</option>
         <?php foreach ($categories as $cat): ?>
         <option value="<?= e($cat['slug']) ?>"><?= e($cat['name']) ?></option>

@@ -207,23 +207,41 @@ INSERT INTO items (slug, event_id, category_id, donor_id, title, description, lo
    'Brand new sealed Apple MacBook Pro 14-inch with M4 chip, 16GB RAM, 512GB SSD in Space Black. Includes UK power adapter. One of the most powerful laptops Apple has ever made — ideal for creative professionals.',
    8, 1500.00, 100.00, 2500.00, 1800.00, 2, 'active', 2399.00);
 
--- Lot 9: PENDING — awaiting admin approval
+-- Lot 9: ART — original watercolour
+INSERT INTO items (slug, event_id, category_id, donor_id, title, description, lot_number,
+  starting_bid, min_increment, buy_now_price, current_bid, bid_count, status, market_value) VALUES
+  ('highland-watercolour', 1,
+   (SELECT id FROM categories WHERE slug='art'), 4,
+   'Highland Glen Watercolour',
+   'Original watercolour depicting a misty Highland glen at dawn by Glasgow-based artist. Painted en plein air in Glencoe. Framed in natural ash. 60cm × 45cm. Signed and dated.',
+   9, 280.00, 20.00, NULL, 280.00, 0, 'active', 520.00);
+
+-- Lot 10: ART — bronze sculpture
+INSERT INTO items (slug, event_id, category_id, donor_id, title, description, lot_number,
+  starting_bid, min_increment, buy_now_price, current_bid, bid_count, status, market_value) VALUES
+  ('bronze-stag-sculpture', 1,
+   (SELECT id FROM categories WHERE slug='art'), 2,
+   'Bronze Stag Sculpture',
+   'Limited-edition cast bronze sculpture of a Highland red deer stag by Edinburgh sculptor. One of only 12 produced. Mounted on a polished slate plinth. Height 34cm. Certificate of authenticity included.',
+   10, 950.00, 50.00, NULL, 950.00, 0, 'active', 1800.00);
+
+-- Lot 11: PENDING — awaiting admin approval
 INSERT INTO items (slug, event_id, category_id, donor_id, title, description, lot_number,
   starting_bid, min_increment, buy_now_price, current_bid, bid_count, status, market_value) VALUES
   ('celtic-fc-signed-jersey', 1,
    (SELECT id FROM categories WHERE slug='sports'), 4,
    'Celtic FC Signed Home Jersey 2025/26',
    'An official Celtic FC home jersey for the 2025/26 season, hand-signed by five first-team players. Presented in a display frame with certificate of authenticity. A must-have for any Hoops fan.',
-   9, 250.00, 25.00, NULL, 250.00, 0, 'pending', 500.00);
+   9, 250.00, 25.00, NULL, 250.00, 0, 'active', 500.00);
 
--- Lot 10: PENDING — awaiting admin approval
+-- Lot 12: ACTIVE
 INSERT INTO items (slug, event_id, category_id, donor_id, title, description, lot_number,
   starting_bid, min_increment, buy_now_price, current_bid, bid_count, status, market_value) VALUES
   ('handmade-jewellery-set', 1,
    (SELECT id FROM categories WHERE slug='fashion'), 2,
    'Handmade Silver Jewellery Set',
    'A beautifully crafted sterling silver jewellery set by Scottish designer, comprising necklace, bracelet, and matching earrings. Inspired by traditional Celtic knotwork. Presented in a velvet gift box.',
-   10, 150.00, 15.00, NULL, 150.00, 0, 'pending', 280.00);
+   10, 150.00, 15.00, NULL, 150.00, 0, 'active', 280.00);
 
 -- ─── Items — Event 2 (ENDED — Winter Wonderland 2025) ─────────────────────
 

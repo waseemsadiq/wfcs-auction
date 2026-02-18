@@ -195,41 +195,23 @@ global $basePath, $csrfToken;
     </div>
 
     <!-- Pending Actions -->
-    <?php $pendingItems = (int)($stats['pending_item_count'] ?? 0); $pendingPayments = (int)($stats['pending_payment_count'] ?? 0); ?>
-    <?php if ($pendingItems > 0 || $pendingPayments > 0): ?>
+    <?php $pendingPayments = (int)($stats['pending_payment_count'] ?? 0); ?>
+    <?php if ($pendingPayments > 0): ?>
     <div class="bg-white dark:bg-slate-800 rounded-xl border border-amber-200 dark:border-amber-700/40 p-5">
       <h3 class="text-sm font-semibold text-slate-900 dark:text-white mb-3">Pending Actions</h3>
       <ul class="space-y-2.5 mb-4">
-        <?php if ($pendingPayments > 0): ?>
         <li class="flex items-start gap-2.5">
           <div class="w-5 h-5 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center flex-shrink-0 mt-0.5">
             <span class="text-xs font-bold text-amber-600 dark:text-amber-400"><?= $pendingPayments ?></span>
           </div>
           <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">Winners awaiting payment request</p>
         </li>
-        <?php endif; ?>
-        <?php if ($pendingItems > 0): ?>
-        <li class="flex items-start gap-2.5">
-          <div class="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-            <span class="text-xs font-bold text-primary"><?= $pendingItems ?></span>
-          </div>
-          <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">Item<?= $pendingItems > 1 ? 's' : '' ?> awaiting admin approval</p>
-        </li>
-        <?php endif; ?>
       </ul>
       <div class="flex flex-col gap-2">
-        <?php if ($pendingPayments > 0): ?>
         <a href="<?= e($basePath) ?>/admin/payments" class="flex items-center justify-center gap-2 px-3 py-2 text-xs font-semibold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/20 hover:bg-amber-100 dark:hover:bg-amber-900/40 rounded-lg transition-colors border border-amber-200 dark:border-amber-700/40">
           <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
           View Pending Payments
         </a>
-        <?php endif; ?>
-        <?php if ($pendingItems > 0): ?>
-        <a href="<?= e($basePath) ?>/admin/items" class="flex items-center justify-center gap-2 px-3 py-2 text-xs font-semibold text-primary bg-primary/5 hover:bg-primary/10 rounded-lg transition-colors border border-primary/20">
-          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-          Approve Items
-        </a>
-        <?php endif; ?>
       </div>
     </div>
     <?php else: ?>

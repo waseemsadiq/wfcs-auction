@@ -69,7 +69,80 @@ class UploadService
             throw new \RuntimeException('Failed to move uploaded file.');
         }
 
+        // 8. Generate thumbnail (best-effort — don't fail upload if GD unavailable)
+        if (extension_loaded('gd')) {
+            $this->generateThumbnail($uploadsDir . '/' . $filename, $mime);
+        }
+
         return $filename;
+    }
+
+    /**
+     * Generate a 200×200-max thumbnail and save to uploads/thumbs/<filename>.
+     * Best-effort — silently ignores failures.
+     */
+    public function generateThumbnail(string $srcPath, string $mime = ''): void
+    {
+        if ($mime === '') {
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mime  = $finfo ? (string)finfo_file($finfo, $srcPath) : '';
+            if ($finfo) finfo_close($finfo);
+        }
+
+        $src = match ($mime) {
+            'image/jpeg' => @imagecreatefromjpeg($srcPath),
+            'image/png'  => @imagecreatefrompng($srcPath),
+            'image/webp' => @imagecreatefromwebp($srcPath),
+            'image/gif'  => @imagecreatefromgif($srcPath),
+            default      => false,
+        };
+
+        if ($src === false) {
+            return;
+        }
+
+        $origW = imagesx($src);
+        $origH = imagesy($src);
+
+        $maxDim = 200;
+        $ratio  = min($maxDim / $origW, $maxDim / $origH, 1.0);
+        $newW   = max(1, (int)round($origW * $ratio));
+        $newH   = max(1, (int)round($origH * $ratio));
+
+        $thumb = imagecreatetruecolor($newW, $newH);
+        if ($thumb === false) {
+            imagedestroy($src);
+            return;
+        }
+
+        // Preserve transparency for PNG/GIF
+        if ($mime === 'image/png' || $mime === 'image/gif') {
+            imagealphablending($thumb, false);
+            imagesavealpha($thumb, true);
+            $transparent = imagecolorallocatealpha($thumb, 0, 0, 0, 127);
+            if ($transparent !== false) {
+                imagefilledrectangle($thumb, 0, 0, $newW, $newH, $transparent);
+            }
+        }
+
+        imagecopyresampled($thumb, $src, 0, 0, 0, 0, $newW, $newH, $origW, $origH);
+        imagedestroy($src);
+
+        $thumbsDir = dirname($srcPath) . '/thumbs';
+        if (!is_dir($thumbsDir)) {
+            @mkdir($thumbsDir, 0755, true);
+        }
+
+        $dest = $thumbsDir . '/' . basename($srcPath);
+        match ($mime) {
+            'image/jpeg' => imagejpeg($thumb, $dest, 85),
+            'image/png'  => imagepng($thumb, $dest, 6),
+            'image/webp' => imagewebp($thumb, $dest, 85),
+            'image/gif'  => imagegif($thumb, $dest),
+            default      => null,
+        };
+
+        imagedestroy($thumb);
     }
 
     /**

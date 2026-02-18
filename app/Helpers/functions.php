@@ -244,3 +244,59 @@ function isGalvani(): bool
 {
     return !empty($_SERVER['GALVANI']) || !empty($_ENV['GALVANI']);
 }
+
+/**
+ * Encrypt a sensitive setting value for DB storage.
+ * Uses AES-256-GCM with a random IV. Stored as "enc:<base64(iv|tag|ciphertext)>".
+ * Key comes from config('app.key') — set APP_KEY in .env.
+ */
+function encryptSetting(string $plaintext): string
+{
+    $key = config('app.key');
+    if (empty($key)) {
+        throw new \RuntimeException('APP_KEY is not set. Cannot encrypt sensitive settings.');
+    }
+    $keyBytes = hex2bin($key);
+    $iv       = random_bytes(12); // 96-bit IV for GCM
+    $tag      = '';
+    $cipher   = openssl_encrypt($plaintext, 'aes-256-gcm', $keyBytes, OPENSSL_RAW_DATA, $iv, $tag, '', 16);
+    if ($cipher === false) {
+        throw new \RuntimeException('Encryption failed.');
+    }
+    return 'enc:' . base64_encode($iv . $tag . $cipher);
+}
+
+/**
+ * Decrypt a setting value from the DB.
+ * Values not starting with "enc:" are treated as legacy plaintext and returned as-is.
+ */
+function decryptSetting(string $value): string
+{
+    if (strncmp($value, 'enc:', 4) !== 0) {
+        return $value; // legacy plaintext — backward compatible
+    }
+    $key = config('app.key');
+    if (empty($key)) {
+        error_log('decryptSetting: APP_KEY is not set — returning empty string');
+        return '';
+    }
+    $keyBytes = @hex2bin($key);
+    if ($keyBytes === false) {
+        error_log('decryptSetting: APP_KEY is not valid hex — returning empty string');
+        return '';
+    }
+    $decoded = base64_decode(substr($value, 4), true);
+    if ($decoded === false || strlen($decoded) < 28) { // 12 IV + 16 tag minimum
+        error_log('decryptSetting: invalid encrypted value — returning empty string');
+        return '';
+    }
+    $iv         = substr($decoded, 0, 12);
+    $tag        = substr($decoded, 12, 16);
+    $ciphertext = substr($decoded, 28);
+    $plaintext  = openssl_decrypt($ciphertext, 'aes-256-gcm', $keyBytes, OPENSSL_RAW_DATA, $iv, $tag);
+    if ($plaintext === false) {
+        error_log('decryptSetting: decryption failed — wrong APP_KEY or corrupted data');
+        return '';
+    }
+    return $plaintext;
+}

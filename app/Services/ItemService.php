@@ -35,7 +35,7 @@ class ItemService
      * Submit an item for donation.
      *
      * Validates: title required, category exists, event exists and is published/active.
-     * Sets status to 'pending' (must be approved by admin).
+     * Sets status to 'draft'.
      * Generates slug from title.
      * Returns the persisted item array.
      *
@@ -53,31 +53,22 @@ class ItemService
             throw new \RuntimeException('Please select a valid category.');
         }
 
-        $eventId = (int)($data['event_id'] ?? 0);
-        $event   = $eventId > 0 ? $this->events->findById($eventId) : null;
-
-        if ($event === null) {
-            throw new \RuntimeException('Please select a valid auction event.');
-        }
-
-        if (!in_array($event['status'], ['published', 'active'], true)) {
-            throw new \RuntimeException('Items can only be submitted to published or active events.');
-        }
-
         $db   = Database::getInstance();
         $slug = uniqueSlug('items', $title, $db);
 
         $id = $this->items->create([
             'slug'          => $slug,
-            'event_id'      => $eventId,
+            'event_id'      => null,
             'category_id'   => $categoryId,
             'donor_id'      => $donorId,
             'title'         => $title,
             'description'   => isset($data['description']) ? trim($data['description']) : null,
             'image'         => $data['image'] ?? null,
-            'lot_number'    => isset($data['lot_number']) ? (int)$data['lot_number'] : null,
-            'starting_bid'  => isset($data['starting_bid']) ? (float)$data['starting_bid'] : 0.00,
-            'min_increment' => isset($data['min_increment']) ? (float)$data['min_increment'] : 1.00,
+            'lot_number'    => null,
+            'starting_bid'  => isset($data['starting_bid']) && $data['starting_bid'] !== ''
+                                ? (float)$data['starting_bid'] : 0.00,
+            'min_increment' => isset($data['min_increment']) && $data['min_increment'] !== ''
+                                ? (float)$data['min_increment'] : 1.00,
             'buy_now_price' => isset($data['buy_now_price']) && $data['buy_now_price'] !== ''
                                 ? (float)$data['buy_now_price'] : null,
             'status'        => 'pending',
@@ -89,53 +80,6 @@ class ItemService
     // -------------------------------------------------------------------------
     // Admin actions
     // -------------------------------------------------------------------------
-
-    /**
-     * Admin: approve a pending item (pending → active).
-     * Optionally update lot_number, starting_bid, min_increment.
-     *
-     * @throws \RuntimeException if item not found
-     */
-    public function approve(int $itemId, array $adminData = []): void
-    {
-        $item = $this->items->findById($itemId);
-        if ($item === null) {
-            throw new \RuntimeException('Item not found.');
-        }
-
-        $updateData = ['status' => 'active'];
-
-        if (array_key_exists('lot_number', $adminData)) {
-            $updateData['lot_number'] = $adminData['lot_number'] !== null
-                ? (int)$adminData['lot_number'] : null;
-        }
-
-        if (array_key_exists('starting_bid', $adminData) && $adminData['starting_bid'] !== '') {
-            $updateData['starting_bid'] = (float)$adminData['starting_bid'];
-        }
-
-        if (array_key_exists('min_increment', $adminData) && $adminData['min_increment'] !== '') {
-            $updateData['min_increment'] = (float)$adminData['min_increment'];
-        }
-
-        $this->items->update($itemId, $updateData);
-    }
-
-    /**
-     * Admin: reject an item.
-     * Sets status to 'ended' (soft-reject, not deleted).
-     *
-     * @throws \RuntimeException if item not found
-     */
-    public function reject(int $itemId): void
-    {
-        $item = $this->items->findById($itemId);
-        if ($item === null) {
-            throw new \RuntimeException('Item not found.');
-        }
-
-        $this->items->updateStatus($itemId, 'ended');
-    }
 
     /**
      * Admin: create or update an item directly.
