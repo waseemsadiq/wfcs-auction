@@ -8,6 +8,7 @@ use App\Repositories\ItemRepository;
 use App\Repositories\EventRepository;
 use App\Repositories\CategoryRepository;
 use App\Repositories\UserRepository;
+use App\Services\AuthService;
 use App\Services\BidService;
 use App\Services\RateLimitService;
 use App\Services\ApiTokenService;
@@ -36,6 +37,65 @@ class ApiController extends Controller
     protected function apiError(string $message, int $status = 400): never
     {
         $this->json(['error' => $message], $status);
+    }
+
+    // -------------------------------------------------------------------------
+    // Auth
+    // -------------------------------------------------------------------------
+
+    /**
+     * POST /api/auth/login
+     * JSON body: { email, password }
+     * Returns: { data: { token, user, expires_in } }
+     */
+    public function apiLogin(): void
+    {
+        $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+
+        try {
+            (new RateLimitService())->check($ip, 'login');
+        } catch (\RuntimeException $e) {
+            $this->apiError($e->getMessage(), 429);
+        }
+
+        $body     = json_decode(file_get_contents('php://input') ?: '{}', true) ?? [];
+        $email    = trim((string)($body['email']    ?? ''));
+        $password = (string)($body['password'] ?? '');
+
+        if ($email === '' || $password === '') {
+            $this->apiError('email and password are required.');
+        }
+
+        try {
+            (new AuthService())->login($email, $password);
+
+            $users = new UserRepository();
+            $user  = $users->findByEmail($email);
+            if (!$user) {
+                $this->apiError('User not found.', 404);
+            }
+
+            $token     = (new ApiTokenService())->generate($user);
+            $expiresIn = 365 * 24 * 3600;
+
+            (new RateLimitService())->clear($ip, 'login');
+
+            $this->apiSuccess([
+                'token'      => $token,
+                'user'       => [
+                    'id'                => (int)$user['id'],
+                    'slug'              => $user['slug'],
+                    'name'              => $user['name'],
+                    'email'             => $user['email'],
+                    'role'              => $user['role'],
+                    'email_verified'    => !empty($user['email_verified_at']),
+                    'gift_aid_eligible' => (bool)(int)($user['gift_aid_eligible'] ?? 0),
+                ],
+                'expires_in' => $expiresIn,
+            ]);
+        } catch (\RuntimeException $e) {
+            $this->apiError($e->getMessage(), 401);
+        }
     }
 
     // -------------------------------------------------------------------------

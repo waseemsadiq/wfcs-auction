@@ -224,6 +224,9 @@ $router->post('/admin/live-events/stop',           [$adminController, 'stopLiveE
 $router->get('/admin/settings',                    [$adminController, 'settings']);
 $router->post('/admin/settings',                   [$adminController, 'saveSettings']);
 
+// ---- REST API: Auth --------------------------------------------------------
+$router->post('/api/auth/login',                   [$apiController, 'apiLogin']);
+
 // ---- REST API v1 -----------------------------------------------------------
 $router->get('/api/v1/items',                      [$apiController, 'listItems']);
 $router->get('/api/v1/items/:slug',                [$apiController, 'showItem']);
