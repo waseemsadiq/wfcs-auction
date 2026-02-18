@@ -60,7 +60,7 @@ global $basePath, $csrfToken;
   </div>
   <div class="stat-card bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700/40 p-5">
     <div class="w-9 h-9 rounded-lg bg-slate-100 dark:bg-slate-700 flex items-center justify-center mb-3">
-      <svg class="w-5 h-5 text-slate-500 dark:text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      <span class="text-base font-black text-slate-500 dark:text-slate-400">£</span>
     </div>
     <p class="text-2xl font-black text-slate-900 dark:text-white">£<?= number_format((float)($giftAidStats['total_amount'] ?? 0), 0) ?></p>
     <p class="text-xs font-medium text-slate-500 dark:text-slate-400 mt-1">Total Donation Amount</p>
