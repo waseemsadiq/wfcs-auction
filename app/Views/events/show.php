@@ -12,23 +12,13 @@
 global $basePath;
 
 $status      = $event['status'] ?? 'published';
-$activeFilter = $_GET['category'] ?? '';
+$activeFilter = trim($_GET['category'] ?? '');
 $query        = trim($_GET['q'] ?? '');
 
-// Filter items client-side by category slug if requested
-$filteredItems = $items;
-if ($activeFilter !== '') {
-    $filteredItems = array_filter($items, function ($itm) use ($activeFilter) {
-        return ($itm['category_name'] ?? '') === $activeFilter
-            || ($itm['category_slug'] ?? '') === $activeFilter;
-    });
-}
-if ($query !== '') {
-    $filteredItems = array_filter($filteredItems, function ($itm) use ($query) {
-        return stripos($itm['title'] ?? '', $query) !== false;
-    });
-}
-$filteredItems = array_values($filteredItems);
+// Client-side category filter using slug (no URL-encoding issues with special chars)
+$filteredItems = $activeFilter !== ''
+    ? array_values(array_filter($items, fn($itm) => ($itm['category_slug'] ?? '') === $activeFilter))
+    : array_values($items);
 
 $statusLabel = match($status) {
     'active'    => 'Live',
@@ -118,22 +108,27 @@ $statusClasses = match($status) {
         All (<?= count($items) ?>)
       </a>
       <?php
-      // Build category counts from items
-      $catCounts = [];
+      // Build category map from $items (all lots, or search-filtered lots).
+      // Key by slug (never has special chars) — name kept for display label.
+      $catMap = [];
       foreach ($items as $itm) {
+          $cs = $itm['category_slug'] ?? '';
           $cn = $itm['category_name'] ?? '';
-          if ($cn !== '') {
-              $catCounts[$cn] = ($catCounts[$cn] ?? 0) + 1;
+          if ($cs !== '') {
+              if (!isset($catMap[$cs])) {
+                  $catMap[$cs] = ['name' => $cn, 'count' => 0];
+              }
+              $catMap[$cs]['count']++;
           }
       }
-      foreach ($catCounts as $catName => $cnt):
-        $isActive = ($activeFilter === $catName);
+      foreach ($catMap as $catSlug => $catInfo):
+        $isActive = ($activeFilter === $catSlug);
       ?>
       <a
-        href="<?= e($basePath) ?>/auctions/<?= e($event['slug']) ?>?category=<?= urlencode($catName) ?>"
+        href="<?= e($basePath) ?>/auctions/<?= e($event['slug']) ?>?category=<?= e($catSlug) ?>"
         class="px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors <?= $isActive ? 'bg-primary text-white' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-primary hover:text-primary' ?>"
       >
-        <?= e($catName) ?> (<?= (int)$cnt ?>)
+        <?= e($catInfo['name']) ?> (<?= (int)$catInfo['count'] ?>)
       </a>
       <?php endforeach; ?>
     </div>

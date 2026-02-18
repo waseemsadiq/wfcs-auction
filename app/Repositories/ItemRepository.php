@@ -54,16 +54,16 @@ class ItemRepository
 
     /**
      * Items in an event for public display (active/ended/sold), ordered by lot_number.
-     * Optional filters: category_name (string), search (LIKE on title)
+     * Optional filters: category_slug (string), search (LIKE on title)
      */
     public function byEvent(int $eventId, int $limit = 50, int $offset = 0, array $filters = []): array
     {
         $conditions = ["i.event_id = ?", "i.status IN ('active', 'ended', 'sold')"];
         $params     = [$eventId];
 
-        if (!empty($filters['category_name'])) {
-            $conditions[] = 'c.name = ?';
-            $params[]     = $filters['category_name'];
+        if (!empty($filters['category_slug'])) {
+            $conditions[] = 'c.slug = ?';
+            $params[]     = $filters['category_slug'];
         }
 
         if (!empty($filters['search'])) {
@@ -74,7 +74,7 @@ class ItemRepository
         $where = ' WHERE ' . implode(' AND ', $conditions);
 
         return $this->db->query(
-            'SELECT i.*, c.name AS category_name
+            'SELECT i.*, c.name AS category_name, c.slug AS category_slug
              FROM items i
              LEFT JOIN categories c ON c.id = i.category_id'
             . $where .

@@ -70,8 +70,7 @@ class EventController extends Controller
         }
 
         $filters = [
-            'category_name' => trim($_GET['category'] ?? ''),
-            'search'        => trim($_GET['q']        ?? ''),
+            'search' => trim($_GET['q'] ?? ''),
         ];
 
         $items      = $this->itemRepo->byEvent((int)$event['id'], 50, 0, $filters);
@@ -82,7 +81,7 @@ class EventController extends Controller
             'event'        => $event,
             'items'        => $items,
             'categories'   => $categories,
-            'activeCategory' => $filters['category_name'],
+            'activeCategory' => trim($_GET['category'] ?? ''),
             'searchQuery'    => $filters['search'],
         ]);
 
