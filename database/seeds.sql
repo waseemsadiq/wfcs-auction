@@ -93,7 +93,7 @@ INSERT INTO events (slug, title, description, status, starts_at, ends_at, venue,
 INSERT INTO events (slug, title, description, status, starts_at, ends_at, venue, created_by) VALUES
   ('winter-wonderland-2025',
    'Winter Wonderland Auction 2025',
-   'Our festive Christmas charity auction featuring luxury gifts, experiences, and festive hampers. Raise a glass and bid for a great cause.',
+   'Our festive Christmas charity auction featuring luxury gifts, experiences, and festive hampers. Bid for a great cause.',
    'ended',
    DATE_SUB(NOW(), INTERVAL 45 DAY),
    DATE_SUB(NOW(), INTERVAL 30 DAY),
@@ -150,7 +150,7 @@ INSERT INTO items (slug, event_id, category_id, donor_id, title, description, lo
   ('chefs-table-experience', 1,
    (SELECT id FROM categories WHERE slug='experiences'), 2,
    'Chef''s Table Experience for Two',
-   'An exclusive chef''s table dining experience for two at a Michelin-starred Glasgow restaurant. Includes a 7-course tasting menu with wine pairing, a kitchen tour, and a personalised recipe card signed by the head chef.',
+   'An exclusive chef''s table dining experience for two at a Michelin-starred Glasgow restaurant. Includes a 7-course tasting menu, a kitchen tour, and a personalised recipe card signed by the head chef.',
    2, 800.00, 50.00, NULL, 800.00, 0, 'active', 1850.00);
 
 -- Lot 3: no bids yet
@@ -192,10 +192,10 @@ INSERT INTO items (slug, event_id, category_id, donor_id, title, description, lo
 -- Lot 7: ACTIVE BID BATTLE — 3 bids, current £925
 INSERT INTO items (slug, event_id, category_id, donor_id, title, description, lot_number,
   starting_bid, min_increment, buy_now_price, current_bid, bid_count, status, market_value) VALUES
-  ('macallan-whisky-collection', 1,
+  ('scottish-artisan-hamper', 1,
    (SELECT id FROM categories WHERE slug='food-drink'), 4,
-   'The Macallan Whisky Collection',
-   'A curated collection of three The Macallan single malt Scotch whiskies: 12 Year Double Cask, 15 Year Double Cask, and 18 Year Double Cask. Each bottle presented in the iconic The Macallan gift box. A truly exceptional gift for the connoisseur.',
+   'Scottish Artisan Food Hamper',
+   'A beautifully curated hamper of Scottish artisan produce: smoked salmon from the Outer Hebrides, Highland oatcakes, heather honey, artisan preserves, handcrafted shortbread, and aged Scottish cheddar. Presented in a traditional wicker hamper with ribbon. A truly exceptional gift.',
    7, 600.00, 50.00, NULL, 925.00, 3, 'active', 1200.00);
 
 -- Lot 8: ACTIVE WITH BUY-NOW — 2 bids, current £1800, buy now £2500
@@ -251,7 +251,7 @@ INSERT INTO items (slug, event_id, category_id, donor_id, title, description, lo
   ('glasgow-city-hotel-stay', 2,
    (SELECT id FROM categories WHERE slug='holidays-travel'), 2,
    'Glasgow City Centre Hotel Stay (2 Nights)',
-   'Two nights bed and breakfast for two at a 4-star Glasgow city centre hotel. Includes champagne on arrival and late checkout. Valid until June 2026.',
+   'Two nights bed and breakfast for two at a 4-star Glasgow city centre hotel. Includes welcome refreshments on arrival and late checkout. Valid until June 2026.',
    1, 200.00, 25.00, NULL, 380.00, 4, 'sold', 520.00, 3);
 
 -- Lot 2: ENDED — no bids met reserve, unsold
@@ -280,7 +280,7 @@ INSERT INTO items (slug, event_id, category_id, donor_id, title, description, lo
   ('edinburgh-castle-private-tour', 3,
    (SELECT id FROM categories WHERE slug='experiences'), 2,
    'Edinburgh Castle Private Evening Tour',
-   'An exclusive private evening tour of Edinburgh Castle for up to 8 guests, after the castle closes to the public. Includes a guided walk of the Crown Jewels exhibition and Great Hall, followed by a champagne reception.',
+   'An exclusive private evening tour of Edinburgh Castle for up to 8 guests, after the castle closes to the public. Includes a guided walk of the Crown Jewels exhibition and Great Hall, followed by a welcome reception.',
    1, 1200.00, 100.00, NULL, 1200.00, 0, 'active', 2400.00);
 
 -- Lot 2: listed
@@ -306,19 +306,19 @@ INSERT INTO items (slug, event_id, category_id, donor_id, title, description, lo
 -- Lot 2: SOLD to Emma Wilson (user 5)
 INSERT INTO items (slug, event_id, category_id, donor_id, title, description, lot_number,
   starting_bid, min_increment, buy_now_price, current_bid, bid_count, status, market_value, winner_id) VALUES
-  ('wine-tasting-evening', 4,
-   (SELECT id FROM categories WHERE slug='food-drink'), 4,
-   'Exclusive Wine Tasting Evening for Six',
-   'A private wine tasting evening for six guests hosted by a qualified sommelier. Includes eight wines, artisan cheeses, and a curated tasting notes booklet. Hosted at a Glasgow city centre venue.',
+  ('afternoon-tea-experience', 4,
+   (SELECT id FROM categories WHERE slug='experiences'), 4,
+   'Luxury Afternoon Tea Experience for Six',
+   'A private luxury afternoon tea for six guests hosted by an award-winning Glasgow tearoom. Includes finger sandwiches, freshly baked scones with clotted cream and jam, a selection of cakes and pastries, and a choice of premium teas and coffees. A wonderful occasion in elegant surroundings.',
    2, 120.00, 15.00, NULL, 210.00, 4, 'sold', 400.00, 5);
 
 -- ─── Bids ──────────────────────────────────────────────────────────────────
 
--- Lot 7 (Macallan Whisky) — 3 bids
+-- Lot 7 (Scottish Artisan Hamper) — 3 bids
 INSERT INTO bids (item_id, user_id, amount, is_buy_now, created_at) VALUES
-  ((SELECT id FROM items WHERE slug='macallan-whisky-collection'), 3, 650.00, 0, DATE_SUB(NOW(), INTERVAL 5 DAY)),
-  ((SELECT id FROM items WHERE slug='macallan-whisky-collection'), 5, 800.00, 0, DATE_SUB(NOW(), INTERVAL 3 DAY)),
-  ((SELECT id FROM items WHERE slug='macallan-whisky-collection'), 3, 925.00, 0, DATE_SUB(NOW(), INTERVAL 1 DAY));
+  ((SELECT id FROM items WHERE slug='scottish-artisan-hamper'), 3, 650.00, 0, DATE_SUB(NOW(), INTERVAL 5 DAY)),
+  ((SELECT id FROM items WHERE slug='scottish-artisan-hamper'), 5, 800.00, 0, DATE_SUB(NOW(), INTERVAL 3 DAY)),
+  ((SELECT id FROM items WHERE slug='scottish-artisan-hamper'), 3, 925.00, 0, DATE_SUB(NOW(), INTERVAL 1 DAY));
 
 -- Lot 8 (MacBook Pro) — 2 bids
 INSERT INTO bids (item_id, user_id, amount, is_buy_now, created_at) VALUES
@@ -349,12 +349,12 @@ INSERT INTO bids (item_id, user_id, amount, is_buy_now, created_at) VALUES
   ((SELECT id FROM items WHERE slug='vintage-omega-watch'), 3, 1100.00, 0, DATE_SUB(NOW(), INTERVAL 74 DAY)),
   ((SELECT id FROM items WHERE slug='vintage-omega-watch'), 3, 1150.00, 0, DATE_SUB(NOW(), INTERVAL 70 DAY));
 
--- Wine Tasting (closed event, sold to user 5) — 4 bids
+-- Afternoon Tea (closed event, sold to user 5) — 4 bids
 INSERT INTO bids (item_id, user_id, amount, is_buy_now, created_at) VALUES
-  ((SELECT id FROM items WHERE slug='wine-tasting-evening'), 3, 135.00, 0, DATE_SUB(NOW(), INTERVAL 78 DAY)),
-  ((SELECT id FROM items WHERE slug='wine-tasting-evening'), 5, 160.00, 0, DATE_SUB(NOW(), INTERVAL 77 DAY)),
-  ((SELECT id FROM items WHERE slug='wine-tasting-evening'), 3, 185.00, 0, DATE_SUB(NOW(), INTERVAL 76 DAY)),
-  ((SELECT id FROM items WHERE slug='wine-tasting-evening'), 5, 210.00, 0, DATE_SUB(NOW(), INTERVAL 73 DAY));
+  ((SELECT id FROM items WHERE slug='afternoon-tea-experience'), 3, 135.00, 0, DATE_SUB(NOW(), INTERVAL 78 DAY)),
+  ((SELECT id FROM items WHERE slug='afternoon-tea-experience'), 5, 160.00, 0, DATE_SUB(NOW(), INTERVAL 77 DAY)),
+  ((SELECT id FROM items WHERE slug='afternoon-tea-experience'), 3, 185.00, 0, DATE_SUB(NOW(), INTERVAL 76 DAY)),
+  ((SELECT id FROM items WHERE slug='afternoon-tea-experience'), 5, 210.00, 0, DATE_SUB(NOW(), INTERVAL 73 DAY));
 
 -- ─── Payments ──────────────────────────────────────────────────────────────
 
@@ -379,11 +379,11 @@ INSERT INTO payments (user_id, item_id, amount, stripe_session_id, stripe_paymen
    1150.00, 'cs_test_omega_001', 'pi_test_omega_001',
    'completed', 1, 0.00, DATE_SUB(NOW(), INTERVAL 63 DAY));
 
--- Wine Tasting: COMPLETED with Gift Aid (user 5, Emma Wilson)
+-- Afternoon Tea: COMPLETED with Gift Aid (user 5, Emma Wilson)
 INSERT INTO payments (user_id, item_id, amount, stripe_session_id, stripe_payment_intent_id,
   status, gift_aid_claimed, gift_aid_amount, created_at) VALUES
-  (5, (SELECT id FROM items WHERE slug='wine-tasting-evening'),
-   210.00, 'cs_test_wine_001', 'pi_test_wine_001',
+  (5, (SELECT id FROM items WHERE slug='afternoon-tea-experience'),
+   210.00, 'cs_test_tea_001', 'pi_test_tea_001',
    'completed', 1, 27.50, DATE_SUB(NOW(), INTERVAL 62 DAY));
 
 -- MacBook Pro (James won, PENDING payment — not yet paid)
