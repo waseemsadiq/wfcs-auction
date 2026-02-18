@@ -234,6 +234,7 @@ function buildSidebar(activeId) {
     setupSidebarScrollSpy(allHeadings, nav);
   } else {
     GROUPS.forEach(function (group, i) {
+      if (group.title === 'Operations') return;
       if (i > 0) {
         var divider = document.createElement('div');
         divider.className = 'sidebar-divider';
