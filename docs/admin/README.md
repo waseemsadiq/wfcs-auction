@@ -99,7 +99,11 @@ The transition to **Ended** also happens automatically when the auction's end da
 
 ### Reviewing donor submissions
 
-Donors submit items via the **Donate an Item** page. Submitted items arrive with status `pending` and must be approved by an admin before they appear in the auction.
+Donors submit items via the **Donate an Item** page. The form collects the donor's contact details (name, email, and optionally phone number) along with the item information. If the email address matches an existing account, the item is linked to that account automatically; otherwise a new donor account is created.
+
+When a submission comes in you will receive an **email notification** with a thumbnail of the item image. The donor also receives a thank-you email confirming receipt.
+
+Submitted items arrive with status `pending` and must be approved by an admin before they appear in the auction.
 
 1. Go to **Admin → Items**
 2. Items with status `pending` are listed at the top
@@ -347,6 +351,8 @@ In the Stripe Dashboard, find your webhook endpoint and click **Send test event*
 Email is used for:
 - Email verification on registration
 - Password reset links
+- Donor item submission — admin notification (with thumbnail) and donor thank-you
+- Item approval and rejection notifications to donors
 - Payment requests to auction winners
 - Admin notifications
 
