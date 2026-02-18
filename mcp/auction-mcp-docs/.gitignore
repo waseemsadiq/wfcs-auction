@@ -1,0 +1,11 @@
+DEPLOY.md
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*~
+.env.local
+node_modules/
+dist/
+build/

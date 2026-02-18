@@ -1,0 +1,41 @@
+name: Sync public docs
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'auction-docs/**'
+      - 'mcp/auction-mcp-docs/**'
+
+jobs:
+  sync-auction-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Push auction-docs subtree
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+          git subtree split --prefix=auction-docs -b split-auction-docs
+          git push https://x-access-token:${{ secrets.DOCS_DEPLOY_TOKEN }}@github.com/waseemsadiq/auction-docs.git split-auction-docs:main --force
+          git branch -D split-auction-docs
+
+  sync-mcp-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Push auction-mcp subtree
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+          git subtree split --prefix=mcp/auction-mcp-docs -b split-mcp-docs
+          git push https://x-access-token:${{ secrets.DOCS_DEPLOY_TOKEN }}@github.com/waseemsadiq/auction-mcp.git split-mcp-docs:main --force
+          git branch -D split-mcp-docs
