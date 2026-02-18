@@ -22,8 +22,13 @@ if ($basePath === '.') {
 }
 
 // ---------------------------------------------------------------------------
-// 2. Load .env file (parse KEY=VALUE lines, skip comments/blanks)
+// 2. Load environment — config/env.php (shared hosting) OR .env (Galvani dev)
 // ---------------------------------------------------------------------------
+$envPhp = __DIR__ . '/config/env.php';
+if (file_exists($envPhp)) {
+    require_once $envPhp;
+}
+
 $dotenv = __DIR__ . '/.env';
 if (file_exists($dotenv)) {
     $lines = file($dotenv, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
@@ -123,6 +128,7 @@ $adminController      = new \App\Controllers\AdminController();
 $apiController        = new \App\Controllers\ApiController();
 $auctioneerController = new \App\Controllers\AuctioneerController();
 $legalController      = new \App\Controllers\LegalController();
+$donorController      = new \App\Controllers\DonorController();
 
 // ---------------------------------------------------------------------------
 // 10. Router
@@ -170,6 +176,9 @@ $router->post('/donate',            [$itemController, 'submit']);
 // ---- Bids ------------------------------------------------------------------
 $router->get('/my-bids',            [$bidController, 'myBids']);
 $router->post('/bids',              [$bidController, 'place']);
+
+// ---- Donor -----------------------------------------------------------------
+$router->get('/my-donations',       [$donorController, 'myDonations']);
 
 // ---- Payments --------------------------------------------------------------
 $router->get('/payment/:slug',      [$paymentController, 'show']);
