@@ -28,7 +28,7 @@ class NotificationService
             if ($smtpUsername !== '') {
                 $mail->SMTPAuth   = true;
                 $mail->Username   = $smtpUsername;
-                $mail->Password   = $settings->get('smtp_password') ?: '';
+                $mail->Password   = decryptSetting($settings->get('smtp_password') ?: '');
                 $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             } else {
                 // No-auth SMTP (e.g. Mailpit local dev)
@@ -277,7 +277,11 @@ class NotificationService
             $mail->AltBody = $textBody;
         }
 
-        $mail->send();
+        try {
+            $mail->send();
+        } catch (\PHPMailer\PHPMailer\Exception $e) {
+            throw new \RuntimeException('Email delivery failed: ' . $e->getMessage(), 0, $e);
+        }
     }
 
     // -------------------------------------------------------------------------

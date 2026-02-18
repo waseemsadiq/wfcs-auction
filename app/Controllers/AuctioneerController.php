@@ -187,6 +187,7 @@ class AuctioneerController extends Controller
                 (new AuctionService())->processItemEnd($liveItemId);
             } catch (\Throwable $e) {
                 error_log('AuctioneerController::closeBidding processItemEnd failed: ' . $e->getMessage());
+                $this->json(['ok' => false, 'error' => 'Winner processing failed. Please contact admin.'], 500);
             }
         } else {
             // Mark item as ended/passed

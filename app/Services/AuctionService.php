@@ -76,14 +76,13 @@ class AuctionService
      */
     public function processEventEnd(int $eventId): void
     {
-        // Re-use findEndedActive filtered to this event
-        // We fetch all active items for the event directly
-        $endedItems = $this->items->findEndedActive();
+        // Fetch all active items for this event regardless of ends_at.
+        // findEndedActive() only returns time-expired items, which would miss items
+        // that are still 'active' with a future ends_at when the admin manually ends early.
+        $activeItems = $this->items->findActiveByEvent($eventId);
 
-        foreach ($endedItems as $item) {
-            if ((int)$item['event_id'] === $eventId) {
-                $this->processOneItem($item);
-            }
+        foreach ($activeItems as $item) {
+            $this->processOneItem($item);
         }
     }
 
@@ -125,10 +124,10 @@ class AuctionService
         }
 
         $paymentId = $this->payments->create([
-            'user_id'   => (int)$winningBid['bidder_id'],
+            'user_id'   => (int)$winningBid['user_id'],
             'item_id'   => $itemId,
             'bid_id'    => (int)$winningBid['id'],
-            'winner_id' => (int)$winningBid['bidder_id'],
+            'winner_id' => (int)$winningBid['user_id'],
             'amount'    => (float)$winningBid['amount'],
             'status'    => 'pending',
             'gift_aid_claimed' => 0,
@@ -159,6 +158,13 @@ class AuctionService
         if ($winningBid !== null) {
             // Step 1: move item to awaiting_payment (winner determined, payment due)
             $this->items->setStatus($itemId, 'awaiting_payment');
+
+            // Idempotency guard — if a payment record already exists (e.g. concurrent page
+            // loads both entered processOneItem before the status update propagated), skip
+            // creation to avoid duplicate payment records.
+            if ($this->payments->findByItem($itemId) !== null) {
+                return ['winner' => $winningBid, 'amount' => (float)$winningBid['amount']];
+            }
 
             // Step 2: create a pending payment record
             $paymentId = $this->payments->create([

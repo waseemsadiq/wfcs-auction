@@ -347,6 +347,22 @@ class ItemRepository
     }
 
     /**
+     * All active (status='active') items for a given event, regardless of ends_at.
+     * Used by AuctionService::processEventEnd when an admin manually ends an event early,
+     * as findEndedActive() only returns time-expired items and would miss future-dated ones.
+     */
+    public function findActiveByEvent(int $eventId): array
+    {
+        return $this->db->query(
+            "SELECT i.*, e.ends_at AS event_ends_at, i.ends_at AS auction_end
+             FROM items i
+             LEFT JOIN events e ON e.id = i.event_id
+             WHERE i.event_id = ? AND i.status = 'active'",
+            [$eventId]
+        );
+    }
+
+    /**
      * All items for a given event, all statuses, ordered by lot_number.
      * Used by the auctioneer panel and projector to show the queue.
      */

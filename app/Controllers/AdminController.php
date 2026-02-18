@@ -500,7 +500,7 @@ class AdminController extends Controller
     public function updateUser(string $slug): void
     {
         global $basePath;
-        requireAdmin();
+        $admin = requireAdmin();
         validateCsrf();
 
         $userRepo = new UserRepository();
@@ -510,14 +510,25 @@ class AdminController extends Controller
             $this->abort(404);
         }
 
+        // Prevent an admin from accidentally demoting themselves
+        if ((int)$profile['id'] === (int)$admin['id']) {
+            flash('You cannot change your own role.', 'error');
+            $this->redirect($basePath . '/admin/users/' . $slug);
+        }
+
         $newRole = trim($_POST['role'] ?? '');
         $allowed = ['bidder', 'donor'];
 
         if (!in_array($newRole, $allowed, true)) {
             flash('Invalid role.', 'error');
         } else {
-            $userRepo->updateRole((int)$profile['id'], $newRole);
-            flash('User role updated to ' . ucfirst($newRole) . '.');
+            try {
+                $userRepo->updateRole((int)$profile['id'], $newRole);
+                flash('User role updated to ' . ucfirst($newRole) . '.');
+            } catch (\Throwable $e) {
+                error_log('AdminController::updateUser updateRole failed: ' . $e->getMessage());
+                flash('Failed to update role. Please try again.', 'error');
+            }
         }
 
         $this->redirect($basePath . '/admin/users/' . $slug);
@@ -622,15 +633,18 @@ class AdminController extends Controller
         $giftAidRepo = new GiftAidRepository();
         $claims      = $giftAidRepo->claimed(10000, 0);
 
+        // Open output stream before sending headers — if this fails, we can still redirect
+        $out = fopen('php://output', 'w');
+        if ($out === false) {
+            error_log('AdminController::exportGiftAid failed to open php://output');
+            flash('Export failed. Please try again.', 'error');
+            $this->redirect($basePath . '/admin/gift-aid');
+        }
+
         header('Content-Type: text/csv; charset=UTF-8');
         header('Content-Disposition: attachment; filename="gift-aid-' . date('Y-m-d') . '.csv"');
         header('Pragma: no-cache');
         header('Expires: 0');
-
-        $out = fopen('php://output', 'w');
-        if ($out === false) {
-            exit;
-        }
 
         // UTF-8 BOM for Excel compatibility
         fwrite($out, "\xEF\xBB\xBF");

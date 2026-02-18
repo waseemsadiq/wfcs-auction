@@ -61,8 +61,9 @@ class BidService
             if ((string)(new SettingsRepository())->get('bidding_paused') === '1') {
                 throw new \RuntimeException('Bidding is currently paused. Please try again shortly.');
             }
-        } catch (\PDOException) {
-            // DB unavailable (e.g. test context) — treat as not paused
+        } catch (\PDOException $e) {
+            // DB unavailable — treat as not paused but log so it's visible during a live event
+            error_log('BidService: DB error checking bidding_paused — bids allowed through: ' . $e->getMessage());
         }
 
         // Rule 1: Item must be active
