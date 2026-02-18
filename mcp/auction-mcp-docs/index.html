@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WFCS Auction MCP — Sign In</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+<div class="login-page">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="logo-icon">W</div>
+    </div>
+    <h1>WFCS Auction MCP</h1>
+    <p>Sign in with your auction account to access role-specific Claude prompts.</p>
+
+    <div class="role-pills">
+      <span class="role-badge bidder">Bidder</span>
+      <span class="role-badge donor">Donor</span>
+      <span class="role-badge admin">Admin</span>
+    </div>
+
+    <form id="login-form">
+      <div class="form-group">
+        <label class="form-label" for="email">Email</label>
+        <input class="form-input" type="email" id="email" name="email" placeholder="you@example.com" required autocomplete="username">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="password">Password</label>
+        <input class="form-input" type="password" id="password" name="password" placeholder="••••••••" required autocomplete="current-password">
+      </div>
+      <p class="error-msg" id="login-error"></p>
+      <button class="btn btn-primary btn-block mt-2" type="submit">Sign in</button>
+    </form>
+
+    <p class="text-muted mt-2" style="font-size:.8rem">
+      You'll be redirected to prompts matching your account role.
+    </p>
+  </div>
+</div>
+<script src="assets/app.js"></script>
+<script>initLoginPage();</script>
+</body>
+</html>

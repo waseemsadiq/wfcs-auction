@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Donor Guide — WFCS Auction MCP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <a class="site-logo" href="index.html">
+    <div class="logo-icon">W</div>
+    <span>WFCS Auction MCP</span>
+  </a>
+  <nav class="header-nav">
+    <span class="role-badge donor">Donor</span>
+    <span id="user-pill" class="text-muted" style="font-size:.85rem"></span>
+    <a href="prompts.html">All Prompts</a>
+    <a href="#" data-logout style="color:#e53e3e">Sign out</a>
+  </nav>
+</header>
+
+<div class="docs-layout">
+  <nav class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-title">Donor Guide</div>
+      <ul class="sidebar-nav">
+        <li><a href="index.html" class="active">Quick Start</a></li>
+        <li><a href="prompts.html">Full Prompt Library</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-title">Other Roles</div>
+      <ul class="sidebar-nav">
+        <li><a href="../bidder/index.html">Bidder Guide</a></li>
+        <li><a href="../admin/index.html">Admin Guide</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main>
+    <div class="page-hero">
+      <h1>Donor Quick Start</h1>
+      <p>Thank you for donating to the WFCS Auction! Use these prompts to track your donations.</p>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Getting Started</div>
+      <div class="card mt-1" style="margin-bottom:1.5rem">
+        <p style="font-size:.875rem;margin-bottom:.75rem">Add this to your Claude MCP config:</p>
+        <pre class="code-block" id="mcp-config">Loading…</pre>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Quick Start Prompts</div>
+      <div class="quick-grid" id="quick-cards"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Available Tools</div>
+      <table class="tool-table">
+        <thead>
+          <tr><th>Tool</th><th>What it does</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>verify_connection</code></td><td>Test the connection and see your account info</td></tr>
+          <tr><td><code>browse_events</code></td><td>Browse auction events</td></tr>
+          <tr><td><code>browse_items</code></td><td>Browse auction items</td></tr>
+          <tr><td><code>my_profile</code></td><td>View your account profile and Gift Aid status</td></tr>
+          <tr><td><code>my_donations</code></td><td>See all items you've donated and their status</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="text-muted mt-3" style="font-size:.85rem">
+      Want more prompts? <a href="prompts.html" style="color:var(--primary)">Browse the full library →</a>
+    </p>
+  </main>
+</div>
+
+<div id="toast" class="toast"></div>
+<script src="../assets/app.js"></script>
+<script src="../assets/prompts-data.js"></script>
+<script>
+  const auth = requireAuth('donor');
+  if (auth) {
+    renderUserPill(auth.user);
+    initLogout();
+    renderMcpConfig(auth.user);
+    renderQuickCards('quick-cards', [
+      { category: 'donations', difficulty: 'easy',         text: 'Show all my donated items.' },
+      { category: 'donations', difficulty: 'easy',         text: 'Which of my donations have sold?' },
+      { category: 'donations', difficulty: 'intermediate', text: 'How much have my donations raised in total?' },
+      { category: 'donations', difficulty: 'intermediate', text: 'Show me a summary of all my donated items and their status.' },
+      { category: 'profile',   difficulty: 'easy',         text: 'Check my Gift Aid status.' },
+    ]);
+  }
+</script>
+</body>
+</html>

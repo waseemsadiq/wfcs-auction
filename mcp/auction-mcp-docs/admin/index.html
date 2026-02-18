@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin Guide — WFCS Auction MCP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <a class="site-logo" href="index.html">
+    <div class="logo-icon">W</div>
+    <span>WFCS Auction MCP</span>
+  </a>
+  <nav class="header-nav">
+    <span class="role-badge admin">Admin</span>
+    <span id="user-pill" class="text-muted" style="font-size:.85rem"></span>
+    <a href="prompts.html">All Prompts</a>
+    <a href="#" data-logout style="color:#e53e3e">Sign out</a>
+  </nav>
+</header>
+
+<div class="docs-layout">
+  <nav class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-title">Admin Guide</div>
+      <ul class="sidebar-nav">
+        <li><a href="index.html" class="active">Quick Start</a></li>
+        <li><a href="prompts.html">Full Prompt Library</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-title">Built-in Prompts</div>
+      <ul class="sidebar-nav">
+        <li><a href="#built-in">Daily Briefing</a></li>
+        <li><a href="#built-in">Auction Report</a></li>
+        <li><a href="#built-in">Revenue Summary</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main>
+    <div class="page-hero">
+      <h1>Admin Quick Start</h1>
+      <p>Manage the entire WFCS Auction from Claude. Full access to auctions, items, users, payments, reports, and the live gala screen.</p>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Getting Started</div>
+      <div class="card mt-1" style="margin-bottom:1.5rem">
+        <p style="font-size:.875rem;margin-bottom:.75rem">Add this to your Claude MCP config:</p>
+        <pre class="code-block" id="mcp-config">Loading…</pre>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Quick Start Prompts</div>
+      <div class="quick-grid" id="quick-cards"></div>
+    </div>
+
+    <div class="section" id="built-in">
+      <div class="section-title">Built-in Claude Prompts</div>
+      <p class="text-muted" style="font-size:.875rem;margin-bottom:1rem">These prompts are registered directly in the MCP server. Use <code>/prompts</code> in Claude to access them.</p>
+      <div class="quick-grid">
+        <div class="card">
+          <strong>daily-briefing</strong>
+          <p class="text-muted mt-1" style="font-size:.85rem">Today's bid count, revenue, live status, and outstanding payments — in one go.</p>
+        </div>
+        <div class="card">
+          <strong>auction-report</strong>
+          <p class="text-muted mt-1" style="font-size:.85rem">Full report for a specific auction: items, bids, revenue, outstanding payments.</p>
+        </div>
+        <div class="card">
+          <strong>revenue-summary</strong>
+          <p class="text-muted mt-1" style="font-size:.85rem">Revenue overview including Gift Aid, formatted for charity trustees.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Available Tools</div>
+      <table class="tool-table">
+        <thead>
+          <tr><th>Tool</th><th>What it does</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>verify_connection</code></td><td>Test API connection</td></tr>
+          <tr><td><code>browse_events</code></td><td>Browse public events</td></tr>
+          <tr><td><code>browse_items</code></td><td>Browse public items</td></tr>
+          <tr><td><code>my_profile</code></td><td>Your admin profile</td></tr>
+          <tr><td><code>my_bids</code></td><td>Your bid history</td></tr>
+          <tr><td><code>place_bid</code></td><td>Place a bid</td></tr>
+          <tr><td><code>my_donations</code></td><td>Your donated items</td></tr>
+          <tr><td><code>manage_auctions</code></td><td>Create, update, publish, open, end auctions</td></tr>
+          <tr><td><code>manage_items</code></td><td>List, view, update auction items</td></tr>
+          <tr><td><code>manage_users</code></td><td>Search, view, update user roles</td></tr>
+          <tr><td><code>admin_payments</code></td><td>List payment records with filters</td></tr>
+          <tr><td><code>admin_gift_aid</code></td><td>Gift Aid statistics and claims</td></tr>
+          <tr><td><code>admin_reports</code></td><td>Revenue and activity reports</td></tr>
+          <tr><td><code>admin_settings</code></td><td>View/update app settings</td></tr>
+          <tr><td><code>manage_live</code></td><td>Control the live gala projector screen</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="text-muted mt-3" style="font-size:.85rem">
+      <a href="prompts.html" style="color:var(--primary)">Browse the full prompt library →</a>
+    </p>
+  </main>
+</div>
+
+<div id="toast" class="toast"></div>
+<script src="../assets/app.js"></script>
+<script src="../assets/prompts-data.js"></script>
+<script>
+  const auth = requireAuth('admin');
+  if (auth) {
+    renderUserPill(auth.user);
+    initLogout();
+    renderMcpConfig(auth.user);
+    renderQuickCards('quick-cards', [
+      { category: 'auctions', difficulty: 'easy',         text: 'List all auctions including drafts.' },
+      { category: 'auctions', difficulty: 'intermediate', text: 'Create a new auction: "Spring Gala 2026", starting 15 March 2026 at 18:00, venue "Edinburgh Marriott".' },
+      { category: 'reports',  difficulty: 'intermediate', text: 'Show me today\'s bidding activity and revenue.' },
+      { category: 'auctions', difficulty: 'easy',         text: 'Open bidding on the Spring Gala.' },
+      { category: 'payments', difficulty: 'easy',         text: 'Show all pending payments.' },
+      { category: 'reports',  difficulty: 'advanced',     text: 'Give me a revenue summary including Gift Aid for the trustees.' },
+    ]);
+  }
+</script>
+</body>
+</html>

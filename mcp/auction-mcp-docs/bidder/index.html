@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bidder Guide — WFCS Auction MCP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <a class="site-logo" href="index.html">
+    <div class="logo-icon">W</div>
+    <span>WFCS Auction MCP</span>
+  </a>
+  <nav class="header-nav">
+    <span class="role-badge bidder">Bidder</span>
+    <span id="user-pill" class="text-muted" style="font-size:.85rem"></span>
+    <a href="prompts.html">All Prompts</a>
+    <a href="#" data-logout style="color:#e53e3e">Sign out</a>
+  </nav>
+</header>
+
+<div class="docs-layout">
+  <nav class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-title">Bidder Guide</div>
+      <ul class="sidebar-nav">
+        <li><a href="index.html" class="active">Quick Start</a></li>
+        <li><a href="prompts.html">Full Prompt Library</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-title">Other Roles</div>
+      <ul class="sidebar-nav">
+        <li><a href="../donor/index.html">Donor Guide</a></li>
+        <li><a href="../admin/index.html">Admin Guide</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main>
+    <div class="page-hero">
+      <h1>Bidder Quick Start</h1>
+      <p>Copy these prompts into Claude to start using the WFCS Auction MCP server. Click any card to copy.</p>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Getting Started</div>
+      <div class="card mt-1" style="margin-bottom:1.5rem">
+        <p style="font-size:.875rem;margin-bottom:.75rem">First, make sure your MCP server is configured in Claude. Add this to your Claude config:</p>
+        <pre class="code-block" id="mcp-config">Loading…</pre>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Quick Start Prompts</div>
+      <div class="quick-grid" id="quick-cards"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Available Tools</div>
+      <table class="tool-table">
+        <thead>
+          <tr><th>Tool</th><th>What it does</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>verify_connection</code></td><td>Test the connection and see your account info</td></tr>
+          <tr><td><code>browse_events</code></td><td>List and browse auction events</td></tr>
+          <tr><td><code>browse_items</code></td><td>Search and browse auction items</td></tr>
+          <tr><td><code>my_profile</code></td><td>View your account profile</td></tr>
+          <tr><td><code>my_bids</code></td><td>See your bid history and status</td></tr>
+          <tr><td><code>place_bid</code></td><td>Place a bid or buy-now on an item</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="text-muted mt-3" style="font-size:.85rem">
+      Want more prompts? <a href="prompts.html" style="color:var(--primary)">Browse the full library →</a>
+    </p>
+  </main>
+</div>
+
+<div id="toast" class="toast"></div>
+<script src="../assets/app.js"></script>
+<script src="../assets/prompts-data.js"></script>
+<script>
+  const auth = requireAuth('bidder');
+  if (auth) {
+    renderUserPill(auth.user);
+    initLogout();
+    renderMcpConfig(auth.user);
+    renderQuickCards('quick-cards', [
+      { category: 'events',   difficulty: 'easy',         text: 'List all active auctions.' },
+      { category: 'items',    difficulty: 'easy',         text: 'Show me the items in [auction-name].' },
+      { category: 'bidding',  difficulty: 'easy',         text: 'Place a £50 bid on [item-slug].' },
+      { category: 'my bids',  difficulty: 'intermediate', text: 'Show my current bids and which ones I\'m winning.' },
+      { category: 'items',    difficulty: 'intermediate', text: 'Find items in the Art category under £100.' },
+      { category: 'bidding',  difficulty: 'easy',         text: 'Buy now on [item-slug].' },
+    ]);
+  }
+</script>
+</body>
+</html>

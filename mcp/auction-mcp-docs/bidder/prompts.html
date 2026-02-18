@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bidder Prompts — WFCS Auction MCP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <a class="site-logo" href="index.html">
+    <div class="logo-icon">W</div>
+    <span>WFCS Auction MCP</span>
+  </a>
+  <nav class="header-nav">
+    <span class="role-badge bidder">Bidder</span>
+    <span id="user-pill" class="text-muted" style="font-size:.85rem"></span>
+    <a href="index.html">Quick Start</a>
+    <a href="#" data-logout style="color:#e53e3e">Sign out</a>
+  </nav>
+</header>
+
+<div class="docs-layout">
+  <nav class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-title">Bidder Guide</div>
+      <ul class="sidebar-nav">
+        <li><a href="index.html">Quick Start</a></li>
+        <li><a href="prompts.html" class="active">Full Prompt Library</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-title">Categories</div>
+      <ul class="sidebar-nav" id="sidebar-cats"></ul>
+    </div>
+  </nav>
+
+  <main>
+    <div class="page-hero">
+      <h1>Bidder Prompt Library</h1>
+      <p>All prompts for bidders. Click any card to copy to clipboard.</p>
+    </div>
+
+    <div class="filter-bar" id="filter-bar"></div>
+
+    <div class="search-box">
+      <input class="search-input" type="search" id="prompt-search" placeholder="Search prompts…">
+    </div>
+
+    <div class="prompt-grid" id="prompt-grid"></div>
+  </main>
+</div>
+
+<div id="toast" class="toast"></div>
+<script src="../assets/app.js"></script>
+<script src="../assets/prompts-data.js"></script>
+<script>
+  const auth = requireAuth('bidder');
+  if (auth) {
+    renderUserPill(auth.user);
+    initLogout();
+
+    // Build filter buttons
+    const filterBar = document.getElementById('filter-bar');
+    const sidebarCats = document.getElementById('sidebar-cats');
+    (window.CATEGORIES.bidder || []).forEach((cat, i) => {
+      const btn = document.createElement('button');
+      btn.className   = 'filter-btn' + (i === 0 ? ' active' : '');
+      btn.textContent = cat;
+      btn.setAttribute('data-category', cat);
+      filterBar.appendChild(btn);
+
+      const li = document.createElement('li');
+      const a  = document.createElement('a');
+      a.href      = '#';
+      a.textContent = cat;
+      a.setAttribute('data-category', cat);
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        filterBar.querySelectorAll('.filter-btn').forEach((b) => b.classList.remove('active'));
+        filterBar.querySelectorAll(`[data-category="${cat}"]`)[0]?.classList.add('active');
+        filterBar.dispatchEvent(new Event('click', { bubbles: true }));
+      });
+      li.appendChild(a);
+      sidebarCats.appendChild(li);
+    });
+
+    initPromptFilters('bidder');
+  }
+</script>
+</body>
+</html>
