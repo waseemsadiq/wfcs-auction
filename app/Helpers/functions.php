@@ -310,8 +310,8 @@ function maskName(string $name): string
     $name  = trim($name);
     $parts = preg_split('/\s+/', $name);
 
-    if (empty($parts) || $parts === [false] || $name === '') {
-        return $name;
+    if ($name === '') {
+        return '';
     }
 
     if (count($parts) === 1) {

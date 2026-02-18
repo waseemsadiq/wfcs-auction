@@ -24,4 +24,9 @@ class HelpersTest extends TestCase
     {
         $this->assertSame('', maskName(''));
     }
+
+    public function testMaskNameWhitespaceOnly(): void
+    {
+        $this->assertSame('', maskName('   '));
+    }
 }
