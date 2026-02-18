@@ -286,6 +286,14 @@ class ApiController extends Controller
         $amount   = (float)($_POST['amount']           ?? 0);
         $isBuyNow = (bool)(int)($_POST['buy_now']      ?? 0);
 
+        // JSON body fallback (MCP server sends JSON)
+        if ($itemSlug === '') {
+            $jsonBody = json_decode(file_get_contents('php://input') ?: '{}', true) ?? [];
+            $itemSlug = trim((string)($jsonBody['item_slug'] ?? ''));
+            $amount   = (float)($jsonBody['amount']   ?? 0);
+            $isBuyNow = (bool)(int)($jsonBody['buy_now'] ?? 0);
+        }
+
         if ($itemSlug === '') {
             $this->apiError('item_slug is required.');
         }
@@ -348,6 +356,22 @@ class ApiController extends Controller
             'gift_aid_eligible' => (bool)(int)($userRow['gift_aid_eligible'] ?? 0),
             'created_at'        => $userRow['created_at'],
         ]);
+    }
+
+    /**
+     * GET /api/v1/users/me/donations
+     */
+    public function myDonations(): void
+    {
+        $user = getAuthUser();
+        if (!$user) {
+            $this->apiError('Authentication required.', 401);
+        }
+
+        $items = new ItemRepository();
+        $rows  = $items->forDonor((int)$user['id']);
+
+        $this->apiSuccess($rows);
     }
 
     /**

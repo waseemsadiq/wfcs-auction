@@ -236,6 +236,7 @@ $router->get('/api/v1/events/:slug/items',         [$apiController, 'eventItems'
 $router->post('/api/v1/bids',                      [$apiController, 'placeBid']);
 $router->get('/api/v1/users/me',                   [$apiController, 'me']);
 $router->get('/api/v1/users/me/bids',              [$apiController, 'myBids']);
+$router->get('/api/v1/users/me/donations',         [$apiController, 'myDonations']);
 $router->get('/api/v1/token',                      [$apiController, 'generateToken']);
 
 // ---- Auctioneer panel (admin) + Projector (public) -------------------------
