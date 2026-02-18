@@ -395,6 +395,36 @@ class ItemRepository
         );
     }
 
+    /**
+     * Fetch all items donated by a user, ordered oldest-first.
+     * Winner name is masked to "First L." for privacy.
+     */
+    public function forDonor(int $userId): array
+    {
+        $rows = $this->db->query(
+            'SELECT items.*,
+                    e.title  AS event_title,
+                    e.slug   AS event_slug,
+                    e.status AS event_status,
+                    w.name   AS winner_name
+             FROM   items
+             LEFT   JOIN events e ON items.event_id = e.id
+             LEFT   JOIN users  w ON items.winner_id = w.id
+             WHERE  items.donor_id = ?
+             ORDER  BY items.created_at ASC',
+            [$userId]
+        );
+
+        foreach ($rows as &$row) {
+            if (!empty($row['winner_name'])) {
+                $row['winner_name'] = maskName($row['winner_name']);
+            }
+        }
+        unset($row);
+
+        return $rows;
+    }
+
     // -------------------------------------------------------------------------
     // Private helpers
     // -------------------------------------------------------------------------
