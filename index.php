@@ -239,6 +239,35 @@ $router->get('/api/v1/users/me/bids',              [$apiController, 'myBids']);
 $router->get('/api/v1/users/me/donations',         [$apiController, 'myDonations']);
 $router->get('/api/v1/token',                      [$apiController, 'generateToken']);
 
+// ---- Admin REST API v1 -----------------------------------------------------
+$adminApiController = new \App\Controllers\AdminApiController();
+
+$router->get('/api/admin/v1/auctions',                    [$adminApiController, 'listAuctions']);
+$router->get('/api/admin/v1/auctions/:slug',              [$adminApiController, 'showAuction']);
+$router->post('/api/admin/v1/auctions',                   [$adminApiController, 'createAuction']);
+$router->put('/api/admin/v1/auctions/:slug',              [$adminApiController, 'updateAuction']);
+$router->post('/api/admin/v1/auctions/:slug/publish',     [$adminApiController, 'publishAuction']);
+$router->post('/api/admin/v1/auctions/:slug/open',        [$adminApiController, 'openAuction']);
+$router->post('/api/admin/v1/auctions/:slug/end',         [$adminApiController, 'endAuction']);
+
+$router->get('/api/admin/v1/items',                       [$adminApiController, 'listItems']);
+$router->get('/api/admin/v1/items/:slug',                 [$adminApiController, 'showItem']);
+$router->put('/api/admin/v1/items/:slug',                 [$adminApiController, 'updateItem']);
+
+$router->get('/api/admin/v1/users',                       [$adminApiController, 'listUsers']);
+$router->get('/api/admin/v1/users/:slug',                 [$adminApiController, 'showUser']);
+$router->put('/api/admin/v1/users/:slug',                 [$adminApiController, 'updateUser']);
+
+$router->get('/api/admin/v1/payments',                    [$adminApiController, 'listPayments']);
+$router->get('/api/admin/v1/gift-aid',                    [$adminApiController, 'giftAidOverview']);
+
+$router->get('/api/admin/v1/reports/revenue',             [$adminApiController, 'revenueReport']);
+$router->get('/api/admin/v1/settings',                    [$adminApiController, 'getSettings']);
+$router->put('/api/admin/v1/settings',                    [$adminApiController, 'updateSettings']);
+$router->get('/api/admin/v1/live',                        [$adminApiController, 'getLiveStatus']);
+$router->post('/api/admin/v1/live/start',                 [$adminApiController, 'startLive']);
+$router->post('/api/admin/v1/live/stop',                  [$adminApiController, 'stopLive']);
+
 // ---- Auctioneer panel (admin) + Projector (public) -------------------------
 $router->get('/auctioneer',              [$auctioneerController, 'panel']);
 $router->post('/auctioneer/set-item',    [$auctioneerController, 'setItem']);
