@@ -1,11 +1,10 @@
 <?php
 /**
- * Donate an Item / submit-item form
+ * Donate an Item form
  *
  * Variables from controller:
  *   $basePath   (global), $csrfToken (global)
- *   $user       — authenticated user (required)
- *   $categories — all categories for dropdown
+ *   $user       — authenticated user or null (public form)
  *   $errors     — validation error messages
  *   $old        — old POST data for re-fill
  */
@@ -32,7 +31,6 @@ $old    = $old ?? [];
   .delay-2 { animation-delay: 0.12s; }
   .delay-3 { animation-delay: 0.18s; }
   .delay-4 { animation-delay: 0.24s; }
-  .delay-5 { animation-delay: 0.30s; }
 
   /* ─── Hero grain ─── */
   .hero-grain::after {
@@ -87,7 +85,6 @@ $old    = $old ?? [];
   input[type="number"]::-webkit-outer-spin-button,
   input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
   input[type="number"] { -moz-appearance: textfield; }
-
 </style>
 
 <!-- Hero banner (full-bleed) -->
@@ -100,13 +97,13 @@ $old    = $old ?? [];
         <div class="flex-1">
           <div class="inline-flex items-center gap-2 mb-4 px-3.5 py-1.5 bg-primary/10 border border-primary/20 rounded-full">
             <svg class="w-3.5 h-3.5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-            <span class="text-xs font-bold text-primary uppercase tracking-widest">Donor Submission</span>
+            <span class="text-xs font-bold text-primary uppercase tracking-widest">Item Donation</span>
           </div>
           <h1 class="text-3xl md:text-4xl font-black text-white tracking-tight leading-tight mb-3">
-            Offer an Item for Auction
+            Donate an Item for Auction
           </h1>
           <p class="text-slate-400 text-base leading-relaxed max-w-xl">
-            Got something you'd like to donate? Tell us about it — our team will be in touch to confirm the details, assign it to the right auction, and handle all the logistics.
+            Got something you'd like to donate? Tell us about it — our team will review your submission, assign it to the right auction, and handle all the details.
           </p>
         </div>
         <div class="flex md:flex-col gap-3">
@@ -141,9 +138,85 @@ $old    = $old ?? [];
   >
     <input type="hidden" name="_csrf_token" value="<?= e($csrfToken) ?>" />
 
-    <!-- ── SECTION 1: ITEM PHOTO ── -->
+    <!-- ── SECTION 1: YOUR DETAILS ── -->
     <div class="form-section fade-up">
-      <p class="section-title">Item photo</p>
+      <p class="section-title">Your details</p>
+      <div class="space-y-4">
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <!-- First name -->
+          <div>
+            <label for="first_name" class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">First name <span class="text-red-500">*</span></label>
+            <input
+              type="text"
+              id="first_name"
+              name="first_name"
+              value="<?= e($old['first_name'] ?? '') ?>"
+              autocomplete="given-name"
+              class="field w-full px-4 py-3 text-sm bg-slate-50 dark:bg-slate-700/50 border <?= !empty($errors['first_name']) ? 'border-red-400' : 'border-slate-200 dark:border-slate-600' ?> rounded-xl text-slate-900 dark:text-white placeholder-slate-400"
+            />
+            <?php if (!empty($errors['first_name'])): ?>
+            <p class="text-xs text-red-500 mt-1"><?= e($errors['first_name']) ?></p>
+            <?php endif; ?>
+          </div>
+
+          <!-- Last name -->
+          <div>
+            <label for="last_name" class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Last name <span class="text-red-500">*</span></label>
+            <input
+              type="text"
+              id="last_name"
+              name="last_name"
+              value="<?= e($old['last_name'] ?? '') ?>"
+              autocomplete="family-name"
+              class="field w-full px-4 py-3 text-sm bg-slate-50 dark:bg-slate-700/50 border <?= !empty($errors['last_name']) ? 'border-red-400' : 'border-slate-200 dark:border-slate-600' ?> rounded-xl text-slate-900 dark:text-white placeholder-slate-400"
+            />
+            <?php if (!empty($errors['last_name'])): ?>
+            <p class="text-xs text-red-500 mt-1"><?= e($errors['last_name']) ?></p>
+            <?php endif; ?>
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div>
+          <label for="email" class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Email address <span class="text-red-500">*</span></label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value="<?= e($old['email'] ?? '') ?>"
+            autocomplete="email"
+            placeholder="you@example.com"
+            class="field w-full px-4 py-3 text-sm bg-slate-50 dark:bg-slate-700/50 border <?= !empty($errors['email']) ? 'border-red-400' : 'border-slate-200 dark:border-slate-600' ?> rounded-xl text-slate-900 dark:text-white placeholder-slate-400"
+          />
+          <?php if (!empty($errors['email'])): ?>
+          <p class="text-xs text-red-500 mt-1"><?= e($errors['email']) ?></p>
+          <?php endif; ?>
+        </div>
+
+        <!-- Phone -->
+        <div>
+          <label for="phone" class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+            Phone number
+            <span class="ml-1 font-normal text-slate-400">(optional)</span>
+          </label>
+          <input
+            type="tel"
+            id="phone"
+            name="phone"
+            value="<?= e($old['phone'] ?? '') ?>"
+            autocomplete="tel"
+            placeholder="+44 7700 900000"
+            class="field w-full px-4 py-3 text-sm bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white placeholder-slate-400"
+          />
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── SECTION 2: ITEM PHOTO ── -->
+    <div class="form-section fade-up delay-1">
+      <p class="section-title">Item photo <span class="font-normal normal-case">(optional)</span></p>
 
       <?php if (!empty($errors['photo'])): ?>
       <p class="text-xs text-red-600 dark:text-red-400 mb-3"><?= e($errors['photo']) ?></p>
@@ -157,22 +230,19 @@ $old    = $old ?? [];
             class="w-full h-full object-cover rounded-[calc(1rem-2px)] hidden"
             id="photo-preview"
           />
-          <!-- Empty state (shown when no image) -->
           <div id="upload-placeholder" class="flex flex-col items-center justify-center text-slate-400 gap-3 p-6">
             <svg class="w-10 h-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
             <div class="text-center">
-              <p class="text-sm font-semibold text-slate-700 dark:text-slate-300">Click or drag to upload photo</p>
+              <p class="text-sm font-semibold text-slate-700 dark:text-slate-300">Click or drag to upload a photo</p>
               <p class="text-xs text-slate-400 mt-0.5">JPG, PNG or WEBP up to 5 MB</p>
             </div>
           </div>
-          <!-- Hover overlay (shown when image present) -->
           <div class="absolute inset-0 bg-slate-900/50 opacity-0 hover:opacity-100 transition-opacity hidden flex-col items-center justify-center rounded-[calc(1rem-2px)] cursor-pointer" id="upload-hover-overlay">
             <svg class="w-7 h-7 text-white mb-1.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
             <span class="text-xs font-semibold text-white">Change photo</span>
           </div>
           <input type="file" name="photo" id="photo-input" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="previewPhoto(this)" />
         </div>
-        <!-- Remove button (hidden until image selected) -->
         <button
           type="button"
           id="remove-photo-btn"
@@ -186,12 +256,12 @@ $old    = $old ?? [];
 
       <p class="text-xs text-slate-400 dark:text-slate-500 mt-4 flex items-center gap-1.5">
         <svg class="w-3.5 h-3.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        JPG, PNG or WEBP. Max 5 MB. High-resolution photos attract more bids.
+        JPG, PNG or WEBP. Max 5 MB. High-resolution photos help the auction team and attract more bids.
       </p>
     </div>
 
-    <!-- ── SECTION 2: ITEM DETAILS ── -->
-    <div class="form-section fade-up delay-1">
+    <!-- ── SECTION 3: ITEM DETAILS ── -->
+    <div class="form-section fade-up delay-2">
       <p class="section-title">Item details</p>
       <div class="space-y-4">
 
@@ -204,7 +274,7 @@ $old    = $old ?? [];
             name="title"
             maxlength="120"
             value="<?= e($old['title'] ?? '') ?>"
-            placeholder="e.g. 1962 Rolex Submariner"
+            placeholder="e.g. Signed framed print by local artist"
             class="field w-full px-4 py-3 text-sm bg-slate-50 dark:bg-slate-700/50 border <?= !empty($errors['title']) ? 'border-red-400' : 'border-slate-200 dark:border-slate-600' ?> rounded-xl text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500"
           />
           <p class="text-xs text-slate-400 mt-1.5 flex items-center justify-between">
@@ -219,147 +289,65 @@ $old    = $old ?? [];
 
         <!-- Description -->
         <div>
-          <label for="description" class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Detailed description</label>
+          <label for="description" class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+            Description
+            <span class="ml-1 font-normal text-slate-400">(optional)</span>
+          </label>
           <textarea
             id="description"
             name="description"
             rows="5"
-            placeholder="Describe your item — condition, provenance, what's included, etc."
+            placeholder="Describe the item — condition, provenance, what's included, etc."
             class="field w-full px-4 py-3 text-sm bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 resize-none leading-relaxed"
           ><?= e($old['description'] ?? '') ?></textarea>
         </div>
 
-      </div>
-    </div>
-
-    <!-- ── SECTION 3: CATEGORY ── -->
-    <div class="form-section fade-up delay-2">
-      <p class="section-title">Category</p>
-      <div>
-        <label for="category_id" class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Category <span class="text-red-500">*</span></label>
-        <select
-          id="category_id"
-          name="category_id"
-          class="field w-full px-4 py-3 text-sm bg-slate-50 dark:bg-slate-700/50 border <?= !empty($errors['category_id']) ? 'border-red-400' : 'border-slate-200 dark:border-slate-600' ?> rounded-xl text-slate-900 dark:text-white"
-        >
-          <option value="">Select a category&hellip;</option>
-          <?php foreach ($categories as $cat): ?>
-          <option value="<?= e($cat['id']) ?>" <?= (int)($old['category_id'] ?? 0) === (int)$cat['id'] ? 'selected' : '' ?>><?= e($cat['name']) ?></option>
-          <?php endforeach; ?>
-        </select>
-        <?php if (!empty($errors['category_id'])): ?>
-        <p class="text-xs text-red-500 mt-1"><?= e($errors['category_id']) ?></p>
-        <?php endif; ?>
-      </div>
-    </div>
-
-    <!-- ── SECTION 4: PRICING (optional) ── -->
-    <div class="form-section fade-up delay-3">
-      <p class="section-title">Pricing hints <span class="font-normal normal-case">(optional — our team will confirm)</span></p>
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-
-        <!-- Starting bid -->
+        <!-- Market value -->
         <div>
-          <label for="starting_bid" class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Starting bid</label>
-          <div class="relative">
-            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-slate-400">£</span>
-            <input
-              type="number"
-              id="starting_bid"
-              name="starting_bid"
-              value="<?= e($old['starting_bid'] ?? '') ?>"
-              min="0"
-              step="0.01"
-              placeholder="0.00"
-              class="field w-full pl-8 pr-3 py-3 text-sm bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white placeholder-slate-400"
-            />
+          <label for="market_value" class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+            Estimated market value
+            <span class="ml-1 font-normal text-slate-400">(optional)</span>
+          </label>
+          <div class="flex gap-3 items-start">
+            <div class="relative w-44 flex-shrink-0">
+              <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-slate-400">£</span>
+              <input
+                type="number"
+                id="market_value"
+                name="market_value"
+                value="<?= e($old['market_value'] ?? '') ?>"
+                min="0"
+                step="0.01"
+                placeholder="0.00"
+                class="field w-full pl-8 pr-3 py-3 text-sm bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white placeholder-slate-400"
+              />
+            </div>
+            <div class="flex items-start gap-2 pt-3">
+              <svg class="w-4 h-4 text-primary flex-shrink-0 mt-px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                Used to calculate Gift Aid. Leave blank if unknown — our team will assess it.
+              </p>
+            </div>
           </div>
         </div>
 
-        <!-- Min increment -->
-        <div>
-          <label for="min_increment" class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Min increment</label>
-          <div class="relative">
-            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-slate-400">£</span>
-            <input
-              type="number"
-              id="min_increment"
-              name="min_increment"
-              value="<?= e($old['min_increment'] ?? '') ?>"
-              min="0"
-              step="0.01"
-              placeholder="1.00"
-              class="field w-full pl-8 pr-3 py-3 text-sm bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white placeholder-slate-400"
-            />
-          </div>
-        </div>
-
-        <!-- Buy now price -->
-        <div>
-          <label for="buy_now_price" class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Buy now price</label>
-          <div class="relative">
-            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-slate-400">£</span>
-            <input
-              type="number"
-              id="buy_now_price"
-              name="buy_now_price"
-              value="<?= e($old['buy_now_price'] ?? '') ?>"
-              min="0"
-              step="0.01"
-              placeholder="Optional"
-              class="field w-full pl-8 pr-3 py-3 text-sm bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white placeholder-slate-400"
-            />
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Market value (Gift Aid) -->
-      <div class="mt-4">
-        <label for="market_value" class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-          Market value
-          <span class="ml-1.5 font-normal text-slate-400">(optional)</span>
-        </label>
-        <div class="flex gap-3 items-start">
-          <div class="relative w-48 flex-shrink-0">
-            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-slate-400">£</span>
-            <input
-              type="number"
-              id="market_value"
-              name="market_value"
-              value="<?= e($old['market_value'] ?? '') ?>"
-              min="0"
-              step="0.01"
-              placeholder="0.00"
-              class="field w-full pl-8 pr-3 py-3 text-sm bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white placeholder-slate-400"
-            />
-          </div>
-          <div class="flex items-start gap-2 pt-3">
-            <svg class="w-4 h-4 text-primary flex-shrink-0 mt-px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-            <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-              Used to calculate Gift Aid. The charity can reclaim 25p tax for every £1 bid above this value.
-              Leave blank if unknown — our team will assess it.
-            </p>
-          </div>
-        </div>
       </div>
     </div>
 
     <!-- ── SUBMIT ── -->
-    <div class="fade-up delay-4 space-y-3">
+    <div class="fade-up delay-3 space-y-3">
       <button
         type="submit"
         class="w-full flex items-center justify-center gap-2.5 px-6 py-4 text-sm font-bold text-white bg-primary hover:bg-primary-hover rounded-xl shadow-lg transition-colors"
       >
-        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-        Pledge this item
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        Submit donation
       </button>
 
-      <!-- Thank-you note -->
       <div class="flex items-start gap-2.5 px-4 py-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700/40 rounded-xl">
         <svg class="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
         <p class="text-xs text-green-700 dark:text-green-300 leading-relaxed">
-          Thank you so much for your generosity. A member of our team will be in touch shortly to discuss your pledge and arrange collection of your donated item.
+          Thank you so much for your generosity. We'll review your donation and be in touch shortly. You'll also receive a welcome email to set up your donor account.
         </p>
       </div>
     </div>
@@ -369,10 +357,10 @@ $old    = $old ?? [];
 
 <script>
 function previewPhoto(input) {
-  const preview = document.getElementById('photo-preview');
-  const placeholder = document.getElementById('upload-placeholder');
+  const preview      = document.getElementById('photo-preview');
+  const placeholder  = document.getElementById('upload-placeholder');
   const hoverOverlay = document.getElementById('upload-hover-overlay');
-  const removeBtn = document.getElementById('remove-photo-btn');
+  const removeBtn    = document.getElementById('remove-photo-btn');
 
   if (!input.files || !input.files[0]) return;
   const reader = new FileReader();
@@ -389,11 +377,11 @@ function previewPhoto(input) {
 }
 
 function removePhoto() {
-  const preview = document.getElementById('photo-preview');
-  const placeholder = document.getElementById('upload-placeholder');
+  const preview      = document.getElementById('photo-preview');
+  const placeholder  = document.getElementById('upload-placeholder');
   const hoverOverlay = document.getElementById('upload-hover-overlay');
-  const removeBtn = document.getElementById('remove-photo-btn');
-  const input = document.getElementById('photo-input');
+  const removeBtn    = document.getElementById('remove-photo-btn');
+  const input        = document.getElementById('photo-input');
 
   preview.src = '';
   preview.classList.add('hidden');
@@ -405,7 +393,6 @@ function removePhoto() {
   input.value = '';
 }
 
-// Title character counter
 const titleField = document.getElementById('title');
 const titleCount = document.getElementById('title-count');
 if (titleField && titleCount) {

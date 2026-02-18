@@ -20,12 +20,12 @@ class PasswordResetRepository
      * Expires in 1 hour.
      * Deletes any existing unused tokens for this user first.
      */
-    public function create(int $userId, string $tokenHash): void
+    public function create(int $userId, string $tokenHash, int $expirySeconds = 3600): void
     {
         // Delete any existing tokens for this user first
         $this->deleteForUser($userId);
 
-        $expiresAt = date('Y-m-d H:i:s', time() + 3600); // 1 hour
+        $expiresAt = date('Y-m-d H:i:s', time() + $expirySeconds);
 
         $this->db->execute(
             'INSERT INTO password_reset_tokens

@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS items (
   id INT AUTO_INCREMENT PRIMARY KEY,
   slug VARCHAR(100) NOT NULL UNIQUE,
   event_id INT NULL DEFAULT NULL,
-  category_id INT NOT NULL,
+  category_id INT NULL,
   donor_id INT NULL,
   title VARCHAR(255) NOT NULL,
   description TEXT NULL,

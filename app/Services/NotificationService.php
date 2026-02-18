@@ -229,32 +229,95 @@ class NotificationService
     /**
      * Notify admin of a new item donation submission.
      */
-    public function sendDonationNotification(array $item, array $donor, string $adminEmail, string $baseUrl): void
-    {
+    public function sendDonationNotification(
+        array  $item,
+        array  $donor,
+        string $adminEmail,
+        string $baseUrl,
+        string $thumbPath = ''
+    ): void {
         $donorName  = trim(($donor['first_name'] ?? '') . ' ' . ($donor['last_name'] ?? ''));
+        if ($donorName === '') {
+            $donorName = $donor['name'] ?? 'Unknown';
+        }
         $donorEmail = $donor['email'] ?? '';
+        $donorPhone = $donor['phone'] ?? '';
         $itemTitle  = $item['title'] ?? 'Untitled';
         $adminUrl   = rtrim($baseUrl, '/') . '/admin/items';
 
-        $imageHtml = '';
-        if (!empty($item['image'])) {
-            $filename     = basename((string)$item['image']);
-            $thumbUrl     = rtrim($baseUrl, '/') . '/uploads/thumbs/' . rawurlencode($filename);
-            $imageHtml    = '<p><img src="' . htmlspecialchars($thumbUrl) . '" alt="' . htmlspecialchars($itemTitle)
-                          . '" style="border-radius:4px;margin-top:12px;"></p>';
-        }
+        $phoneHtml = $donorPhone !== '' ? "<li><strong>Phone:</strong> " . htmlspecialchars($donorPhone) . "</li>" : '';
+        $descHtml  = !empty($item['description'])
+            ? "<li><strong>Description:</strong> " . nl2br(htmlspecialchars($item['description'])) . "</li>"
+            : '';
+        $valueHtml = !empty($item['market_value'])
+            ? "<li><strong>Market value:</strong> &pound;" . number_format((float)$item['market_value'], 2) . "</li>"
+            : '';
 
         $html = "<p>A new item has been submitted for review.</p>
 <ul>
   <li><strong>Item:</strong> " . htmlspecialchars($itemTitle) . "</li>
-  <li><strong>Donor:</strong> " . htmlspecialchars($donorName) . " (" . htmlspecialchars($donorEmail) . ")</li>
+  {$descHtml}
+  {$valueHtml}
+  <li><strong>Donor:</strong> " . htmlspecialchars($donorName) . "</li>
+  <li><strong>Email:</strong> " . htmlspecialchars($donorEmail) . "</li>
+  {$phoneHtml}
 </ul>
-{$imageHtml}
 <p><a href='" . htmlspecialchars($adminUrl) . "'>Review in admin &rarr;</a></p>";
 
-        $text = "New donation submitted: {$itemTitle}\nDonor: {$donorName} ({$donorEmail})\nReview: {$adminUrl}";
+        $text  = "New donation submitted: {$itemTitle}\n";
+        $text .= "Donor: {$donorName} ({$donorEmail})";
+        if ($donorPhone !== '') {
+            $text .= " — {$donorPhone}";
+        }
+        $text .= "\nReview: {$adminUrl}";
 
-        $this->send($adminEmail, 'WFCS Auction Admin', "New donation: {$itemTitle}", $html, $text);
+        $mail = $this->mailer();
+        $mail->addAddress($adminEmail, 'WFCS Auction Admin');
+        $mail->isHTML(true);
+        $mail->Subject = "New donation: {$itemTitle}";
+        $mail->Body    = $html;
+        $mail->AltBody = $text;
+
+        if ($thumbPath !== '' && file_exists($thumbPath)) {
+            $ext      = strtolower(pathinfo($thumbPath, PATHINFO_EXTENSION));
+            $mimeMap  = ['jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg', 'png' => 'image/png', 'webp' => 'image/webp', 'gif' => 'image/gif'];
+            $mime     = $mimeMap[$ext] ?? 'image/jpeg';
+            $mail->addAttachment($thumbPath, 'item-photo.' . $ext, 'base64', $mime);
+        }
+
+        try {
+            $mail->send();
+        } catch (\PHPMailer\PHPMailer\Exception $e) {
+            throw new \RuntimeException('Email delivery failed: ' . $e->getMessage(), 0, $e);
+        }
+    }
+
+    public function sendDonorWelcome(array $donor, string $firstName, string $setPasswordUrl): void
+    {
+        $email = $donor['email'] ?? '';
+        $name  = $firstName;
+
+        $subject = 'Thank you for your donation — set up your WFCS Auction account';
+
+        $html = $this->layout(
+            $subject,
+            "Thank you, {$name}!",
+            "Your item donation has been received and our team will be in touch shortly to confirm the details
+            and assign it to the right auction.<br><br>
+            We've created a donor account for you. Click the button below to set your password and
+            access your account — the link expires in 7 days.",
+            $setPasswordUrl,
+            'Set Your Password',
+            "If you didn't submit a donation, you can safely ignore this email."
+        );
+
+        $text = "Hi {$name},\n\nThank you for donating! Your item has been received.\n\n"
+              . "Set your password to access your WFCS Auction account:\n{$setPasswordUrl}\n\n"
+              . "This link expires in 7 days.\n\n"
+              . "If you didn't submit a donation, ignore this email.\n\n"
+              . $this->footerText();
+
+        $this->send($email, $name, $subject, $html, $text);
     }
 
     /**
