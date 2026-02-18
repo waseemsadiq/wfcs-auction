@@ -35,6 +35,9 @@ docs/mockups/
 /*.png
 /*.jpg
 
+# Git worktrees
+.worktrees/
+
 # OS
 .DS_Store
 Thumbs.db
