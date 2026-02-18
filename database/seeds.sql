@@ -312,6 +312,30 @@ INSERT INTO items (slug, event_id, category_id, donor_id, title, description, lo
    'A private luxury afternoon tea for six guests hosted by an award-winning Glasgow tearoom. Includes finger sandwiches, freshly baked scones with clotted cream and jam, a selection of cakes and pastries, and a choice of premium teas and coffees. A wonderful occasion in elegant surroundings.',
    2, 120.00, 15.00, NULL, 210.00, 4, 'sold', 400.00, 5);
 
+-- ─── Item images ────────────────────────────────────────────────────────────
+-- Royalty-free images (Picsum Photos — CC0). Files live in uploads/.
+-- If uploads/ is empty on a fresh environment, items fall back to the placeholder.
+
+UPDATE items SET image = 'rolex-submariner.jpg'              WHERE slug = 'rolex-submariner';
+UPDATE items SET image = 'chefs-table-experience.jpg'        WHERE slug = 'chefs-table-experience';
+UPDATE items SET image = 'loch-lomond-oil-painting.jpg'      WHERE slug = 'loch-lomond-oil-painting';
+UPDATE items SET image = 'gleneagles-golf-package.jpg'       WHERE slug = 'gleneagles-golf-package';
+UPDATE items SET image = 'balmoral-spa-day.jpg'              WHERE slug = 'balmoral-spa-day';
+UPDATE items SET image = 'amalfi-villa-week.jpg'             WHERE slug = 'amalfi-villa-week';
+UPDATE items SET image = 'scottish-artisan-hamper.jpg'       WHERE slug = 'scottish-artisan-hamper';
+UPDATE items SET image = 'macbook-pro-m4.jpg'                WHERE slug = 'macbook-pro-m4';
+UPDATE items SET image = 'highland-watercolour.jpg'          WHERE slug = 'highland-watercolour';
+UPDATE items SET image = 'bronze-stag-sculpture.jpg'         WHERE slug = 'bronze-stag-sculpture';
+UPDATE items SET image = 'celtic-fc-signed-jersey.jpg'       WHERE slug = 'celtic-fc-signed-jersey';
+UPDATE items SET image = 'handmade-jewellery-set.jpg'        WHERE slug = 'handmade-jewellery-set';
+UPDATE items SET image = 'glasgow-city-hotel-stay.jpg'       WHERE slug = 'glasgow-city-hotel-stay';
+UPDATE items SET image = 'personal-training-package.jpg'     WHERE slug = 'personal-training-package';
+UPDATE items SET image = 'signed-book-collection.jpg'        WHERE slug = 'signed-book-collection';
+UPDATE items SET image = 'edinburgh-castle-private-tour.jpg' WHERE slug = 'edinburgh-castle-private-tour';
+UPDATE items SET image = 'garden-makeover-day.jpg'           WHERE slug = 'garden-makeover-day';
+UPDATE items SET image = 'vintage-omega-watch.jpg'           WHERE slug = 'vintage-omega-watch';
+UPDATE items SET image = 'afternoon-tea-experience.jpg'      WHERE slug = 'afternoon-tea-experience';
+
 -- ─── Bids ──────────────────────────────────────────────────────────────────
 
 -- Lot 7 (Scottish Artisan Hamper) — 3 bids
