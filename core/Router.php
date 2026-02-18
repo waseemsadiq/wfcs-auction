@@ -41,6 +41,11 @@ class Router
         $this->addRoute('DELETE', $path, $handler);
     }
 
+    public function put(string $path, mixed $handler): void
+    {
+        $this->addRoute('PUT', $path, $handler);
+    }
+
     // -------------------------------------------------------------------------
     // Dispatch
     // -------------------------------------------------------------------------
