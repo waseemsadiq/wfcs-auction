@@ -1,0 +1,7 @@
+{
+  "name": "@wellfoundation/auction-mcp-root",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ]
+}
