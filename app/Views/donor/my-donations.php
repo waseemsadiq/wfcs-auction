@@ -55,8 +55,10 @@ $linkableEventStatuses = ['published', 'active', 'ended', 'closed'];
 <!-- ── Empty state ── -->
 <div class="fade-up delay-1 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700/30 shadow-sm">
   <?php
-  $icon = '<svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>';
-  $action = '<a href="' . e($basePath . '/donate') . '" class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-primary hover:bg-primary-hover rounded-xl shadow-sm transition-colors">Donate an item</a>';
+  $icon        = '<svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>';
+  $title       = "You haven't donated any items yet.";
+  $description = 'Every donation helps raise funds for WFCS.';
+  $action      = '<a href="' . e($basePath . '/donate') . '" class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-primary hover:bg-primary-hover rounded-xl shadow-sm transition-colors">Donate an item</a>';
   include __DIR__ . '/../atoms/empty-state.php';
   ?>
 </div>
@@ -143,7 +145,7 @@ $linkableEventStatuses = ['published', 'active', 'ended', 'closed'];
       <div class="w-full sm:w-16 h-28 sm:h-16 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-700">
         <?php if (!empty($item['image'])): ?>
         <img
-          src="<?= e($basePath . '/uploads/thumbs/' . $item['image']) ?>"
+          src="<?= e($basePath . '/uploads/thumbs/' . basename($item['image'])) ?>"
           alt="<?= e($item['title'] ?? '') ?>"
           class="w-full h-full object-cover"
         />
@@ -179,11 +181,11 @@ $linkableEventStatuses = ['published', 'active', 'ended', 'closed'];
         <?php if ($status === 'pending'): ?>
         Awaiting review by our team
         <?php elseif ($status === 'active'): ?>
-        In auction<?php if ($currentBid > 0): ?> · <span class="font-semibold text-slate-700 dark:text-slate-300"><?= e(formatCurrency($currentBid)) ?></span> current bid<?php endif; ?>
+        In auction<?php if ($currentBid > 0): ?> · <span class="font-semibold text-slate-700 dark:text-slate-300"><?= e('£' . number_format($currentBid, 0)) ?></span> current bid<?php endif; ?>
         <?php elseif ($status === 'ended'): ?>
         Auction ended — not sold
         <?php elseif ($status === 'sold'): ?>
-        <span class="font-bold text-green-700 dark:text-green-400"><?= e(formatCurrency($currentBid)) ?></span> raised
+        <span class="font-bold text-green-700 dark:text-green-400"><?= e('£' . number_format($currentBid, 0)) ?></span> raised
         <?php if (!empty($item['winner_name'])): ?>
         · Won by <?= e($item['winner_name']) ?>
         <?php endif; ?>
