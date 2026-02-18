@@ -11,6 +11,9 @@ if (file_exists($dotenv)) {
     }
 }
 
-// Helpers will be loaded here once they exist — for now stub the globals
+// Load application helpers (global functions)
+require_once __DIR__ . '/../app/Helpers/functions.php';
+
+// Stub globals used by some helpers
 $basePath = '';
 $csrfToken = 'test_csrf_token';

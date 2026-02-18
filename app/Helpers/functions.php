@@ -300,3 +300,26 @@ function decryptSetting(string $value): string
     }
     return $plaintext;
 }
+
+/**
+ * Mask a full name to "First L." for privacy (e.g. "Jane Doe" → "Jane D.").
+ * Single-word names are returned unchanged.
+ */
+function maskName(string $name): string
+{
+    $name  = trim($name);
+    $parts = preg_split('/\s+/', $name);
+
+    if (empty($parts) || $parts === [false] || $name === '') {
+        return $name;
+    }
+
+    if (count($parts) === 1) {
+        return $parts[0];
+    }
+
+    $first = $parts[0];
+    $last  = $parts[count($parts) - 1];
+
+    return $first . ' ' . mb_strtoupper(mb_substr($last, 0, 1)) . '.';
+}

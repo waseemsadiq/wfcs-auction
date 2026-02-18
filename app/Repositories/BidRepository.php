@@ -32,7 +32,7 @@ class BidRepository
 
         // Mask bidder name and compute time_ago
         foreach ($rows as &$row) {
-            $row['bidder_name'] = $this->maskName((string)($row['bidder_name'] ?? ''));
+            $row['bidder_name'] = maskName((string)($row['bidder_name'] ?? ''));
             $row['time_ago']    = $this->timeAgo((string)($row['created_at'] ?? ''));
         }
         unset($row);
@@ -194,30 +194,6 @@ class BidRepository
     // -------------------------------------------------------------------------
     // Private helpers
     // -------------------------------------------------------------------------
-
-    /**
-     * Mask a full name to "First L." for bidder privacy.
-     * "John Smith" → "John S."
-     * "John"       → "John"
-     */
-    private function maskName(string $name): string
-    {
-        $name  = trim($name);
-        $parts = preg_split('/\s+/', $name);
-
-        if (empty($parts) || $parts === [false]) {
-            return $name;
-        }
-
-        if (count($parts) === 1) {
-            return $parts[0];
-        }
-
-        $first = $parts[0];
-        $last  = $parts[count($parts) - 1];
-
-        return $first . ' ' . mb_strtoupper(mb_substr($last, 0, 1)) . '.';
-    }
 
     private function timeAgo(string $datetime): string
     {
