@@ -738,7 +738,7 @@ Tests use `.env.test` for configuration. The CI pipeline (`.github/workflows/ci.
 
 ## Deployment to LAMP Hosting
 
-Production deployments use `build.sh` to produce a self-contained `dist/` folder ready to upload to any shared LAMP host (tested on IONOS).
+Production deployments use `build.sh` to produce a self-contained `dist/` folder ready to upload to any shared LAMP host.
 
 ### 1. Run the build script
 

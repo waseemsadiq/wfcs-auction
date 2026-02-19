@@ -1059,10 +1059,10 @@ Complete reference for every endpoint:
 - `.env.test` configuration
 
 ### `docs/developer/deployment.md` — Deployment Guide
-- Shared LAMP hosting steps (IONOS)
+- Shared LAMP hosting steps
 - Apache `.htaccess` required
 - `php.ini` values for production
-- Environment variables via `config/env.php` (not `.env` on IONOS)
+- Environment variables via `config/env.php` (not `.env` on shared hosting)
 - Stripe live key setup
 - SMTP configuration
 

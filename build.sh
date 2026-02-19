@@ -1,6 +1,6 @@
 #!/bin/bash
 # Build script for Shared Hosting Distribution
-# Creates a dist/ folder ready to upload to IONOS (or any LAMP server)
+# Creates a dist/ folder ready to upload to any shared LAMP server
 
 # Ensure we are in the script directory (auction/)
 cd "$(dirname "$0")"

@@ -1121,8 +1121,8 @@
     "title": "Deployment to LAMP Hosting",
     "level": 2,
     "anchor": "deployment-to-lamp-hosting",
-    "snippet": "Production deployments use `build.sh` to produce a self-contained `dist/` folder ready to upload to any shared LAMP host (tested on IONOS).",
-    "content": "Production deployments use `build.sh` to produce a self-contained `dist/` folder ready to upload to any shared LAMP host (tested on IONOS)."
+    "snippet": "Production deployments use `build.sh` to produce a self-contained `dist/` folder ready to upload to any shared LAMP host.",
+    "content": "Production deployments use `build.sh` to produce a self-contained `dist/` folder ready to upload to any shared LAMP host."
   },
   {
     "pageId": "developer-guide",

@@ -3,7 +3,7 @@
 /**
  * Environment Configuration - SHARED HOSTING VERSION
  *
- * This file replaces .env on shared hosting (IONOS etc.) where dotfiles
+ * This file replaces .env on shared hosting where dotfiles
  * are not reliable. It populates $_ENV so all env() / getenv() calls work.
  *
  * The build script renames this to config/env.php in the dist/ folder.
