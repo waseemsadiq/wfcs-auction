@@ -57,10 +57,12 @@ class UserRepository
         $this->db->execute(
             'INSERT INTO users
                 (slug, name, email, password_hash, role, phone,
+                 company_name, company_contact_first_name, company_contact_last_name,
+                 company_contact_email, website,
                  email_verified_at,
                  email_verification_token, email_verification_expires_at,
                  created_at, updated_at)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())',
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())',
             [
                 $data['slug'],
                 $data['name'],
@@ -68,6 +70,11 @@ class UserRepository
                 $data['password_hash'],
                 $data['role'] ?? 'bidder',
                 $data['phone'] ?? null,
+                $data['company_name'] ?? null,
+                $data['company_contact_first_name'] ?? null,
+                $data['company_contact_last_name'] ?? null,
+                $data['company_contact_email'] ?? null,
+                $data['website'] ?? null,
                 $data['email_verified_at'] ?? null,
                 $data['email_verification_token'] ?? null,
                 $data['email_verification_expires_at'] ?? null,
@@ -131,6 +138,8 @@ class UserRepository
     {
         $allowed = [
             'name', 'email', 'phone',
+            'company_name', 'company_contact_first_name', 'company_contact_last_name',
+            'company_contact_email', 'website',
             'gift_aid_eligible', 'gift_aid_name',
             'gift_aid_address', 'gift_aid_city', 'gift_aid_postcode',
             'notify_outbid', 'notify_ending_soon', 'notify_win', 'notify_payment',

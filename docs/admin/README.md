@@ -99,7 +99,7 @@ The transition to **Ended** also happens automatically when the auction's end da
 
 ### Reviewing donor submissions
 
-Donors submit items via the **Donate an Item** page. The form collects the donor's contact details (name, email, and optionally phone number) along with the item information. If the email address matches an existing account, the item is linked to that account automatically; otherwise a new donor account is created.
+Donors submit items via the **Donate an Item** page. The form collects the donor's contact details (name, email, and optionally phone number, company name, company contact, and website) along with the item information. If the email address matches an existing account, the item is linked to that account automatically; otherwise a new donor account is created.
 
 When a submission comes in you will receive an **email notification** with a thumbnail of the item image. The donor also receives a thank-you email confirming receipt.
 

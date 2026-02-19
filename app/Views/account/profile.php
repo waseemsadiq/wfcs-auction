@@ -165,6 +165,62 @@ $giftAidName   = !empty($user['gift_aid_name']) ? $user['gift_aid_name'] : $sugg
       <p class="text-xs text-slate-400 dark:text-slate-500 mt-1.5">Used for important auction updates only. Never shared.</p>
     </div>
 
+    <!-- Company Name -->
+    <div>
+      <label for="company_name" class="block text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5">Your Company <span class="normal-case font-normal">(optional)</span></label>
+      <input
+        type="text" id="company_name" name="company_name"
+        value="<?= e($user['company_name'] ?? '') ?>"
+        maxlength="255"
+        class="w-full px-3 py-2.5 text-sm bg-white dark:bg-slate-700/60 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors"
+      />
+    </div>
+
+    <!-- Company Contact Name -->
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label for="company_contact_first_name" class="block text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5">Contact First Name</label>
+        <input
+          type="text" id="company_contact_first_name" name="company_contact_first_name"
+          value="<?= e($user['company_contact_first_name'] ?? '') ?>"
+          maxlength="100"
+          class="w-full px-3 py-2.5 text-sm bg-white dark:bg-slate-700/60 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors"
+        />
+      </div>
+      <div>
+        <label for="company_contact_last_name" class="block text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5">Contact Last Name</label>
+        <input
+          type="text" id="company_contact_last_name" name="company_contact_last_name"
+          value="<?= e($user['company_contact_last_name'] ?? '') ?>"
+          maxlength="100"
+          class="w-full px-3 py-2.5 text-sm bg-white dark:bg-slate-700/60 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors"
+        />
+      </div>
+    </div>
+
+    <!-- Company Contact Email -->
+    <div>
+      <label for="company_contact_email" class="block text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5">Company Contact Email</label>
+      <input
+        type="email" id="company_contact_email" name="company_contact_email"
+        value="<?= e($user['company_contact_email'] ?? '') ?>"
+        maxlength="255"
+        class="w-full px-3 py-2.5 text-sm bg-white dark:bg-slate-700/60 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors"
+      />
+    </div>
+
+    <!-- Website -->
+    <div>
+      <label for="website" class="block text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5">Website</label>
+      <input
+        type="url" id="website" name="website"
+        value="<?= e($user['website'] ?? '') ?>"
+        placeholder="https://example.com"
+        maxlength="255"
+        class="w-full px-3 py-2.5 text-sm bg-white dark:bg-slate-700/60 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors"
+      />
+    </div>
+
     <!-- Save -->
     <div>
       <button type="submit" class="px-5 py-2.5 text-sm font-semibold text-white bg-primary hover:bg-primary-hover rounded-xl shadow-sm transition-colors">

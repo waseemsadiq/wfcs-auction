@@ -211,6 +211,86 @@ $old    = $old ?? [];
           />
         </div>
 
+        <!-- Company name -->
+        <div>
+          <label for="company_name" class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+            Your company
+            <span class="ml-1 font-normal text-slate-400">(optional)</span>
+          </label>
+          <input
+            type="text"
+            id="company_name"
+            name="company_name"
+            value="<?= e($old['company_name'] ?? '') ?>"
+            autocomplete="organization"
+            placeholder="e.g. Acme Ltd"
+            class="field w-full px-4 py-3 text-sm bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white placeholder-slate-400"
+          />
+        </div>
+
+        <!-- Company contact name -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="company_contact_first_name" class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+              Company contact first name
+              <span class="ml-1 font-normal text-slate-400">(optional)</span>
+            </label>
+            <input
+              type="text"
+              id="company_contact_first_name"
+              name="company_contact_first_name"
+              value="<?= e($old['company_contact_first_name'] ?? '') ?>"
+              class="field w-full px-4 py-3 text-sm bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white placeholder-slate-400"
+            />
+          </div>
+          <div>
+            <label for="company_contact_last_name" class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+              Company contact last name
+              <span class="ml-1 font-normal text-slate-400">(optional)</span>
+            </label>
+            <input
+              type="text"
+              id="company_contact_last_name"
+              name="company_contact_last_name"
+              value="<?= e($old['company_contact_last_name'] ?? '') ?>"
+              class="field w-full px-4 py-3 text-sm bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white placeholder-slate-400"
+            />
+          </div>
+        </div>
+
+        <!-- Company contact email -->
+        <div>
+          <label for="company_contact_email" class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+            Company contact email
+            <span class="ml-1 font-normal text-slate-400">(optional)</span>
+          </label>
+          <input
+            type="email"
+            id="company_contact_email"
+            name="company_contact_email"
+            value="<?= e($old['company_contact_email'] ?? '') ?>"
+            placeholder="contact@company.com"
+            class="field w-full px-4 py-3 text-sm bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white placeholder-slate-400"
+          />
+        </div>
+
+        <!-- Website -->
+        <div>
+          <label for="website" class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+            Website
+            <span class="ml-1 font-normal text-slate-400">(optional)</span>
+          </label>
+          <input
+            type="url"
+            id="website"
+            name="website"
+            value="<?= e($old['website'] ?? '') ?>"
+            autocomplete="url"
+            placeholder="https://www.yourcompany.com"
+            class="field w-full px-4 py-3 text-sm bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white placeholder-slate-400"
+          />
+        </div>
+
       </div>
     </div>
 

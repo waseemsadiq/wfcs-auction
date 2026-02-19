@@ -1,0 +1,66 @@
+# .distignore — files and folders excluded from the dist/ build
+# rsync --exclude-from='.distignore'
+# Add project-specific exclusions at the bottom.
+
+# Build output (never recurse into itself)
+dist
+
+# All hidden files and folders (dot-prefixed) — covers .worktrees, .claude, .git, etc.
+.*
+
+# Keep specific hidden files that ARE needed in dist
+# (none currently — all dotfiles are dev/tooling only)
+
+# Dev tools / local-only
+node_modules
+vendor
+
+# Dev scripts and config
+build.sh
+db-init.php
+hash.php
+php.ini
+phpunit.xml
+run-tests.php
+.phpunit.cache
+.phpunit.result.cache
+
+# Dependencies (installed on server separately or via composer install)
+composer.json
+composer.lock
+package.json
+package-lock.json
+
+# Tests
+tests
+
+# Docs and planning
+docs
+*.md
+
+# Database source files (installer is built separately by build.sh)
+database
+
+# Dev-only source files
+css/tailwind.css
+
+# Session and log files
+*.log
+*.sqlite
+
+# Uploads (conditionally included by build.sh based on seed choice)
+uploads
+
+# Galvani local data
+data
+
+# Smoke test screenshots
+*.png
+
+# This file
+.distignore
+
+# -----------------------------------------------
+# Project-specific exclusions — add below here
+# -----------------------------------------------
+scripts

@@ -104,10 +104,15 @@ class ItemController extends Controller
 
         validateCsrf();
 
-        $firstName = trim($_POST['first_name'] ?? '');
-        $lastName  = trim($_POST['last_name']  ?? '');
-        $email     = trim(strtolower($_POST['email'] ?? ''));
-        $phone     = trim($_POST['phone'] ?? '');
+        $firstName               = trim($_POST['first_name'] ?? '');
+        $lastName                = trim($_POST['last_name']  ?? '');
+        $email                   = trim(strtolower($_POST['email'] ?? ''));
+        $phone                   = trim($_POST['phone'] ?? '');
+        $companyName             = trim($_POST['company_name'] ?? '');
+        $companyContactFirstName = trim($_POST['company_contact_first_name'] ?? '');
+        $companyContactLastName  = trim($_POST['company_contact_last_name'] ?? '');
+        $companyContactEmail     = trim($_POST['company_contact_email'] ?? '');
+        $website                 = trim($_POST['website'] ?? '');
 
         $data = [
             'title'        => trim($_POST['title'] ?? ''),
@@ -130,10 +135,15 @@ class ItemController extends Controller
                 'user'   => $user,
                 'errors' => $errors,
                 'old'    => array_merge($data, [
-                    'first_name' => $firstName,
-                    'last_name'  => $lastName,
-                    'email'      => $email,
-                    'phone'      => $phone,
+                    'first_name'                 => $firstName,
+                    'last_name'                  => $lastName,
+                    'email'                      => $email,
+                    'phone'                      => $phone,
+                    'company_name'               => $companyName,
+                    'company_contact_first_name' => $companyContactFirstName,
+                    'company_contact_last_name'  => $companyContactLastName,
+                    'company_contact_email'      => $companyContactEmail,
+                    'website'                    => $website,
                 ]),
             ]);
             $this->view('layouts/public', ['pageTitle' => 'Donate an Item', 'activeNav' => 'donate', 'user' => $user, 'content' => $content]);
@@ -150,7 +160,13 @@ class ItemController extends Controller
                 $content = $this->renderView('items/submit', [
                     'user'   => $user,
                     'errors' => ['photo' => $e->getMessage()],
-                    'old'    => array_merge($data, compact('firstName', 'lastName', 'email', 'phone')),
+                    'old'    => array_merge($data, compact('firstName', 'lastName', 'email', 'phone'), [
+                        'company_name'               => $companyName,
+                        'company_contact_first_name' => $companyContactFirstName,
+                        'company_contact_last_name'  => $companyContactLastName,
+                        'company_contact_email'      => $companyContactEmail,
+                        'website'                    => $website,
+                    ]),
                 ]);
                 $this->view('layouts/public', ['pageTitle' => 'Donate an Item', 'activeNav' => 'donate', 'user' => $user, 'content' => $content]);
                 return;
@@ -162,23 +178,40 @@ class ItemController extends Controller
         $existingUser = $this->users->findByEmail($email);
         $isNewDonor   = false;
 
+        $companyFields = [
+            'company_name'               => $companyName             !== '' ? $companyName             : null,
+            'company_contact_first_name' => $companyContactFirstName !== '' ? $companyContactFirstName : null,
+            'company_contact_last_name'  => $companyContactLastName  !== '' ? $companyContactLastName  : null,
+            'company_contact_email'      => $companyContactEmail     !== '' ? $companyContactEmail     : null,
+            'website'                    => $website                 !== '' ? $website                 : null,
+        ];
+
         if ($existingUser !== null) {
-            $donorId = (int)$existingUser['id'];
+            $donorId    = (int)$existingUser['id'];
+            $updateData = [];
             if ($phone !== '') {
-                $this->users->updatePhone($donorId, $phone);
+                $updateData['phone'] = $phone;
+            }
+            foreach ($companyFields as $field => $value) {
+                if ($value !== null) {
+                    $updateData[$field] = $value;
+                }
+            }
+            if (!empty($updateData)) {
+                $this->users->updateProfile($donorId, $updateData);
             }
         } else {
             $isNewDonor = true;
             $slug       = $this->users->uniqueSlug($fullName);
-            $donorId    = $this->users->create([
-                'slug'             => $slug,
-                'name'             => $fullName,
-                'email'            => $email,
-                'password_hash'    => '!',   // impossible hash — account locked until password set
-                'role'             => 'donor',
-                'phone'            => $phone !== '' ? $phone : null,
+            $donorId    = $this->users->create(array_merge([
+                'slug'              => $slug,
+                'name'              => $fullName,
+                'email'             => $email,
+                'password_hash'     => '!',   // impossible hash — account locked until password set
+                'role'              => 'donor',
+                'phone'             => $phone !== '' ? $phone : null,
                 'email_verified_at' => date('Y-m-d H:i:s'), // donors are pre-verified
-            ]);
+            ], $companyFields));
         }
 
         try {
@@ -197,7 +230,10 @@ class ItemController extends Controller
                 $thumbPath = dirname(__DIR__, 2) . '/uploads/thumbs/' . basename($data['image']);
             }
             $adminEmail = (string)($this->settings->get('admin_email') ?? 'info@wellfoundation.org.uk');
-            $donorRow   = ['first_name' => $firstName, 'last_name' => $lastName, 'email' => $email, 'phone' => $phone];
+            $donorRow   = array_merge(
+                ['first_name' => $firstName, 'last_name' => $lastName, 'email' => $email, 'phone' => $phone],
+                $companyFields
+            );
 
             try {
                 (new NotificationService())->sendDonationNotification($item, $donorRow, $adminEmail, $baseUrl, $thumbPath);
@@ -222,7 +258,13 @@ class ItemController extends Controller
             $content = $this->renderView('items/submit', [
                 'user'   => $user,
                 'errors' => ['general' => $e->getMessage()],
-                'old'    => array_merge($data, compact('firstName', 'lastName', 'email', 'phone')),
+                'old'    => array_merge($data, compact('firstName', 'lastName', 'email', 'phone'), [
+                    'company_name'               => $companyName,
+                    'company_contact_first_name' => $companyContactFirstName,
+                    'company_contact_last_name'  => $companyContactLastName,
+                    'company_contact_email'      => $companyContactEmail,
+                    'website'                    => $website,
+                ]),
             ]);
             $this->view('layouts/public', ['pageTitle' => 'Donate an Item', 'activeNav' => 'donate', 'user' => $user, 'content' => $content]);
         }

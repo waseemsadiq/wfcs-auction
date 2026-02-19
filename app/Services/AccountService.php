@@ -38,9 +38,14 @@ class AccountService
         $name      = $firstName !== '' || $lastName !== ''
             ? trim($firstName . ' ' . $lastName)
             : trim($data['name'] ?? '');
-        $phone           = trim($data['phone'] ?? '');
-        $email           = trim($data['email'] ?? '');
-        $giftAidEligible = !empty($data['gift_aid_eligible']) ? 1 : 0;
+        $phone                   = trim($data['phone'] ?? '');
+        $email                   = trim($data['email'] ?? '');
+        $companyName             = trim($data['company_name'] ?? '');
+        $companyContactFirstName = trim($data['company_contact_first_name'] ?? '');
+        $companyContactLastName  = trim($data['company_contact_last_name'] ?? '');
+        $companyContactEmail     = trim($data['company_contact_email'] ?? '');
+        $website                 = trim($data['website'] ?? '');
+        $giftAidEligible         = !empty($data['gift_aid_eligible']) ? 1 : 0;
         $giftAidName     = trim($data['gift_aid_name'] ?? '');
         $giftAidAddress  = trim($data['gift_aid_address'] ?? '');
         $giftAidCity     = trim($data['gift_aid_city'] ?? '');
@@ -78,6 +83,15 @@ class AccountService
 
         if (array_key_exists('phone', $data)) {
             $profileData['phone'] = $phone !== '' ? $phone : null;
+        }
+
+        // Company fields — only update when the profile form sends them
+        if (array_key_exists('company_name', $data)) {
+            $profileData['company_name']               = $companyName             !== '' ? $companyName             : null;
+            $profileData['company_contact_first_name'] = $companyContactFirstName !== '' ? $companyContactFirstName : null;
+            $profileData['company_contact_last_name']  = $companyContactLastName  !== '' ? $companyContactLastName  : null;
+            $profileData['company_contact_email']      = $companyContactEmail     !== '' ? $companyContactEmail     : null;
+            $profileData['website']                    = $website                 !== '' ? $website                 : null;
         }
 
         if (array_key_exists('gift_aid_eligible', $data)) {

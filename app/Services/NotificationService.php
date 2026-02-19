@@ -240,10 +240,15 @@ class NotificationService
         if ($donorName === '') {
             $donorName = $donor['name'] ?? 'Unknown';
         }
-        $donorEmail = $donor['email'] ?? '';
-        $donorPhone = $donor['phone'] ?? '';
-        $itemTitle  = $item['title'] ?? 'Untitled';
-        $adminUrl   = rtrim($baseUrl, '/') . '/admin/items';
+        $donorEmail              = $donor['email'] ?? '';
+        $donorPhone              = $donor['phone'] ?? '';
+        $companyName             = $donor['company_name'] ?? '';
+        $companyContactFirstName = $donor['company_contact_first_name'] ?? '';
+        $companyContactLastName  = $donor['company_contact_last_name'] ?? '';
+        $companyContactEmail     = $donor['company_contact_email'] ?? '';
+        $website                 = $donor['website'] ?? '';
+        $itemTitle               = $item['title'] ?? 'Untitled';
+        $adminUrl                = rtrim($baseUrl, '/') . '/admin/items';
 
         $phoneHtml = $donorPhone !== '' ? "<li><strong>Phone:</strong> " . htmlspecialchars($donorPhone) . "</li>" : '';
         $descHtml  = !empty($item['description'])
@@ -253,6 +258,16 @@ class NotificationService
             ? "<li><strong>Market value:</strong> &pound;" . number_format((float)$item['market_value'], 2) . "</li>"
             : '';
 
+        // Company details block (only rendered when at least one field is set)
+        $companyContactName = trim($companyContactFirstName . ' ' . $companyContactLastName);
+        $companyHtml = '';
+        if ($companyName !== '' || $companyContactName !== '' || $companyContactEmail !== '' || $website !== '') {
+            $companyHtml .= $companyName        !== '' ? "<li><strong>Company:</strong> "         . htmlspecialchars($companyName) . "</li>" : '';
+            $companyHtml .= $companyContactName !== '' ? "<li><strong>Contact:</strong> "          . htmlspecialchars($companyContactName) . "</li>" : '';
+            $companyHtml .= $companyContactEmail !== '' ? "<li><strong>Contact email:</strong> "   . htmlspecialchars($companyContactEmail) . "</li>" : '';
+            $companyHtml .= $website             !== '' ? "<li><strong>Website:</strong> <a href='" . htmlspecialchars($website) . "'>" . htmlspecialchars($website) . "</a></li>" : '';
+        }
+
         $html = "<p>A new item has been submitted for review.</p>
 <ul>
   <li><strong>Item:</strong> " . htmlspecialchars($itemTitle) . "</li>
@@ -261,6 +276,7 @@ class NotificationService
   <li><strong>Donor:</strong> " . htmlspecialchars($donorName) . "</li>
   <li><strong>Email:</strong> " . htmlspecialchars($donorEmail) . "</li>
   {$phoneHtml}
+  {$companyHtml}
 </ul>
 <p><a href='" . htmlspecialchars($adminUrl) . "'>Review in admin &rarr;</a></p>";
 
@@ -268,6 +284,18 @@ class NotificationService
         $text .= "Donor: {$donorName} ({$donorEmail})";
         if ($donorPhone !== '') {
             $text .= " — {$donorPhone}";
+        }
+        if ($companyName !== '') {
+            $text .= "\nCompany: {$companyName}";
+        }
+        if ($companyContactName !== '') {
+            $text .= "\nContact: {$companyContactName}";
+        }
+        if ($companyContactEmail !== '') {
+            $text .= " ({$companyContactEmail})";
+        }
+        if ($website !== '') {
+            $text .= "\nWebsite: {$website}";
         }
         $text .= "\nReview: {$adminUrl}";
 
