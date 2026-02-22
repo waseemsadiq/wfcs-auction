@@ -529,7 +529,7 @@ class AdminController extends Controller
                     $newEmail,
                     (string)($profile['email'] ?? '')
                 );
-                flash('Email updated. A verification link has been sent to ' . htmlspecialchars($newEmail, ENT_QUOTES) . '.');
+                flash('Email updated. A verification link has been sent to ' . $newEmail . '.');
             } catch (\RuntimeException $e) {
                 flash($e->getMessage(), 'error');
             } catch (\Throwable $e) {
