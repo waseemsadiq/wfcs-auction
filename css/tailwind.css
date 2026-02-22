@@ -43,3 +43,10 @@
 .dark {
   color-scheme: dark;
 }
+
+/* Ensure popovers are hidden until explicitly opened.
+   The Popover API UA rule (display:none) has no !important, so Tailwind
+   display utilities (e.g. flex) override it — this locks the hidden state. */
+[popover]:not(:popover-open) {
+  display: none !important;
+}
