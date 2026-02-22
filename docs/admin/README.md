@@ -186,7 +186,7 @@ From a user's profile page (**Admin → Users → [User Name]**):
 
 2. Click **Save**
 
-> Be careful when granting admin access. Admin accounts have full control over the platform including payment settings.
+> Be careful when granting admin access. Admin accounts can manage auctions, items, users, and live events.
 
 ### Changing a user's email address
 
