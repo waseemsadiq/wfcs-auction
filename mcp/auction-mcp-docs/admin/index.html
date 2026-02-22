@@ -95,12 +95,30 @@
           <tr><td><code>my_donations</code></td><td>Your donated items</td></tr>
           <tr><td><code>manage_auctions</code></td><td>Create, update, publish, open, end auctions</td></tr>
           <tr><td><code>manage_items</code></td><td>List, view, update auction items</td></tr>
-          <tr><td><code>manage_users</code></td><td>Search, view, update user roles and email addresses, and permanently delete non-admin users (GDPR)</td></tr>
+          <tr><td><code>manage_users</code></td><td>Search, view, update user roles and email addresses, and permanently delete users (GDPR). Super admins can also delete admin accounts.</td></tr>
           <tr><td><code>admin_payments</code></td><td>List payment records with filters</td></tr>
           <tr><td><code>admin_gift_aid</code></td><td>Gift Aid statistics and claims</td></tr>
           <tr><td><code>admin_reports</code></td><td>Revenue and activity reports</td></tr>
           <tr><td><code>admin_settings</code></td><td>View/update app settings</td></tr>
           <tr><td><code>manage_live</code></td><td>Control the live gala projector screen</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Role Permissions</div>
+      <p class="text-muted" style="font-size:.875rem;margin-bottom:.75rem">
+        Some tools are only available to super admins:
+      </p>
+      <table class="tool-table">
+        <thead>
+          <tr><th>Tool</th><th>Admin</th><th>Super Admin</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>admin_payments</code></td><td>—</td><td>✓</td></tr>
+          <tr><td><code>admin_gift_aid</code></td><td>—</td><td>✓</td></tr>
+          <tr><td><code>admin_settings</code></td><td>—</td><td>✓</td></tr>
+          <tr><td>All other admin tools</td><td>✓</td><td>✓</td></tr>
         </tbody>
       </table>
     </div>

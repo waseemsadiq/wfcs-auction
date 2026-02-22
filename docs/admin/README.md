@@ -45,6 +45,34 @@ The admin panel has eight sections, accessible from the top navigation bar:
 
 ---
 
+## Role Hierarchy
+
+The platform has four user roles with escalating permissions:
+
+| Role          | Admin panel | Auctions / Items / Users | Payments / Gift Aid / Settings |
+|---------------|-------------|--------------------------|-------------------------------|
+| **Bidder**    | No          | Browsing only            | No                            |
+| **Donor**     | No          | Browsing only            | No                            |
+| **Admin**     | Yes         | Full control             | No                            |
+| **Super Admin** | Yes       | Full control             | Yes                           |
+
+Super admin accounts are created directly in the database. There is no UI for promoting a user to super admin.
+
+### What admins can do
+
+Admins have access to the full admin panel — Dashboard, Auctions, Items, Users, and Live Events — but cannot view or change Payments, Gift Aid records, or platform Settings.
+
+### What super admins can do
+
+Super admins have full access to everything, including:
+- Payments — view all payment records
+- Gift Aid — download HMRC reports
+- Settings — configure Stripe, SMTP, and webhooks
+- Delete admin accounts (admins cannot delete other admins)
+- Change any non-super-admin user's role, including promoting to admin
+
+---
+
 ## Managing Auctions
 
 ### Creating a new auction
@@ -152,7 +180,10 @@ From a user's profile page (**Admin → Users → [User Name]**):
 1. Select the new role from the **Role** dropdown:
    - **Bidder** — standard registered user, can bid
    - **Donor** — can submit items; can also bid
-   - **Admin** — full admin access
+   - **Admin** — full admin access (payments, gift aid, and settings excluded)
+
+> The Admin option in the dropdown is only visible to super admin users. Regular admins can only set Bidder or Donor.
+
 2. Click **Save**
 
 > Be careful when granting admin access. Admin accounts have full control over the platform including payment settings.
@@ -191,7 +222,9 @@ From the users list (**Admin → Users**):
 
 > **This action cannot be undone.** There is no recovery path once confirmed.
 
-> The Delete button is not shown for admin accounts. To remove an admin, first change their role to Bidder or Donor, then delete them.
+> The Delete button is not shown for super admin accounts.
+>
+> Admin accounts can only be deleted by a super admin. Regular admins do not see the Delete button for admin accounts.
 
 ---
 
