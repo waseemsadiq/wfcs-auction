@@ -36,24 +36,30 @@ async function main(): Promise<void> {
   registerProfileTools(server, client);
 
   // ---- Bidder + Admin -------------------------------------------------------
-  if (role === 'bidder' || role === 'admin') {
+  if (role === 'bidder' || role === 'admin' || role === 'super_admin') {
     registerBiddingTools(server, client);
   }
 
   // ---- Donor + Admin --------------------------------------------------------
-  if (role === 'donor' || role === 'admin') {
+  if (role === 'donor' || role === 'admin' || role === 'super_admin') {
     registerDonationTools(server, client);
   }
 
   // ---- Admin only -----------------------------------------------------------
-  if (role === 'admin') {
+  const isAdmin      = role === 'admin'       || role === 'super_admin';
+  const isSuperAdmin = role === 'super_admin';
+
+  if (isAdmin) {
     registerAdminAuctionTools(server, client);
     registerAdminItemTools(server, client);
     registerAdminUserTools(server, client);
-    registerAdminPaymentTools(server, client);
     registerAdminReportTools(server, client);
-    registerAdminSettingsTools(server, client);
     registerAdminLiveTools(server, client);
+  }
+
+  if (isSuperAdmin) {
+    registerAdminPaymentTools(server, client);
+    registerAdminSettingsTools(server, client);
   }
 
   // ---- Resources ------------------------------------------------------------
@@ -87,6 +93,12 @@ async function main(): Promise<void> {
           'verify_connection', 'browse_events', 'browse_items',
           'my_profile', 'my_bids', 'place_bid', 'my_donations',
           'manage_auctions', 'manage_items', 'manage_users',
+          'admin_reports', 'manage_live',
+        ],
+        super_admin: [
+          'verify_connection', 'browse_events', 'browse_items',
+          'my_profile', 'my_bids', 'place_bid', 'my_donations',
+          'manage_auctions', 'manage_items', 'manage_users',
           'admin_payments', 'admin_gift_aid', 'admin_reports',
           'admin_settings', 'manage_live',
         ],
@@ -106,7 +118,7 @@ async function main(): Promise<void> {
   );
 
   // ---- Admin prompts --------------------------------------------------------
-  if (role === 'admin') {
+  if (role === 'admin' || role === 'super_admin') {
     server.prompt(
       'daily-briefing',
       'Generate a daily briefing of auction activity: bids today, revenue, and live status.',
