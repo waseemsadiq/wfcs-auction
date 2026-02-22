@@ -87,6 +87,28 @@ global $basePath, $csrfToken;
       </form>
     </div>
     <?php endif; ?>
+
+    <!-- Change email form (not shown for admins) -->
+    <?php if ($profile['role'] !== 'admin'): ?>
+    <div class="mt-5 pt-5 border-t border-slate-100 dark:border-slate-700/40">
+      <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Change Email</p>
+      <form method="POST" action="<?= e($basePath) ?>/admin/users/<?= e($profile['slug']) ?>">
+        <input type="hidden" name="_csrf_token" value="<?= e($csrfToken) ?>">
+        <input type="hidden" name="action"      value="change_email">
+        <div class="flex items-center gap-2">
+          <input
+            type="email"
+            name="new_email"
+            placeholder="<?= e($profile['email']) ?>"
+            class="flex-1 px-3 py-2 text-sm border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors"
+            required
+          >
+          <button type="submit" class="px-4 py-2 text-xs font-semibold text-white bg-primary hover:bg-primary-hover rounded-lg transition-colors whitespace-nowrap">Save</button>
+        </div>
+        <p class="mt-1.5 text-xs text-slate-400">User will receive a verification email at the new address.</p>
+      </form>
+    </div>
+    <?php endif; ?>
   </div>
 
   <!-- Bid history -->
