@@ -2,15 +2,16 @@
 // $user — authenticated admin user array
 // $basePath — base URL path (global)
 // $activeNav — one of: dashboard|auctions|items|users|payments|gift-aid|live-events|settings
+$isSuperAdmin = roleLevel($user['role'] ?? '') >= 3;
 $navItems = [
     'dashboard'   => ['label' => 'Dashboard',   'url' => '/admin/dashboard'],
     'auctions'    => ['label' => 'Auctions',     'url' => '/admin/auctions'],
     'items'       => ['label' => 'Items',        'url' => '/admin/items'],
     'users'       => ['label' => 'Users',        'url' => '/admin/users'],
-    'payments'    => ['label' => 'Payments',     'url' => '/admin/payments'],
-    'gift-aid'    => ['label' => 'Gift Aid',     'url' => '/admin/gift-aid'],
+    ...($isSuperAdmin ? ['payments'  => ['label' => 'Payments',  'url' => '/admin/payments']] : []),
+    ...($isSuperAdmin ? ['gift-aid'  => ['label' => 'Gift Aid',  'url' => '/admin/gift-aid']] : []),
     'live-events' => ['label' => 'Live Events',  'url' => '/admin/live-events'],
-    'settings'    => ['label' => 'Settings',     'url' => '/admin/settings'],
+    ...($isSuperAdmin ? ['settings'  => ['label' => 'Settings',  'url' => '/admin/settings']] : []),
 ];
 $currentNav = $activeNav ?? 'dashboard';
 ?>
