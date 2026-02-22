@@ -324,6 +324,30 @@ class UserRepository
         );
     }
 
+    /**
+     * Change a user's email address.
+     * Clears email_verified_at and generates a new verification token in one query.
+     * Returns the raw token string so the caller can send the verification email.
+     */
+    public function updateEmail(int $id, string $email): string
+    {
+        $token   = bin2hex(random_bytes(32));
+        $expires = date('Y-m-d H:i:s', time() + 86400);
+
+        $this->db->execute(
+            'UPDATE users
+             SET email = ?,
+                 email_verified_at = NULL,
+                 email_verification_token = ?,
+                 email_verification_expires_at = ?,
+                 updated_at = NOW()
+             WHERE id = ?',
+            [$email, $token, $expires, $id]
+        );
+
+        return $token;
+    }
+
     public function uniqueSlug(string $text): string
     {
         return uniqueSlug('users', $text, $this->db);
