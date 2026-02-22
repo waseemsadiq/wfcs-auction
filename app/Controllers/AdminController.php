@@ -512,8 +512,13 @@ class AdminController extends Controller
             $this->redirect($basePath . '/admin/users');
         }
 
-        if ((string)($profile['role'] ?? '') === 'admin') {
-            flash('Admin accounts cannot be deleted.', 'error');
+        if (roleLevel($profile['role'] ?? '') >= 3) {
+            flash('Super admin accounts cannot be deleted.', 'error');
+            $this->redirect($basePath . '/admin/users');
+        }
+
+        if (roleLevel($profile['role'] ?? '') >= 2 && roleLevel($actingAdmin['role'] ?? '') < 3) {
+            flash('Only super admins can delete admin accounts.', 'error');
             $this->redirect($basePath . '/admin/users');
         }
 
@@ -556,7 +561,7 @@ class AdminController extends Controller
         if ($action === 'change_email') {
 
             // Admin accounts cannot be edited from this panel
-            if ($profile['role'] === 'admin') {
+            if ($profile['role'] === 'admin' || $profile['role'] === 'super_admin') {
                 flash('Admin email addresses cannot be changed from here.', 'error');
                 $this->redirect($basePath . '/admin/users/' . $slug);
             }
@@ -593,7 +598,10 @@ class AdminController extends Controller
         }
 
         $newRole = trim($_POST['role'] ?? '');
-        $allowed = ['bidder', 'donor'];
+        // Super admins can promote to admin; regular admins cannot
+        $allowed = roleLevel($admin['role'] ?? '') >= 3
+            ? ['bidder', 'donor', 'admin']
+            : ['bidder', 'donor'];
 
         if (!in_array($newRole, $allowed, true)) {
             flash('Invalid role.', 'error');
@@ -620,7 +628,7 @@ class AdminController extends Controller
     public function payments(): void
     {
         global $basePath;
-        $user = requireAdmin();
+        $user = requireSuperAdmin();
 
         $perPage      = 30;
         $page         = max(1, (int)($_GET['page'] ?? 1));
@@ -670,7 +678,7 @@ class AdminController extends Controller
     public function giftAid(): void
     {
         global $basePath;
-        $user = requireAdmin();
+        $user = requireSuperAdmin();
 
         $perPage  = 30;
         $page     = max(1, (int)($_GET['page'] ?? 1));
@@ -703,7 +711,7 @@ class AdminController extends Controller
      */
     public function exportGiftAid(): void
     {
-        requireAdmin();
+        requireSuperAdmin();
         validateCsrf();
 
         $giftAidRepo = new GiftAidRepository();
@@ -848,7 +856,7 @@ class AdminController extends Controller
     public function settings(): void
     {
         global $basePath;
-        $user = requireAdmin();
+        $user = requireSuperAdmin();
 
         $settingsRepo = new SettingsRepository();
         $settings     = $settingsRepo->all();
@@ -879,7 +887,7 @@ class AdminController extends Controller
     public function saveSettings(): void
     {
         global $basePath;
-        requireAdmin();
+        requireSuperAdmin();
         validateCsrf();
 
         $settingsRepo = new SettingsRepository();

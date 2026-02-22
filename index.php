@@ -215,6 +215,7 @@ $router->get('/admin/payments',                    [$adminController, 'payments'
 
 // Admin — Gift Aid
 $router->get('/admin/gift-aid',                    [$adminController, 'giftAid']);
+$router->post('/admin/gift-aid/export',                [$adminController, 'exportGiftAid']);
 
 // Admin — Live Events
 $router->get('/admin/live-events',                 [$adminController, 'liveEvents']);
