@@ -7,19 +7,20 @@ export function registerAdminUserTools(server: McpServer, client: ApiClient): vo
 
   server.tool(
     'manage_users',
-    'Admin: manage users. Actions: list (with optional search/role filter), get (single user), update (role/profile).',
+    'Admin: manage users. Actions: list (with optional search/role filter), get (single user), update (role/profile/email).',
     {
-      action:   z.enum(['list', 'get', 'update']).describe('Action to perform'),
-      slug:     z.string().optional().describe('User slug (required for get, update)'),
-      q:        z.string().optional().describe('Search by name or email (for list)'),
-      role:     z.string().optional().describe('Filter by role: bidder, donor, admin (for list)'),
-      page:     z.number().int().positive().optional().describe('Page number'),
-      per_page: z.number().int().positive().optional().describe('Results per page'),
-      new_role: z.enum(['bidder', 'donor', 'admin']).optional().describe('New role (for update)'),
-      name:     z.string().optional().describe('New display name (for update)'),
-      phone:    z.string().optional().describe('New phone number (for update)'),
+      action:    z.enum(['list', 'get', 'update']).describe('Action to perform'),
+      slug:      z.string().optional().describe('User slug (required for get, update)'),
+      q:         z.string().optional().describe('Search by name or email (for list)'),
+      role:      z.string().optional().describe('Filter by role: bidder, donor, admin (for list)'),
+      page:      z.number().int().positive().optional().describe('Page number'),
+      per_page:  z.number().int().positive().optional().describe('Results per page'),
+      new_role:  z.enum(['bidder', 'donor', 'admin']).optional().describe('New role (for update)'),
+      name:      z.string().optional().describe('New display name (for update)'),
+      phone:     z.string().optional().describe('New phone number (for update)'),
+      new_email: z.string().email().optional().describe('New email address (for update — sends verification email to new address; admin accounts excluded)'),
     },
-    async ({ action, slug, q, role, page, per_page, new_role, name, phone }) => {
+    async ({ action, slug, q, role, page, per_page, new_role, name, phone, new_email }) => {
       let text: string;
 
       switch (action) {
@@ -45,9 +46,10 @@ export function registerAdminUserTools(server: McpServer, client: ApiClient): vo
         case 'update': {
           if (!slug) throw new Error('slug is required');
           const body: Record<string, unknown> = {};
-          if (new_role) body['role']  = new_role;
-          if (name)     body['name']  = name;
-          if (phone)    body['phone'] = phone;
+          if (new_role)  body['role']  = new_role;
+          if (name)      body['name']  = name;
+          if (phone)     body['phone'] = phone;
+          if (new_email) body['email'] = new_email;
           const res = await client.put<ApiResponse<unknown>>(`/api/admin/v1/users/${slug}`, body);
           text = `User updated:\n\n${JSON.stringify(res.data, null, 2)}`;
           break;

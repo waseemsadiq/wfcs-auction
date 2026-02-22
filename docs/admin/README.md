@@ -157,6 +157,17 @@ From a user's profile page (**Admin → Users → [User Name]**):
 
 > Be careful when granting admin access. Admin accounts have full control over the platform including payment settings.
 
+### Changing a user's email address
+
+From a user's profile page (**Admin → Users → [User Name]**):
+
+1. Enter the new email address in the **Change Email** field
+2. Click **Save**
+
+The user's account is immediately marked as unverified and a verification email is sent to the new address. They must click the link in that email before they can bid again.
+
+> This form is not available for admin accounts. Admin users manage their own email via Account Settings.
+
 ---
 
 ## Payments

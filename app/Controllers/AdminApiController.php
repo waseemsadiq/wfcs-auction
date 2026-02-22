@@ -362,6 +362,22 @@ class AdminApiController extends ApiController
             $this->apiError('User not found.', 404);
         }
 
+        // Email change — triggers verification reset and sends email to new address
+        if (isset($body['email'])) {
+            if ($user['role'] === 'admin') {
+                $this->apiError('Admin email addresses cannot be changed via the API.', 422);
+            }
+            try {
+                (new \App\Services\AuthService())->changeUserEmail(
+                    (int)$user['id'],
+                    (string)$body['email'],
+                    (string)($user['email'] ?? '')
+                );
+            } catch (\RuntimeException $e) {
+                $this->apiError($e->getMessage(), 422);
+            }
+        }
+
         // Role update handled separately
         if (isset($body['role'])) {
             $allowedRoles = ['bidder', 'donor', 'admin'];
