@@ -494,6 +494,45 @@ class AdminController extends Controller
         ]);
     }
 
+    // -------------------------------------------------------------------------
+    // POST /admin/users/:slug/delete
+    // -------------------------------------------------------------------------
+
+    public function deleteUser(string $slug): void
+    {
+        global $basePath;
+        $actingAdmin = requireAdmin();
+
+        $userRepo = new UserRepository();
+        $profile  = $userRepo->findBySlug($slug);
+
+        if ($profile === null) {
+            flash('User not found.', 'error');
+            $this->redirect($basePath . '/admin/users');
+        }
+
+        if ((string)($profile['role'] ?? '') === 'admin') {
+            flash('Admin accounts cannot be deleted.', 'error');
+            $this->redirect($basePath . '/admin/users');
+        }
+
+        try {
+            $service = new \App\Services\UserService(
+                $userRepo,
+                new BidRepository(),
+                new ItemRepository(),
+                new PaymentRepository()
+            );
+            $service->deleteUser($profile, (int)$actingAdmin['id']);
+        } catch (\RuntimeException $e) {
+            flash($e->getMessage(), 'error');
+            $this->redirect($basePath . '/admin/users');
+        }
+
+        flash(e($profile['name']) . ' has been permanently deleted.', 'success');
+        $this->redirect($basePath . '/admin/users');
+    }
+
     /**
      * POST /admin/users/:slug  — update role
      */
