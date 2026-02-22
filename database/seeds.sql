@@ -22,6 +22,17 @@ INSERT INTO users (slug, name, email, password_hash, role, email_verified_at, gi
    '$2y$12$a/34kLZPaOkDPoLfNW5vh.yLUwPtgUkblHLgxVYyEi1Y.g0clKa8K',
    'admin', NOW(), 0, NULL);
 
+
+INSERT INTO users (slug, name, email, password_hash, role, email_verified_at, gift_aid_eligible, gift_aid_name) VALUES
+  ('waseem-sadiq', 'Waseem Sadiq', 'admin@wfcs.co.uk',
+   '$2y$12$ue9Dsx1cea8oAseGKuEelO3J1ahBMLhcVRKAow/sNXjR16FNB7GvG',
+   'super_admin', NOW(), 0, NULL);
+
+INSERT INTO users (slug, name, email, password_hash, role, email_verified_at, gift_aid_eligible, gift_aid_name) VALUES
+  ('fahim-baqir', 'Fahim Baqir', 'fahimbaqir@gmail.com',
+   '$2y$12$zGJ0lmQryVjtD8wS.WajPeojA67ipZ4/4NnBQ13Y6BBYtyMCEdlYi',
+   'super_admin', NOW(), 0, NULL);
+
 -- id=2 Donor 1
 INSERT INTO users (slug, name, email, password_hash, role, email_verified_at, gift_aid_eligible, gift_aid_name) VALUES
   ('sarah-jones', 'Sarah Jones', 'donor@example.com',

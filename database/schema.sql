@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS users (
   name VARCHAR(255) NOT NULL,
   email VARCHAR(255) NOT NULL UNIQUE,
   password_hash VARCHAR(255) NOT NULL,
-  role ENUM('bidder','donor','admin') NOT NULL DEFAULT 'bidder',
+  role ENUM('bidder','donor','admin','super_admin') NOT NULL DEFAULT 'bidder',
   email_verified_at DATETIME NULL,
   email_verification_token VARCHAR(64) NULL,
   email_verification_expires_at DATETIME NULL,
