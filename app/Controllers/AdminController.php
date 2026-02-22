@@ -510,7 +510,37 @@ class AdminController extends Controller
             $this->abort(404);
         }
 
-        // Prevent an admin from accidentally demoting themselves
+        $action = trim($_POST['action'] ?? 'change_role');
+
+        // --- Change email -------------------------------------------------------
+        if ($action === 'change_email') {
+
+            // Admin cannot use this form to change their own email — use /account/profile
+            if ((int)$profile['id'] === (int)$admin['id']) {
+                flash('Use Account Settings to change your own email address.', 'error');
+                $this->redirect($basePath . '/admin/users/' . $slug);
+            }
+
+            $newEmail = trim($_POST['new_email'] ?? '');
+
+            try {
+                (new \App\Services\AuthService())->changeUserEmail(
+                    (int)$profile['id'],
+                    $newEmail,
+                    (string)($profile['email'] ?? '')
+                );
+                flash('Email updated. A verification link has been sent to ' . htmlspecialchars($newEmail, ENT_QUOTES) . '.');
+            } catch (\RuntimeException $e) {
+                flash($e->getMessage(), 'error');
+            } catch (\Throwable $e) {
+                error_log('AdminController::updateUser changeEmail failed: ' . $e->getMessage());
+                flash('Failed to update email. Please try again.', 'error');
+            }
+
+            $this->redirect($basePath . '/admin/users/' . $slug);
+        }
+
+        // --- Change role (existing logic) ---------------------------------------
         if ((int)$profile['id'] === (int)$admin['id']) {
             flash('You cannot change your own role.', 'error');
             $this->redirect($basePath . '/admin/users/' . $slug);
