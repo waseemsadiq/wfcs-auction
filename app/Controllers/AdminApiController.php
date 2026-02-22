@@ -18,8 +18,17 @@ class AdminApiController extends ApiController
     private function requireAdmin(): array
     {
         $user = getAuthUser();
-        if (!$user || $user['role'] !== 'admin') {
+        if (!$user || roleLevel($user['role'] ?? '') < 2) {
             $this->apiError('Admin access required.', 403);
+        }
+        return $user;
+    }
+
+    private function requireSuperAdmin(): array
+    {
+        $user = getAuthUser();
+        if (!$user || roleLevel($user['role'] ?? '') < 3) {
+            $this->apiError('Super admin access required.', 403);
         }
         return $user;
     }
@@ -352,7 +361,7 @@ class AdminApiController extends ApiController
      */
     public function updateUser(string $slug): void
     {
-        $this->requireAdmin();
+        $actingAdmin = $this->requireAdmin();
         $body = $this->jsonBody();
 
         $users = new UserRepository();
@@ -364,7 +373,7 @@ class AdminApiController extends ApiController
 
         // Email change — triggers verification reset and sends email to new address
         if (isset($body['email'])) {
-            if ($user['role'] === 'admin') {
+            if (roleLevel($user['role'] ?? '') >= 2) {
                 $this->apiError('Admin email addresses cannot be changed via the API.', 422);
             }
             try {
@@ -380,9 +389,11 @@ class AdminApiController extends ApiController
 
         // Role update handled separately
         if (isset($body['role'])) {
-            $allowedRoles = ['bidder', 'donor', 'admin'];
+            $allowedRoles = roleLevel($actingAdmin['role'] ?? '') >= 3
+                ? ['bidder', 'donor', 'admin']
+                : ['bidder', 'donor'];
             if (!in_array($body['role'], $allowedRoles, true)) {
-                $this->apiError('Invalid role. Must be bidder, donor, or admin.');
+                $this->apiError('Invalid role. Allowed: ' . implode(', ', $allowedRoles) . '.');
             }
             $users->updateRole((int)$user['id'], $body['role']);
         }
@@ -414,8 +425,12 @@ class AdminApiController extends ApiController
             $this->apiError('User not found.', 404);
         }
 
-        if (($profile['role'] ?? '') === 'admin') {
-            $this->apiError('Admin accounts cannot be deleted.', 422);
+        if (roleLevel($profile['role'] ?? '') >= 3) {
+            $this->apiError('Super admin accounts cannot be deleted.', 422);
+        }
+
+        if (roleLevel($profile['role'] ?? '') >= 2 && roleLevel($actingAdmin['role'] ?? '') < 3) {
+            $this->apiError('Only super admins can delete admin accounts.', 403);
         }
 
         try {
@@ -441,7 +456,7 @@ class AdminApiController extends ApiController
      */
     public function listPayments(): void
     {
-        $this->requireAdmin();
+        $this->requireSuperAdmin();
 
         $page    = max(1, (int)($_GET['page']     ?? 1));
         $perPage = min(100, max(1, (int)($_GET['per_page'] ?? 20)));
@@ -471,7 +486,7 @@ class AdminApiController extends ApiController
      */
     public function giftAidOverview(): void
     {
-        $this->requireAdmin();
+        $this->requireSuperAdmin();
 
         $giftAid = new GiftAidRepository();
         $stats   = $giftAid->stats();
@@ -514,7 +529,7 @@ class AdminApiController extends ApiController
      */
     public function getSettings(): void
     {
-        $this->requireAdmin();
+        $this->requireSuperAdmin();
 
         $settings = new SettingsRepository();
         $all      = $settings->all();
@@ -535,7 +550,7 @@ class AdminApiController extends ApiController
      */
     public function updateSettings(): void
     {
-        $this->requireAdmin();
+        $this->requireSuperAdmin();
         $body = $this->jsonBody();
 
         $settings  = new SettingsRepository();
