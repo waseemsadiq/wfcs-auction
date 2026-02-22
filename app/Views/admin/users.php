@@ -139,14 +139,40 @@ $roleBadge = function(string $role): string {
           <td class="px-4 py-3.5 text-xs text-slate-500 dark:text-slate-400">
             <?= e(date('j M Y', strtotime((string)($u['created_at'] ?? 'now')))) ?>
           </td>
-          <td class="px-5 py-3.5">
-            <a href="<?= e($basePath) ?>/admin/users/<?= e($u['slug']) ?>" class="px-3 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg transition-colors">View</a>
+          <td class="px-5 py-3.5 text-right">
+            <div class="inline-flex items-center gap-2">
+              <a href="<?= e($basePath) ?>/admin/users/<?= e($u['slug']) ?>"
+                 class="px-3 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg transition-colors">View</a>
+              <?php if (($u['role'] ?? '') !== 'admin'): ?>
+              <button
+                type="button"
+                popovertarget="del-<?= e($u['slug']) ?>"
+                class="px-3 py-1.5 text-xs font-semibold text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+              >Delete</button>
+              <?php endif; ?>
+            </div>
           </td>
         </tr>
         <?php endforeach; ?>
       </tbody>
     </table>
   </div>
+
+  <?php foreach ($users as $u): ?>
+  <?php if (($u['role'] ?? '') !== 'admin'): ?>
+  <?php echo atom('popover-shell', [
+      'id'     => 'del-' . ($u['slug'] ?? ''),
+      'title'  => 'Delete ' . ($u['name'] ?? '') . '?',
+      'width'  => '28rem',
+      'body'   => '<p class="text-sm text-slate-600 dark:text-slate-300">This will permanently remove <strong>' . e($u['name']) . '</strong> (' . e($u['email']) . ') and all their data — bids, donations, and payment records.</p>'
+                . '<p class="text-sm font-semibold text-red-600 dark:text-red-400 mt-3">This action cannot be undone.</p>',
+      'footer' => '<button type="button" popovertarget="del-' . e($u['slug']) . '" class="px-4 py-2 text-sm font-semibold text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg transition-colors">Cancel</button>'
+                . '<form method="POST" action="' . e($basePath) . '/admin/users/' . e($u['slug']) . '/delete?_csrf_token=' . e($csrfToken) . '" class="inline">'
+                . '<button type="submit" class="px-4 py-2 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors">Yes, delete permanently</button>'
+                . '</form>',
+  ]); ?>
+  <?php endif; ?>
+  <?php endforeach; ?>
 
   <?php if ($totalPages > 1): ?>
   <div class="px-5 py-4 border-t border-slate-100 dark:border-slate-700/40 flex items-center justify-between">
