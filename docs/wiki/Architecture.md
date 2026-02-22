@@ -105,7 +105,7 @@ Nine tables:
 - **Web (browser):** JWT stored in an `HttpOnly` cookie (`auth_token`). Set on login, cleared on logout.
 - **API:** JWT passed as `?token=` query parameter or `token` POST field.
 - JWT payload: `{ id, email, name, role, slug, verified, exp }`
-- Web session tokens expire in 24 hours. API tokens expire in 1 year.
+- Web session tokens expire after **120 minutes of inactivity** (2-hour sliding window: any authenticated page request resets the clock). API tokens expire in 1 year.
 - The `getAuthUser()` helper decodes the JWT from the cookie or request parameter and returns the user array, or `null` if unauthenticated.
 
 ---
