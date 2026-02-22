@@ -451,6 +451,7 @@ class AdminController extends Controller
             'stats'      => $stats,
             'search'     => $search,
             'roleFilter' => $roleFilter,
+            'user'       => $user,
         ]);
 
         $this->view('layouts/admin', [
