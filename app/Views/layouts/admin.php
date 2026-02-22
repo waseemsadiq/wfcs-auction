@@ -29,5 +29,15 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 <?php endif; ?>
+<script>
+(function() {
+  var logoutUrl = <?= json_encode($basePath . '/logout') ?>;
+  var delay = 120 * 60 * 1000;
+  var timer;
+  function reset() { clearTimeout(timer); timer = setTimeout(function() { window.location.href = logoutUrl; }, delay); }
+  ['mousemove','keydown','click','scroll','touchstart'].forEach(function(e) { window.addEventListener(e, reset, {passive:true}); });
+  reset();
+})();
+</script>
 </body>
 </html>
