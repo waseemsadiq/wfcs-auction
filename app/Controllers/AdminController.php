@@ -515,6 +515,12 @@ class AdminController extends Controller
         // --- Change email -------------------------------------------------------
         if ($action === 'change_email') {
 
+            // Admin accounts cannot be edited from this panel
+            if ($profile['role'] === 'admin') {
+                flash('Admin email addresses cannot be changed from here.', 'error');
+                $this->redirect($basePath . '/admin/users/' . $slug);
+            }
+
             // Admin cannot use this form to change their own email — use /account/profile
             if ((int)$profile['id'] === (int)$admin['id']) {
                 flash('Use Account Settings to change your own email address.', 'error');
