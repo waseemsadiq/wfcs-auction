@@ -98,13 +98,48 @@ function requireAuth(): array
 }
 
 /**
+ * Map a role string to its numeric hierarchy level.
+ * Use >= comparisons: >= 2 = admin or above, >= 3 = super_admin only.
+ */
+function roleLevel(string $role): int
+{
+    return match($role) {
+        'super_admin' => 3,
+        'admin'       => 2,
+        'donor'       => 1,
+        'bidder'      => 0,
+        default       => 0,
+    };
+}
+
+/**
  * Require an admin user. Renders 403 on failure.
  */
 function requireAdmin(): array
 {
     global $basePath;
     $user = requireAuth();
-    if ($user['role'] !== 'admin') {
+    if (roleLevel($user['role'] ?? '') < 2) {
+        http_response_code(403);
+        $errorView = dirname(__DIR__, 2) . '/app/Views/errors/403.php';
+        if (file_exists($errorView)) {
+            require $errorView;
+        } else {
+            echo 'Forbidden';
+        }
+        exit;
+    }
+    return $user;
+}
+
+/**
+ * Require a super_admin user. Renders 403 on failure.
+ */
+function requireSuperAdmin(): array
+{
+    global $basePath;
+    $user = requireAuth();
+    if (roleLevel($user['role'] ?? '') < 3) {
         http_response_code(403);
         $errorView = dirname(__DIR__, 2) . '/app/Views/errors/403.php';
         if (file_exists($errorView)) {
