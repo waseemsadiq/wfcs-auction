@@ -400,6 +400,38 @@ class AdminApiController extends ApiController
         $this->apiSuccess($updated);
     }
 
+    /**
+     * DELETE /api/admin/v1/users/:slug
+     */
+    public function deleteUser(string $slug): void
+    {
+        $actingAdmin = $this->requireAdmin();
+
+        $userRepo = new UserRepository();
+        $profile  = $userRepo->findBySlug($slug);
+
+        if (!$profile) {
+            $this->apiError('User not found.', 404);
+        }
+
+        if (($profile['role'] ?? '') === 'admin') {
+            $this->apiError('Admin accounts cannot be deleted.', 422);
+        }
+
+        try {
+            (new \App\Services\UserService(
+                $userRepo,
+                new BidRepository(),
+                new ItemRepository(),
+                new PaymentRepository()
+            ))->deleteUser($profile, (int)$actingAdmin['id']);
+        } catch (\RuntimeException $e) {
+            $this->apiError($e->getMessage(), 422);
+        }
+
+        $this->apiSuccess(['message' => 'User deleted.']);
+    }
+
     // -------------------------------------------------------------------------
     // Payments
     // -------------------------------------------------------------------------

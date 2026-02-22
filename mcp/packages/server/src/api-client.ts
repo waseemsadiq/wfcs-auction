@@ -99,6 +99,10 @@ export class ApiClient {
     return this.request<T>('PUT', path, { body });
   }
 
+  async delete<T>(path: string): Promise<T> {
+    return this.request<T>('DELETE', path);
+  }
+
   getRole(): Role {
     if (!this.currentUser) throw new Error('Not logged in');
     return this.currentUser.role;

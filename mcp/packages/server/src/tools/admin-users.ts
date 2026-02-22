@@ -7,9 +7,9 @@ export function registerAdminUserTools(server: McpServer, client: ApiClient): vo
 
   server.tool(
     'manage_users',
-    'Admin: manage users. Actions: list (with optional search/role filter), get (single user), update (role/profile/email).',
+    'Admin: manage users. Actions: list (with optional search/role filter), get (single user), update (role/profile/email), delete (permanently erase non-admin user and all their data).',
     {
-      action:    z.enum(['list', 'get', 'update']).describe('Action to perform'),
+      action:    z.enum(['list', 'get', 'update', 'delete']).describe('Action to perform'),
       slug:      z.string().optional().describe('User slug (required for get, update)'),
       q:         z.string().optional().describe('Search by name or email (for list)'),
       role:      z.string().optional().describe('Filter by role: bidder, donor, admin (for list)'),
@@ -52,6 +52,13 @@ export function registerAdminUserTools(server: McpServer, client: ApiClient): vo
           if (new_email) body['email'] = new_email;
           const res = await client.put<ApiResponse<unknown>>(`/api/admin/v1/users/${slug}`, body);
           text = `User updated:\n\n${JSON.stringify(res.data, null, 2)}`;
+          break;
+        }
+
+        case 'delete': {
+          if (!slug) throw new Error('slug is required');
+          const res = await client.delete<ApiResponse<{ message: string }>>(`/api/admin/v1/users/${slug}`);
+          text = res.data?.message ?? 'User deleted.';
           break;
         }
       }

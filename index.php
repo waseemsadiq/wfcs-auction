@@ -258,6 +258,7 @@ $router->put('/api/admin/v1/items/:slug',                 [$adminApiController, 
 $router->get('/api/admin/v1/users',                       [$adminApiController, 'listUsers']);
 $router->get('/api/admin/v1/users/:slug',                 [$adminApiController, 'showUser']);
 $router->put('/api/admin/v1/users/:slug',                 [$adminApiController, 'updateUser']);
+$router->delete('/api/admin/v1/users/:slug',              [$adminApiController, 'deleteUser']);
 
 $router->get('/api/admin/v1/payments',                    [$adminApiController, 'listPayments']);
 $router->get('/api/admin/v1/gift-aid',                    [$adminApiController, 'giftAidOverview']);

@@ -168,6 +168,31 @@ The user's account is immediately marked as unverified and a verification email 
 
 > This form is not available for admin accounts. Admin users manage their own email via Account Settings.
 
+### Deleting a user
+
+The delete action permanently erases a user and all their personal data in compliance with GDPR Article 17 (right to erasure).
+
+From the users list (**Admin → Users**):
+
+1. Click the red **Delete** button next to the user's row
+2. A confirmation panel will appear showing the user's name and email
+3. Click **Yes, delete permanently** to proceed, or **Cancel** to go back
+
+**What gets deleted:**
+
+- The user account and all personal details
+- All bids placed by the user
+- Donated items not in an active auction (and all bids on those items)
+- Payment records
+
+**What gets anonymised instead of deleted:**
+
+- Items the user donated to a currently **active** auction — these keep running with the donor link removed (donor shown as anonymous)
+
+> **This action cannot be undone.** There is no recovery path once confirmed.
+
+> The Delete button is not shown for admin accounts. To remove an admin, first change their role to Bidder or Donor, then delete them.
+
 ---
 
 ## Payments
