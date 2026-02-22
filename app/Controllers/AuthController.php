@@ -92,7 +92,7 @@ class AuthController extends Controller
             if ($redirect && str_starts_with($redirect, '/')) {
                 $this->redirect($basePath . $redirect);
             }
-            if (($user['role'] ?? '') === 'admin') {
+            if (roleLevel($user['role'] ?? '') >= 2) {
                 $this->redirect($basePath . '/admin/dashboard');
             }
             $this->redirect($basePath . '/');
