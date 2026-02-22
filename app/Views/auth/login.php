@@ -185,25 +185,6 @@ global $basePath, $csrfToken;
 
         </form>
 
-        <!-- Dev quick-login -->
-        <div class="mt-8 pt-6 border-t border-dashed border-slate-200 dark:border-slate-700">
-          <p class="text-center text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-600 mb-3">Dev accounts</p>
-          <div class="flex gap-2 flex-wrap justify-center">
-            <button type="button" onclick="devLogin('admin@wellfoundation.org.uk')"
-              class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-primary hover:text-white dark:hover:bg-primary dark:hover:text-white transition-colors">
-              Admin
-            </button>
-            <button type="button" onclick="devLogin('donor@example.com')"
-              class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-primary hover:text-white dark:hover:bg-primary dark:hover:text-white transition-colors">
-              Donor
-            </button>
-            <button type="button" onclick="devLogin('bidder@example.com')"
-              class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-primary hover:text-white dark:hover:bg-primary dark:hover:text-white transition-colors">
-              Bidder
-            </button>
-          </div>
-        </div>
-
         <!-- Below form note -->
         <p class="text-center text-xs text-slate-400 dark:text-slate-600 mt-6">
           By signing in you agree to our
@@ -219,11 +200,6 @@ global $basePath, $csrfToken;
 </div>
 
 <script>
-function devLogin(email) {
-  document.getElementById('email').value = email;
-  document.getElementById('password').value = 'Admin1234!';
-  document.querySelector('form').submit();
-}
 function togglePassword(fieldId, btn) {
   const field = document.getElementById(fieldId);
   const isText = field.type === 'text';
