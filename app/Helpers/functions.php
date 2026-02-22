@@ -65,6 +65,11 @@ function getAuthUser(): ?array
 
 /**
  * Require an authenticated user. Redirects to /login on failure.
+ *
+ * Rolling refresh: if the token was issued more than 60 minutes ago, a fresh
+ * 2-hour JWT is issued and the auth cookie is overwritten. This creates a
+ * sliding 120-minute inactivity window for all HTML page routes.
+ * API routes use their own auth checks and are not affected.
  */
 function requireAuth(): array
 {
@@ -74,6 +79,21 @@ function requireAuth(): array
         header('Location: ' . $basePath . '/login');
         exit;
     }
+
+    if (!empty($user['iat']) && (time() - (int)$user['iat']) > 3600) {
+        $secret  = config('app.jwt_secret');
+        $payload = $user;
+        $payload['exp'] = time() + 7200;
+        $token = \Core\JWT::encode($payload, $secret);
+        setcookie('auth_token', $token, [
+            'expires'  => time() + 7200,
+            'path'     => '/',
+            'httponly' => true,
+            'secure'   => isset($_SERVER['HTTPS']),
+            'samesite' => 'Strict',
+        ]);
+    }
+
     return $user;
 }
 
