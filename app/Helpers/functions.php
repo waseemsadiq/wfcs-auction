@@ -49,6 +49,15 @@ function getAuthUser(): ?array
         $token = $_POST['token'];
     } elseif (!empty($_GET['token'])) {
         $token = $_GET['token'];
+    } else {
+        $headers    = function_exists('getallheaders') ? getallheaders() : [];
+        $authHeader = $headers['Authorization'] ?? $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+        if ($authHeader !== '') {
+            $parts = explode(' ', $authHeader, 2);
+            if (count($parts) === 2 && $parts[0] === 'Bearer') {
+                $token = $parts[1];
+            }
+        }
     }
 
     if (!$token) {
@@ -137,7 +146,6 @@ function requireAdmin(): array
  */
 function requireSuperAdmin(): array
 {
-    global $basePath;
     $user = requireAuth();
     if (roleLevel($user['role'] ?? '') < 3) {
         http_response_code(403);

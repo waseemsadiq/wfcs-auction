@@ -7,7 +7,7 @@ export function registerAdminUserTools(server: McpServer, client: ApiClient): vo
 
   server.tool(
     'manage_users',
-    'Admin: manage users. Actions: list (with optional search/role filter), get (single user), update (role/profile/email), delete (permanently erase non-admin user and all their data).',
+    'Admin: manage users. Actions: list (with optional search/role filter), get (single user), update (role/profile/email), delete (permanently erase user and all their data — super admins can also delete admin accounts).',
     {
       action:    z.enum(['list', 'get', 'update', 'delete']).describe('Action to perform'),
       slug:      z.string().optional().describe('User slug (required for get, update)'),

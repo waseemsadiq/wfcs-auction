@@ -561,7 +561,7 @@ class AdminController extends Controller
         if ($action === 'change_email') {
 
             // Admin accounts cannot be edited from this panel
-            if ($profile['role'] === 'admin' || $profile['role'] === 'super_admin') {
+            if (roleLevel($profile['role'] ?? '') >= 2) {
                 flash('Admin email addresses cannot be changed from here.', 'error');
                 $this->redirect($basePath . '/admin/users/' . $slug);
             }
