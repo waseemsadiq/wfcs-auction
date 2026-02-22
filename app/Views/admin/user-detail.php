@@ -44,7 +44,9 @@ global $basePath, $csrfToken;
         <dt class="text-slate-500 dark:text-slate-400">Role</dt>
         <dd>
           <?php $r = $profile['role'] ?? 'bidder'; ?>
-          <?php if ($r === 'admin'): ?>
+          <?php if ($r === 'super_admin'): ?>
+          <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400">Super Admin</span>
+          <?php elseif ($r === 'admin'): ?>
           <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">Admin</span>
           <?php elseif ($r === 'donor'): ?>
           <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400">Donor</span>
@@ -72,7 +74,7 @@ global $basePath, $csrfToken;
     </dl>
 
     <!-- Change role form -->
-    <?php if ($profile['role'] !== 'admin'): ?>
+    <?php if ($profile['role'] !== 'super_admin'): ?>
     <div class="mt-5 pt-5 border-t border-slate-100 dark:border-slate-700/40">
       <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Change Role</p>
       <form method="POST" action="<?= e($basePath) ?>/admin/users/<?= e($profile['slug']) ?>">
@@ -81,6 +83,9 @@ global $basePath, $csrfToken;
           <select name="role" class="flex-1 px-3 py-2 text-sm border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors">
             <option value="bidder" <?= $profile['role'] === 'bidder' ? 'selected' : '' ?>>Bidder</option>
             <option value="donor"  <?= $profile['role'] === 'donor'  ? 'selected' : '' ?>>Donor</option>
+            <?php if (roleLevel($user['role'] ?? '') >= 3): ?>
+            <option value="admin"  <?= $profile['role'] === 'admin'  ? 'selected' : '' ?>>Admin</option>
+            <?php endif; ?>
           </select>
           <button type="submit" class="px-4 py-2 text-xs font-semibold text-white bg-primary hover:bg-primary-hover rounded-lg transition-colors">Save</button>
         </div>
@@ -89,7 +94,7 @@ global $basePath, $csrfToken;
     <?php endif; ?>
 
     <!-- Change email form (not shown for admins) -->
-    <?php if ($profile['role'] !== 'admin'): ?>
+    <?php if (roleLevel($profile['role'] ?? '') < 2): ?>
     <div class="mt-5 pt-5 border-t border-slate-100 dark:border-slate-700/40">
       <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Change Email</p>
       <form method="POST" action="<?= e($basePath) ?>/admin/users/<?= e($profile['slug']) ?>">

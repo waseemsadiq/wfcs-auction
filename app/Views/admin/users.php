@@ -18,10 +18,11 @@ global $basePath, $csrfToken;
 
 $roleBadge = function(string $role): string {
     return match($role) {
-        'admin'  => '<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">Admin</span>',
-        'bidder' => '<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">Bidder</span>',
-        'donor'  => '<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400">Donor</span>',
-        default  => '<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300">' . e($role) . '</span>',
+        'super_admin' => '<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400">Super Admin</span>',
+        'admin'       => '<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">Admin</span>',
+        'donor'       => '<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">Donor</span>',
+        'bidder'      => '<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">Bidder</span>',
+        default       => '<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300">' . e($role) . '</span>',
     };
 };
 ?>
@@ -56,6 +57,7 @@ $roleBadge = function(string $role): string {
       <option value="bidder" <?= ($roleFilter ?? '') === 'bidder' ? 'selected' : '' ?>>Bidders</option>
       <option value="donor"  <?= ($roleFilter ?? '') === 'donor'  ? 'selected' : '' ?>>Donors</option>
       <option value="admin"  <?= ($roleFilter ?? '') === 'admin'  ? 'selected' : '' ?>>Admins</option>
+      <option value="super_admin" <?= ($roleFilter ?? '') === 'super_admin' ? 'selected' : '' ?>>Super Admins</option>
     </select>
     <button type="submit" class="px-4 py-2 text-sm font-semibold text-white bg-primary hover:bg-primary-hover rounded-lg transition-colors">Search</button>
   </form>
@@ -143,7 +145,7 @@ $roleBadge = function(string $role): string {
             <div class="inline-flex items-center gap-2">
               <a href="<?= e($basePath) ?>/admin/users/<?= e($u['slug']) ?>"
                  class="px-3 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg transition-colors">View</a>
-              <?php if (($u['role'] ?? '') !== 'admin'): ?>
+              <?php if (roleLevel($u['role'] ?? '') < 3 && (roleLevel($u['role'] ?? '') < 2 || roleLevel($user['role'] ?? '') >= 3)): ?>
               <button
                 type="button"
                 popovertarget="del-<?= e($u['slug']) ?>"
@@ -159,7 +161,7 @@ $roleBadge = function(string $role): string {
   </div>
 
   <?php foreach ($users as $u): ?>
-  <?php if (($u['role'] ?? '') !== 'admin'): ?>
+  <?php if (roleLevel($u['role'] ?? '') < 3 && (roleLevel($u['role'] ?? '') < 2 || roleLevel($user['role'] ?? '') >= 3)): ?>
   <?php echo atom('popover-shell', [
       'id'     => 'del-' . ($u['slug'] ?? ''),
       'title'  => 'Delete ' . ($u['name'] ?? '') . '?',
