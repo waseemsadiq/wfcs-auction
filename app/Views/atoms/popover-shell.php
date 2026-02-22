@@ -11,7 +11,7 @@ $footer = $footer ?? '';
   id="<?= e($id) ?>"
   popover="manual"
   style="position:fixed;inset:0;margin:auto;width:min(<?= e($width) ?>,calc(100% - 2rem));max-height:min(90vh,760px);border:none;border-radius:0.75rem;padding:0;overflow:hidden;box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);"
-  class="form-popover bg-white dark:bg-slate-800 flex flex-col"
+  class="form-popover bg-white dark:bg-slate-800"
 >
   <!-- Header -->
   <div class="flex items-center justify-between px-6 py-5 border-b border-slate-200 dark:border-slate-700/40 flex-shrink-0">
