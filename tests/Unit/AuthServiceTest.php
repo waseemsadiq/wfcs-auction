@@ -117,4 +117,35 @@ class AuthServiceTest extends TestCase
 
         $this->assertEquals('john-doe-2', $slug);
     }
+
+    public function testGenerateTokenExpiresInTwoHours(): void
+    {
+        $userRepo = $this->createMock(\App\Repositories\UserRepository::class);
+        $service  = new \App\Services\AuthService($userRepo);
+
+        $user = [
+            'id'                => 1,
+            'email'             => 'test@example.com',
+            'name'              => 'Test User',
+            'role'              => 'bidder',
+            'slug'              => 'test-user',
+            'email_verified_at' => '2026-01-01 00:00:00',
+        ];
+
+        $before = time();
+        $token  = $service->generateToken($user);
+        $after  = time();
+
+        // Decode payload without signature verification
+        $parts   = explode('.', $token);
+        $payload = json_decode(base64_decode(strtr($parts[1], '-_', '+/')), true);
+
+        $this->assertArrayHasKey('iat', $payload);
+        $this->assertArrayHasKey('exp', $payload);
+        $this->assertGreaterThanOrEqual($before, $payload['iat']);
+        $this->assertLessThanOrEqual($after, $payload['iat']);
+
+        $lifetime = $payload['exp'] - $payload['iat'];
+        $this->assertEquals(7200, $lifetime, 'Session token must expire in exactly 120 minutes (7200 s)');
+    }
 }

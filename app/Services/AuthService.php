@@ -170,13 +170,13 @@ class AuthService
 
     /**
      * Generate a signed JWT for the given user row.
-     * Expiry: 30 days.
+     * Expiry: 2 hours (inactivity session timeout).
      */
     public function generateToken(array $user): string
     {
         $secret  = config('app.jwt_secret');
         $payload = $this->buildPayload($user);
-        $payload['exp'] = time() + (30 * 24 * 3600);
+        $payload['exp'] = time() + 7200;
         return JWT::encode($payload, $secret);
     }
 
@@ -287,7 +287,7 @@ class AuthService
             'name'     => $user['name'] ?? '',
             'role'     => $user['role'] ?? 'bidder',
             'slug'     => $user['slug'] ?? '',
-            'verified' => !empty($user['email_verified_at']),
+            'verified' => !empty($user['email_verified_at']) || !empty($user['verified']),
         ];
     }
 

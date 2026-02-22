@@ -73,13 +73,10 @@ class AuthController extends Controller
                 $this->redirect($basePath . '/login');
             }
 
-            $token  = $this->authService->generateToken($user);
-            $expiry = $remember
-                ? time() + (90 * 24 * 3600)   // 90 days if "remember me"
-                : time() + (30 * 24 * 3600);   // 30 days default
+            $token = $this->authService->generateToken($user);
 
             setcookie('auth_token', $token, [
-                'expires'  => $expiry,
+                'expires'  => time() + 7200,
                 'path'     => '/',
                 'httponly' => true,
                 'secure'   => isset($_SERVER['HTTPS']),
@@ -214,7 +211,7 @@ class AuthController extends Controller
             $token = $this->authService->generateToken($user);
 
             setcookie('auth_token', $token, [
-                'expires'  => time() + (30 * 24 * 3600),
+                'expires'  => time() + 7200,
                 'path'     => '/',
                 'httponly' => true,
                 'secure'   => isset($_SERVER['HTTPS']),
@@ -248,7 +245,7 @@ class AuthController extends Controller
                 // Reissue JWT with verified=true
                 $jwt = $this->authService->generateToken($user);
                 setcookie('auth_token', $jwt, [
-                    'expires'  => time() + (30 * 24 * 3600),
+                    'expires'  => time() + 7200,
                     'path'     => '/',
                     'httponly' => true,
                     'secure'   => isset($_SERVER['HTTPS']),
