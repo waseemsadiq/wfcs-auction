@@ -425,6 +425,79 @@ class ItemRepository
         return $rows;
     }
 
+
+    /**
+     * Return IDs of items donated by $userId whose event is currently active.
+     * These items will be anonymised (donor_id = NULL) rather than deleted.
+     */
+    public function donorItemIdsInActiveAuctions(int $userId): array
+    {
+        $rows = $this->db->query(
+            'SELECT i.id FROM items i
+             JOIN events e ON e.id = i.event_id
+             WHERE i.donor_id = ? AND e.status = \'active\'',
+            [$userId]
+        );
+        return array_column($rows, 'id');
+    }
+
+    /**
+     * Return IDs of items donated by $userId that are NOT in an active auction.
+     * These items will be deleted.
+     */
+    public function donorItemIdsNotActive(int $userId): array
+    {
+        $rows = $this->db->query(
+            'SELECT i.id FROM items i
+             LEFT JOIN events e ON e.id = i.event_id
+             WHERE i.donor_id = ?
+               AND (e.id IS NULL OR e.status != \'active\')',
+            [$userId]
+        );
+        return array_column($rows, 'id');
+    }
+
+    /**
+     * Strip donor link from items in active auctions (GDPR anonymisation).
+     */
+    public function anonymiseDonor(int $userId): void
+    {
+        $this->db->execute(
+            'UPDATE items i
+             JOIN events e ON e.id = i.event_id
+             SET i.donor_id = NULL
+             WHERE i.donor_id = ? AND e.status = \'active\'',
+            [$userId]
+        );
+    }
+
+    /**
+     * Delete items by their IDs.
+     */
+    public function deleteByIds(array $ids): void
+    {
+        if (empty($ids)) {
+            return;
+        }
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+        $this->db->execute(
+            'DELETE FROM items WHERE id IN (' . $placeholders . ')',
+            $ids
+        );
+    }
+
+    /**
+     * Clear winner_id where the deleted user is the winner.
+     * The item stays — we just remove the winner reference.
+     */
+    public function clearWinner(int $userId): void
+    {
+        $this->db->execute(
+            'UPDATE items SET winner_id = NULL WHERE winner_id = ?',
+            [$userId]
+        );
+    }
+
     // -------------------------------------------------------------------------
     // Private helpers
     // -------------------------------------------------------------------------

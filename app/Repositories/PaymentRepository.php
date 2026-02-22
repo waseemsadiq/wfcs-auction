@@ -224,6 +224,30 @@ class PaymentRepository
         return $result;
     }
 
+
+    /**
+     * Delete payment records for a set of items (e.g. donated items being deleted).
+     */
+    public function deleteByItems(array $itemIds): void
+    {
+        if (empty($itemIds)) {
+            return;
+        }
+        $placeholders = implode(',', array_fill(0, count($itemIds), '?'));
+        $this->db->execute(
+            'DELETE FROM payments WHERE item_id IN (' . $placeholders . ')',
+            $itemIds
+        );
+    }
+
+    /**
+     * Delete all payment records for a user (e.g. items they won).
+     */
+    public function deleteByUser(int $userId): void
+    {
+        $this->db->execute('DELETE FROM payments WHERE user_id = ?', [$userId]);
+    }
+
     // -------------------------------------------------------------------------
     // Private helpers
     // -------------------------------------------------------------------------

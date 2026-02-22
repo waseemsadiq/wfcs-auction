@@ -352,4 +352,47 @@ class UserRepository
     {
         return uniqueSlug('users', $text, $this->db);
     }
+
+    /**
+     * Delete password reset tokens for a user.
+     */
+    public function deletePasswordResets(int $userId): void
+    {
+        $this->db->execute(
+            'DELETE FROM password_reset_tokens WHERE user_id = ?',
+            [$userId]
+        );
+    }
+
+    /**
+     * Delete rate limit records keyed by email.
+     * rate_limits has no FK — uses identifier (email) + action strings.
+     */
+    public function deleteRateLimits(string $email): void
+    {
+        $this->db->execute(
+            'DELETE FROM rate_limits WHERE identifier = ?',
+            [$email]
+        );
+    }
+
+    /**
+     * Transfer events created_by to another user (handles demoted admins edge case).
+     */
+    public function transferEvents(int $fromUserId, int $toUserId): void
+    {
+        $this->db->execute(
+            'UPDATE events SET created_by = ? WHERE created_by = ?',
+            [$toUserId, $fromUserId]
+        );
+    }
+
+    /**
+     * Permanently delete a user row. All FK-referenced rows must be cleaned up first.
+     */
+    public function delete(int $id): void
+    {
+        $this->db->execute('DELETE FROM users WHERE id = ?', [$id]);
+    }
+
 }

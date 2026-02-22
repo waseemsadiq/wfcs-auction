@@ -208,4 +208,28 @@ class BidRepository
         if ($diff < 86400) return floor($diff / 3600) . 'h ago';
         return floor($diff / 86400) . 'd ago';
     }
+
+    /**
+     * Delete all bids placed by a user (cascade step for user deletion).
+     */
+    public function deleteByUser(int $userId): void
+    {
+        $this->db->execute('DELETE FROM bids WHERE user_id = ?', [$userId]);
+    }
+
+    /**
+     * Delete all bids on a set of items (cascade step before deleting donated items).
+     */
+    public function deleteByItems(array $itemIds): void
+    {
+        if (empty($itemIds)) {
+            return;
+        }
+        $placeholders = implode(',', array_fill(0, count($itemIds), '?'));
+        $this->db->execute(
+            'DELETE FROM bids WHERE item_id IN (' . $placeholders . ')',
+            $itemIds
+        );
+    }
+
 }
