@@ -212,6 +212,48 @@ class AuthService
     }
 
     // -------------------------------------------------------------------------
+    // Admin: change a user's email address
+    // -------------------------------------------------------------------------
+
+    /**
+     * Change a user's email address on their behalf (admin action).
+     *
+     * Validates format, checks for duplicates, updates the email, resets
+     * email verification, and sends a new verification email to the new address.
+     *
+     * @throws \RuntimeException on validation failure or duplicate email
+     */
+    public function changeUserEmail(int $userId, string $newEmail, string $currentEmail): void
+    {
+        $newEmail = trim(strtolower($newEmail));
+
+        if (!filter_var($newEmail, FILTER_VALIDATE_EMAIL)) {
+            throw new \RuntimeException('Invalid email address.');
+        }
+
+        if ($newEmail === trim(strtolower($currentEmail))) {
+            throw new \RuntimeException('That is already their email address.');
+        }
+
+        $existing = $this->users->findByEmail($newEmail);
+        if ($existing !== null) {
+            throw new \RuntimeException('That email address is already in use by another account.');
+        }
+
+        $token = $this->users->updateEmail($userId, $newEmail);
+
+        try {
+            $updatedUser = $this->users->findById($userId);
+            if ($updatedUser !== null) {
+                $baseUrl = rtrim(config('app.url') ?: 'http://localhost:8080', '/');
+                (new NotificationService())->sendVerification($updatedUser, $token, $baseUrl);
+            }
+        } catch (\Throwable $e) {
+            error_log('Email failed (changeUserEmail): ' . $e->getMessage());
+        }
+    }
+
+    // -------------------------------------------------------------------------
     // Slug generation
     // -------------------------------------------------------------------------
 
