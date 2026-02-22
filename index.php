@@ -208,6 +208,7 @@ $router->post('/admin/items/:slug/edit',           [$adminController, 'updateIte
 $router->get('/admin/users',                       [$adminController, 'users']);
 $router->get('/admin/users/:slug',                 [$adminController, 'showUser']);
 $router->post('/admin/users/:slug',                [$adminController, 'updateUser']);
+$router->post('/admin/users/:slug/delete',         [$adminController, 'deleteUser']);
 
 // Admin — Payments
 $router->get('/admin/payments',                    [$adminController, 'payments']);

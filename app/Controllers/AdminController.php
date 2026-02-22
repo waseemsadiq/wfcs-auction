@@ -8,6 +8,7 @@ use App\Services\EventService;
 use App\Services\ItemService;
 use App\Services\AuctionService;
 use App\Services\UploadService;
+use App\Services\UserService;
 use App\Repositories\EventRepository;
 use App\Repositories\ItemRepository;
 use App\Repositories\CategoryRepository;
@@ -517,7 +518,7 @@ class AdminController extends Controller
         }
 
         try {
-            $service = new \App\Services\UserService(
+            $service = new UserService(
                 $userRepo,
                 new BidRepository(),
                 new ItemRepository(),
