@@ -42,8 +42,8 @@ class UserService
         $userId = (int)$user['id'];
         $email  = (string)($user['email'] ?? '');
 
-        if (($user['role'] ?? '') === 'admin') {
-            throw new \RuntimeException('Admin accounts cannot be deleted via this action.');
+        if (roleLevel($user['role'] ?? '') >= 3) {
+            throw new \RuntimeException('Super admin accounts cannot be deleted.');
         }
 
         // 1. Password reset tokens

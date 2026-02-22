@@ -16,14 +16,31 @@ class UserServiceDeleteTest extends TestCase
         );
     }
 
-    public function testDeleteBlocksAdminUser(): void
+    public function testDeleteBlocksSuperAdminUser(): void
     {
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Admin accounts cannot be deleted');
+        $this->expectExceptionMessage('Super admin accounts cannot be deleted.');
 
         $service = $this->makeService();
         $service->deleteUser(
-            ['id' => 5, 'role' => 'admin', 'email' => 'admin@example.com'],
+            ['id' => 5, 'role' => 'super_admin', 'email' => 'superadmin@example.com'],
+            99
+        );
+    }
+
+    public function testDeleteAllowsAdminUser(): void
+    {
+        // Admin deletion is allowed at service level; authorization is the controller's job.
+        $users = $this->createMock(\App\Repositories\UserRepository::class);
+        $items = $this->createMock(\App\Repositories\ItemRepository::class);
+
+        $items->method('donorItemIdsInActiveAuctions')->willReturn([]);
+        $items->method('donorItemIdsNotActive')->willReturn([]);
+        $users->expects($this->once())->method('delete');
+
+        $service = $this->makeService(['users' => $users, 'items' => $items]);
+        $service->deleteUser(
+            ['id' => 10, 'role' => 'admin', 'email' => 'admin@example.com'],
             99
         );
     }
