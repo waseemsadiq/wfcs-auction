@@ -97,7 +97,7 @@ HOTLINK_HTACCESS='Options -Indexes
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteCond %{HTTP_REFERER} !^$
-    RewriteCond %{HTTP_REFERER} !^https?://%{SERVER_NAME}[/:]  [NC]
+    RewriteCond %{HTTP_REFERER} !^https?://([a-z0-9-]+\.)?wfcs\.co.uk/  [NC]
     RewriteRule \.(jpe?g|png|gif|webp|svg|ico)$  -  [F,NC,L]
 </IfModule>'
 

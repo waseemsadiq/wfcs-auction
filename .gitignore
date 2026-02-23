@@ -48,3 +48,6 @@ Thumbs.db
 *.swp
 .claude/
 .mcp.json
+/docs/plans/2026-02-22-admin-change-user-email.md
+/database/seeds.sql
+/.htaccess
