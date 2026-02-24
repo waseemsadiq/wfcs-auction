@@ -322,11 +322,12 @@ $filterQ        = $filters['q'] ?? '';
         </div>
         <div class="col-span-2">
           <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Images</label>
-          <div class="border-2 border-dashed border-slate-200 dark:border-slate-600 rounded-xl p-6 text-center">
+          <div id="add-item-dropzone" class="border-2 border-dashed border-slate-200 dark:border-slate-600 rounded-xl p-6 text-center transition-colors">
             <svg class="w-8 h-8 text-slate-300 mx-auto mb-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-            <p class="text-sm text-slate-400 mb-1">Drop images here, or <label for="add-item-image" class="text-primary font-medium cursor-pointer">browse</label></p>
-            <p class="text-xs text-slate-400">Max 5MB per image</p>
-            <input type="file" id="add-item-image" name="image" accept="image/*" class="sr-only" />
+            <p class="text-sm text-slate-400 mb-1">Drop image here, or <label for="add-item-image" class="text-primary font-medium cursor-pointer">browse</label></p>
+            <p id="add-item-filename" class="text-xs text-primary font-medium mt-1 hidden"></p>
+            <p class="text-xs text-slate-400">Max 5 MB · JPEG, PNG, WebP</p>
+            <input type="file" id="add-item-image" name="image" accept="image/jpeg,image/png,image/webp" class="sr-only" />
           </div>
         </div>
       </div>
@@ -381,4 +382,56 @@ function clearSelection() {
   document.querySelectorAll('.row-check, #selectAll').forEach(c => { c.checked = false; });
   document.getElementById('batchBar').classList.add('hidden');
 }
+
+// ── Add item image drop zone ──────────────────────────────────────────────────
+(function () {
+  const zone     = document.getElementById('add-item-dropzone');
+  const input    = document.getElementById('add-item-image');
+  const filename = document.getElementById('add-item-filename');
+  if (!zone || !input || !filename) return;
+
+  function showFile(file) {
+    filename.textContent = file.name;
+    filename.classList.remove('hidden');
+  }
+
+  // Browse-to-select also updates the label
+  input.addEventListener('change', function () {
+    if (input.files.length) showFile(input.files[0]);
+  });
+
+  zone.addEventListener('dragover', function (e) {
+    e.preventDefault();
+    zone.classList.add('drop-active');
+  });
+
+  zone.addEventListener('dragleave', function (e) {
+    if (!zone.contains(e.relatedTarget)) {
+      zone.classList.remove('drop-active');
+    }
+  });
+
+  zone.addEventListener('drop', function (e) {
+    e.preventDefault();
+    zone.classList.remove('drop-active');
+    const file = e.dataTransfer.files[0];
+    if (!file) return;
+    const allowed = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!allowed.includes(file.type)) {
+      filename.textContent = 'Only JPEG, PNG, or WebP images are allowed.';
+      filename.classList.remove('hidden');
+      return;
+    }
+    const dt = new DataTransfer();
+    dt.items.add(file);
+    input.files = dt.files;
+    showFile(file);
+  });
+}());
 </script>
+<style>
+  #add-item-dropzone.drop-active {
+    border-color: var(--color-primary);
+    background-color: color-mix(in srgb, var(--color-primary) 8%, transparent);
+  }
+</style>
