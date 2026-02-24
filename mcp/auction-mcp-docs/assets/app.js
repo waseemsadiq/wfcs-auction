@@ -1,5 +1,5 @@
 // WFCS Auction MCP Docs — App JS
-const API_BASE = '/auction';
+const API_BASE = 'https://auction.wfcs.co.uk';
 
 // ---- Auth state ----
 const AUTH_KEY = 'wfcs_mcp_auth';
@@ -227,7 +227,7 @@ function renderMcpConfig(user) {
         command: 'node',
         args: ['/path/to/auction/mcp/packages/server/dist/index.js'],
         env: {
-          WFCS_API_URL: window.location.origin + '/auction',
+          WFCS_API_URL: 'https://auction.wfcs.co.uk',
           WFCS_EMAIL:   user.email,
           WFCS_PASSWORD: '(your password)',
         },
