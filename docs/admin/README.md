@@ -146,10 +146,10 @@ Submitted items arrive with status `pending` and must be approved by an admin be
 Admins can create items without a donor submission:
 
 1. Go to **Admin → Items → Add Item**
-2. Fill in all required fields (title, description, starting bid, category, event)
-3. Upload an item image
-4. Set the **Market Value** for Gift Aid purposes
-5. Click **Save**
+2. Fill in all required fields (title, category, event, starting bid)
+3. Optionally add a description, donor name, and item image
+4. Click **Add Lot**
+5. Open the new item in **Edit** to set the **Market Value** for Gift Aid purposes
 
 ### Market value and Gift Aid
 
