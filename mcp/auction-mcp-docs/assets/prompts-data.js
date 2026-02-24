@@ -69,6 +69,8 @@ window.PROMPTS = {
     { id: 'a12', category: 'items', difficulty: 'intermediate', text: 'Set the starting bid for [item-slug] to £75.' },
     { id: 'a13', category: 'items', difficulty: 'intermediate', text: 'Update the lot number for [item-slug] to Lot 12.' },
     { id: 'a14', category: 'items', difficulty: 'intermediate', text: 'Set a buy-now price of £200 on [item-slug].' },
+    { id: 'a35', category: 'items', difficulty: 'easy', text: 'Show all bids on [item-slug] with full bidder details.' },
+    { id: 'a36', category: 'items', difficulty: 'intermediate', text: 'Who is the highest bidder on [item-slug]?' },
 
     // Users
     { id: 'a15', category: 'users', difficulty: 'easy', text: 'List all users.' },

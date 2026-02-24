@@ -80,6 +80,7 @@ export interface ApiResponse<T> {
     page: number;
     per_page: number;
     pages: number;
+    [key: string]: unknown;
   };
 }
 

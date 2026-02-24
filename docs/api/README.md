@@ -14,6 +14,7 @@ WFCS Auction exposes a versioned REST API at `/api/v1/` and a separate internal 
   - [Users](#users)
   - [Token](#token)
   - [Internal AJAX](#internal-ajax)
+- [Admin API](#admin-api)
 - [Error Responses](#error-responses)
 - [Rate Limiting](#rate-limiting)
 - [Webhooks](#webhooks)
@@ -26,10 +27,10 @@ WFCS Auction exposes a versioned REST API at `/api/v1/` and a separate internal 
 
 The API uses **JWT tokens** for authentication. Tokens are passed in one of two ways:
 
-| Method | How to send |
-|--------|-------------|
-| POST body | Include a `token` field in the request body |
-| Query string | Append `?token=YOUR_TOKEN` to the URL |
+| Method       | How to send                                 |
+| ------------ | ------------------------------------------- |
+| POST body    | Include a `token` field in the request body |
+| Query string | Append `?token=YOUR_TOKEN` to the URL       |
 
 > **Important:** Do NOT use the `Authorization` header. The Galvani runtime drops custom HTTP headers before they reach PHP. Always pass the token as a query parameter or in the POST body.
 
@@ -128,13 +129,13 @@ Returns a paginated list of publicly visible items (status: `active`, `ended`, o
 
 **Query parameters:**
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `q` | string | — | Search query (matches item title using LIKE) |
-| `category` | string | — | Filter by category slug |
-| `event` | string | — | Filter by event slug |
-| `page` | integer | `1` | Page number |
-| `per_page` | integer | `20` | Results per page (max 100) |
+| Parameter  | Type    | Default | Description                                  |
+| ---------- | ------- | ------- | -------------------------------------------- |
+| `q`        | string  | —       | Search query (matches item title using LIKE) |
+| `category` | string  | —       | Filter by category slug                      |
+| `event`    | string  | —       | Filter by event slug                         |
+| `page`     | integer | `1`     | Page number                                  |
+| `per_page` | integer | `20`    | Results per page (max 100)                   |
 
 **Example request:**
 
@@ -190,9 +191,9 @@ Returns full detail for a single item, including the last 5 bids in its history 
 
 **Path parameters:**
 
-| Parameter | Description |
-|-----------|-------------|
-| `slug` | Item slug (e.g. `rolex-submariner`) |
+| Parameter | Description                         |
+| --------- | ----------------------------------- |
+| `slug`    | Item slug (e.g. `rolex-submariner`) |
 
 **Example request:**
 
@@ -246,11 +247,11 @@ Returns a paginated list of publicly visible events (status: `published` or `act
 
 **Query parameters:**
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `status` | string | — | Filter by status: `published` or `active` |
-| `page` | integer | `1` | Page number |
-| `per_page` | integer | `20` | Results per page (max 100) |
+| Parameter  | Type    | Default | Description                               |
+| ---------- | ------- | ------- | ----------------------------------------- |
+| `status`   | string  | —       | Filter by status: `published` or `active` |
+| `page`     | integer | `1`     | Page number                               |
+| `per_page` | integer | `20`    | Results per page (max 100)                |
 
 **Example request:**
 
@@ -297,9 +298,9 @@ Returns full detail for a single event. Events with status `draft` return 404.
 
 **Path parameters:**
 
-| Parameter | Description |
-|-----------|-------------|
-| `slug` | Event slug (e.g. `spring-gala-2026`) |
+| Parameter | Description                          |
+| --------- | ------------------------------------ |
+| `slug`    | Event slug (e.g. `spring-gala-2026`) |
 
 **Example request:**
 
@@ -322,15 +323,15 @@ Returns all items belonging to a specific event, paginated.
 **Path parameters:**
 
 | Parameter | Description |
-|-----------|-------------|
-| `slug` | Event slug |
+| --------- | ----------- |
+| `slug`    | Event slug  |
 
 **Query parameters:**
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `page` | integer | `1` | Page number |
-| `per_page` | integer | `50` | Results per page (max 100) |
+| Parameter  | Type    | Default | Description                |
+| ---------- | ------- | ------- | -------------------------- |
+| `page`     | integer | `1`     | Page number                |
+| `per_page` | integer | `50`    | Results per page (max 100) |
 
 **Example request:**
 
@@ -369,12 +370,12 @@ Places a bid on an item. Requires authentication and a verified email address.
 
 **Request body (application/x-www-form-urlencoded):**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `item_slug` | string | Yes | Slug of the item to bid on |
-| `amount` | float | Yes | Bid amount in pounds (e.g. `1300.00`) |
-| `buy_now` | integer | No | Pass `1` to use the Buy Now price |
-| `token` | string | Yes | Your API token |
+| Parameter   | Type    | Required | Description                           |
+| ----------- | ------- | -------- | ------------------------------------- |
+| `item_slug` | string  | Yes      | Slug of the item to bid on            |
+| `amount`    | float   | Yes      | Bid amount in pounds (e.g. `1300.00`) |
+| `buy_now`   | integer | No       | Pass `1` to use the Buy Now price     |
+| `token`     | string  | Yes      | Your API token                        |
 
 **Example request:**
 
@@ -422,9 +423,9 @@ Returns the authenticated user's profile. Password hash is never included.
 
 **Query parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `token` | string | Yes | Your API token |
+| Parameter | Type   | Required | Description    |
+| --------- | ------ | -------- | -------------- |
+| `token`   | string | Yes      | Your API token |
 
 **Example request:**
 
@@ -463,11 +464,11 @@ Returns the authenticated user's bid history, paginated.
 
 **Query parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `token` | string | Yes | Your API token |
-| `page` | integer | No | Page number (default: 1) |
-| `per_page` | integer | No | Results per page (default: 20, max: 100) |
+| Parameter  | Type    | Required | Description                              |
+| ---------- | ------- | -------- | ---------------------------------------- |
+| `token`    | string  | Yes      | Your API token                           |
+| `page`     | integer | No       | Page number (default: 1)                 |
+| `per_page` | integer | No       | Results per page (default: 20, max: 100) |
 
 **Example request:**
 
@@ -548,8 +549,8 @@ Returns the live current bid and bid count for an item. Used by the item detail 
 **Path parameters:**
 
 | Parameter | Description |
-|-----------|-------------|
-| `slug` | Item slug |
+| --------- | ----------- |
+| `slug`    | Item slug   |
 
 **Example request:**
 
@@ -563,12 +564,100 @@ curl "https://example.com/api/current-bid/rolex-submariner"
 {
   "data": {
     "slug": "rolex-submariner",
-    "current_bid": 1300.00,
+    "current_bid": 1300.0,
     "bid_count": 8,
     "status": "active"
   }
 }
 ```
+
+---
+
+## Admin API
+
+Admin endpoints live under `/api/admin/v1/` and require an authenticated admin session (cookie-based). They are used by the admin panel's AJAX features and the MCP server.
+
+### Auctions
+
+| Method | Endpoint                               | Description                       |
+| ------ | -------------------------------------- | --------------------------------- |
+| `GET`  | `/api/admin/v1/auctions`               | List all auctions (paginated)     |
+| `GET`  | `/api/admin/v1/auctions/:slug`         | Get auction detail                |
+| `POST` | `/api/admin/v1/auctions`               | Create a new auction              |
+| `PUT`  | `/api/admin/v1/auctions/:slug`         | Update auction fields             |
+| `POST` | `/api/admin/v1/auctions/:slug/publish` | Publish a draft auction           |
+| `POST` | `/api/admin/v1/auctions/:slug/open`    | Open bidding (set to active)      |
+| `POST` | `/api/admin/v1/auctions/:slug/end`     | End auction and determine winners |
+
+### Items
+
+| Method | Endpoint                         | Description                                            |
+| ------ | -------------------------------- | ------------------------------------------------------ |
+| `GET`  | `/api/admin/v1/items`            | List all items (paginated, filterable by status/event) |
+| `GET`  | `/api/admin/v1/items/:slug`      | Get item detail                                        |
+| `PUT`  | `/api/admin/v1/items/:slug`      | Update item fields                                     |
+| `GET`  | `/api/admin/v1/items/:slug/bids` | Get all bids for an item (unmasked bidder names)       |
+
+#### Get item bids (admin)
+
+```
+GET /api/admin/v1/items/:slug/bids
+```
+
+Returns all bids for an item with **full (unmasked) bidder names and email addresses**, ordered by amount descending. The highest bid appears first.
+
+**Authentication:** Admin session required
+
+**Path parameters:**
+
+| Parameter | Description                         |
+| --------- | ----------------------------------- |
+| `slug`    | Item slug (e.g. `rolex-submariner`) |
+
+**Example response:**
+
+```json
+{
+  "data": [
+    {
+      "id": 8,
+      "amount": "1300.00",
+      "is_buy_now": 0,
+      "bidder_name": "Ahmed Khan",
+      "bidder_email": "ahmed@example.com",
+      "bidder_slug": "ahmed-khan",
+      "time_ago": "2 hours ago",
+      "created_at": "2026-02-15 14:22:11"
+    }
+  ],
+  "meta": {
+    "item_title": "Rolex Submariner",
+    "item_slug": "rolex-submariner",
+    "bid_count": 8,
+    "current_bid": "1300.00"
+  }
+}
+```
+
+### Users
+
+| Method   | Endpoint                    | Description                |
+| -------- | --------------------------- | -------------------------- |
+| `GET`    | `/api/admin/v1/users`       | List all users (paginated) |
+| `GET`    | `/api/admin/v1/users/:slug` | Get user detail            |
+| `PUT`    | `/api/admin/v1/users/:slug` | Update user (role, email)  |
+| `DELETE` | `/api/admin/v1/users/:slug` | Delete user (GDPR)         |
+
+### Bulk operations (form POST, not API)
+
+These endpoints accept standard form POST (not JSON) and are used by the admin panel's batch action bars:
+
+| Method | Endpoint                      | Description                         |
+| ------ | ----------------------------- | ----------------------------------- |
+| `POST` | `/admin/items/bulk-delete`    | Delete multiple items               |
+| `POST` | `/admin/users/bulk-delete`    | Delete multiple users               |
+| `POST` | `/admin/auctions/bulk-status` | Bulk publish/unpublish/end auctions |
+| `POST` | `/admin/auctions/bulk-delete` | Delete multiple auctions            |
 
 ---
 
@@ -584,14 +673,14 @@ All errors return JSON with an `error` key:
 
 ### HTTP status codes
 
-| Code | Meaning | Common causes |
-|------|---------|---------------|
-| `400` | Bad Request | Missing required field, invalid parameter format |
-| `401` | Unauthorised | No token provided, token missing or invalid |
-| `403` | Forbidden | Token valid but insufficient permissions (e.g. not an admin) |
-| `404` | Not Found | Item/event/user does not exist or is not publicly visible |
+| Code  | Meaning              | Common causes                                                                   |
+| ----- | -------------------- | ------------------------------------------------------------------------------- |
+| `400` | Bad Request          | Missing required field, invalid parameter format                                |
+| `401` | Unauthorised         | No token provided, token missing or invalid                                     |
+| `403` | Forbidden            | Token valid but insufficient permissions (e.g. not an admin)                    |
+| `404` | Not Found            | Item/event/user does not exist or is not publicly visible                       |
 | `422` | Unprocessable Entity | Business rule violation (e.g. bid too low, item not active, email not verified) |
-| `429` | Too Many Requests | Rate limit exceeded — see retry message for wait time |
+| `429` | Too Many Requests    | Rate limit exceeded — see retry message for wait time                           |
 
 ### Example 401 response
 
@@ -627,14 +716,14 @@ Identifiers are typically the user's slug (for authenticated requests) or IP add
 
 ### Rate limit thresholds
 
-| Action | Max attempts | Window | Block duration |
-|--------|-------------|--------|----------------|
-| `login` | 5 | 15 minutes | 30 minutes |
-| `register` | 3 | 60 minutes | 60 minutes |
-| `bid` | 30 | 60 seconds | 5 minutes |
-| `api_token` | 10 | 60 minutes | 60 minutes |
-| `password_reset` | 3 | 60 minutes | 60 minutes |
-| `resend_verification` | 3 | 60 minutes | 60 minutes |
+| Action                | Max attempts | Window     | Block duration |
+| --------------------- | ------------ | ---------- | -------------- |
+| `login`               | 5            | 15 minutes | 30 minutes     |
+| `register`            | 3            | 60 minutes | 60 minutes     |
+| `bid`                 | 30           | 60 seconds | 5 minutes      |
+| `api_token`           | 10           | 60 minutes | 60 minutes     |
+| `password_reset`      | 3            | 60 minutes | 60 minutes     |
+| `resend_verification` | 3            | 60 minutes | 60 minutes     |
 
 When a rate limit is exceeded, the API returns HTTP `429` with a message indicating how long to wait.
 
@@ -665,8 +754,8 @@ POST https://yourdomain.com/webhook/stripe?webhook_secret=YOUR_TOKEN
 
 **Events handled:**
 
-| Event | Action taken |
-|-------|-------------|
+| Event                        | Action taken                                                                                            |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------- |
 | `checkout.session.completed` | Marks the payment as `completed`, marks the item as `sold`, triggers Gift Aid calculation if applicable |
 
 **Webhook request body:**
