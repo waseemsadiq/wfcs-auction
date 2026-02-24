@@ -77,9 +77,25 @@ $rawPath = $basePath !== ''
     ? preg_replace('#^' . preg_quote($basePath, '#') . '#', '', (string)$rawUri)
     : (string)$rawUri;
 if (str_starts_with($rawPath, '/api/')) {
-    header('Access-Control-Allow-Origin: *');
-    header('Access-Control-Allow-Methods: GET, POST, PUT, OPTIONS');
-    header('Access-Control-Allow-Headers: Content-Type');
+    $allowedOrigins = [
+        '#^https?://(.*\.)?wfcs\.co\.uk$#',
+        '#^https?://(.*\.)?wellfoundation\.org\.uk$#',
+        '#^https://waseemsadiq\.github\.io$#',
+    ];
+    $origin    = $_SERVER['HTTP_ORIGIN'] ?? '';
+    $corsAllow = false;
+    foreach ($allowedOrigins as $pattern) {
+        if (preg_match($pattern, $origin)) {
+            $corsAllow = true;
+            break;
+        }
+    }
+    if ($corsAllow) {
+        header('Access-Control-Allow-Origin: ' . $origin);
+        header('Access-Control-Allow-Methods: GET, POST, PUT, OPTIONS');
+        header('Access-Control-Allow-Headers: Content-Type');
+        header('Vary: Origin');
+    }
     if (strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'OPTIONS') {
         http_response_code(204);
         exit;
