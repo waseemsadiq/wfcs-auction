@@ -14,7 +14,7 @@ $footer = $footer ?? '';
   class="form-popover bg-white dark:bg-slate-800"
 >
   <!-- Header -->
-  <div class="flex items-center justify-between px-6 py-5 border-b border-slate-200 dark:border-slate-700/40 flex-shrink-0">
+  <div class="flex items-center justify-between px-6 py-5 border-b border-slate-200 dark:border-slate-700/40 min-height-auto">
     <h2 class="text-base font-bold text-slate-900 dark:text-white"><?= e($title) ?></h2>
     <button
       onclick="document.getElementById('<?= e($id) ?>').hidePopover()"

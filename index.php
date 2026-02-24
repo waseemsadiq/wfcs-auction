@@ -201,6 +201,7 @@ $router->post('/admin/auctions/:slug/end',         [$adminController, 'endAuctio
 
 // Admin — Items
 $router->get('/admin/items',                       [$adminController, 'items']);
+$router->post('/admin/items',                      [$adminController, 'storeItem']);
 $router->get('/admin/items/:slug/edit',            [$adminController, 'editItem']);
 $router->post('/admin/items/:slug/edit',           [$adminController, 'updateItem']);
 

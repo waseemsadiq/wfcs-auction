@@ -332,6 +332,39 @@ class AdminController extends Controller
     }
 
     /**
+     * POST /admin/items
+     */
+    public function storeItem(): void
+    {
+        global $basePath;
+        $user = requireAdmin();
+        validateCsrf();
+
+        $imageFilename = null;
+        if (!empty($_FILES['image']['tmp_name'])) {
+            try {
+                $uploadService = new UploadService();
+                $imageFilename = $uploadService->uploadItemImage($_FILES['image']);
+            } catch (\RuntimeException $e) {
+                flash($e->getMessage(), 'error');
+                $this->redirect($basePath . '/admin/items');
+                return;
+            }
+        }
+
+        try {
+            $itemService = new ItemService();
+            $data = array_merge($_POST, ['image' => $imageFilename]);
+            $itemService->adminSave($data, (int)$user['id']);
+            flash('Item created.');
+        } catch (\RuntimeException $e) {
+            flash($e->getMessage(), 'error');
+        }
+
+        $this->redirect($basePath . '/admin/items');
+    }
+
+    /**
      * GET /admin/items/:slug/edit
      */
     public function editItem(string $slug): void
@@ -389,7 +422,7 @@ class AdminController extends Controller
         if (!empty($_FILES['image']['tmp_name'])) {
             try {
                 $uploadService = new UploadService();
-                $imageFilename = $uploadService->handleImage($_FILES['image']);
+                $imageFilename = $uploadService->uploadItemImage($_FILES['image']);
             } catch (\RuntimeException $e) {
                 flash($e->getMessage(), 'error');
                 $this->redirect($basePath . '/admin/items/' . $slug . '/edit');
