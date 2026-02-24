@@ -41,6 +41,12 @@ $statusBadge = function(string $status): string {
   .form-popover::backdrop { background: rgba(15,23,42,0.4); backdrop-filter: blur(4px); }
   .form-popover:popover-open { display: flex; flex-direction: column; }
   .popover-xl { position: fixed; inset: 0; width: min(36rem, calc(100% - 2rem)); height: fit-content; max-height: 90vh; margin: auto; overflow: hidden; }
+  .popover-sm { position: fixed; inset: 0; width: min(28rem, calc(100% - 2rem)); height: fit-content; max-height: 90vh; margin: auto; overflow: hidden; }
+
+  /* Toggle switch */
+  .toggle-input ~ .toggle-track .toggle-knob { transform: translateX(0); }
+  .toggle-input:checked ~ .toggle-track { background-color: #45a2da; }
+  .toggle-input:checked ~ .toggle-track .toggle-knob { transform: translateX(16px); }
 </style>
 
 <!-- Page heading + action -->
@@ -49,10 +55,32 @@ $statusBadge = function(string $status): string {
     <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Auctions</h1>
     <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Manage all fundraising auctions and their lots.</p>
   </div>
-  <button onclick="document.getElementById('create-event-popover').showPopover()" class="flex-shrink-0 flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-primary hover:bg-primary-hover rounded-xl shadow-sm transition-colors">
+  <button onclick="document.getElementById('create-event-popover').showPopover()" class="shrink-0 flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-primary hover:bg-primary-hover rounded-xl shadow-sm transition-colors">
     <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
     New Auction
   </button>
+</div>
+
+<!-- Batch actions bar (hidden by default) -->
+<div id="batchBar" style="display:none" class="fade-up mb-3 bg-slate-900 dark:bg-slate-700 rounded-xl px-4 py-3 flex items-center gap-3 flex-wrap">
+  <span id="batchCount" class="text-xs font-bold text-slate-300 mr-1">0 selected</span>
+  <button onclick="submitBulkStatus('published')" class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-blue-300 bg-blue-900/40 hover:bg-blue-900/70 rounded-lg transition-colors border border-blue-700/50">
+    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    Publish
+  </button>
+  <button onclick="submitBulkStatus('draft')" class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-300 bg-slate-700/60 hover:bg-slate-600/70 rounded-lg transition-colors border border-slate-500/50">
+    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+    Unpublish
+  </button>
+  <button onclick="submitBulkStatus('ended')" class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-amber-300 bg-amber-900/40 hover:bg-amber-900/70 rounded-lg transition-colors border border-amber-700/50">
+    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    End Auction
+  </button>
+  <button popovertarget="confirm-delete-popover" class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-red-300 bg-red-900/40 hover:bg-red-900/70 rounded-lg transition-colors border border-red-700/50">
+    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+    Delete Selected
+  </button>
+  <button onclick="clearSelection()" class="ml-auto text-xs font-medium text-slate-400 hover:text-slate-200 transition-colors">Clear</button>
 </div>
 
 <!-- Auctions table -->
@@ -72,7 +100,15 @@ $statusBadge = function(string $status): string {
     <table class="w-full text-sm min-w-[700px]">
       <thead>
         <tr class="border-b border-slate-100 dark:border-slate-700/40">
-          <th class="text-left text-xs font-semibold text-slate-400 uppercase tracking-wider px-5 py-3">Auction Name</th>
+          <th class="px-4 py-3 w-10">
+            <label class="flex items-center cursor-pointer">
+              <input type="checkbox" id="selectAll" onchange="toggleSelectAll(this)" class="toggle-input sr-only" />
+              <div class="toggle-track relative w-9 h-5 bg-slate-300 dark:bg-slate-600 rounded-full transition-colors duration-200 shrink-0">
+                <span class="toggle-knob absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200"></span>
+              </div>
+            </label>
+          </th>
+          <th class="text-left text-xs font-semibold text-slate-400 uppercase tracking-wider px-3 py-3">Auction Name</th>
           <th class="text-left text-xs font-semibold text-slate-400 uppercase tracking-wider px-4 py-3">Date</th>
           <th class="text-center text-xs font-semibold text-slate-400 uppercase tracking-wider px-4 py-3">Lots</th>
           <th class="text-left text-xs font-semibold text-slate-400 uppercase tracking-wider px-4 py-3">Status</th>
@@ -82,10 +118,18 @@ $statusBadge = function(string $status): string {
       <tbody class="divide-y divide-slate-50 dark:divide-slate-700/30">
         <?php foreach ($events as $event): ?>
         <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
-          <td class="px-5 py-4">
+          <td class="px-4 py-3.5">
+            <label class="flex items-center cursor-pointer">
+              <input type="checkbox" onchange="handleRowCheck()" class="row-check toggle-input sr-only" data-slug="<?= e($event['slug']) ?>" />
+              <div class="toggle-track relative w-9 h-5 bg-slate-300 dark:bg-slate-600 rounded-full transition-colors duration-200 shrink-0">
+                <span class="toggle-knob absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200"></span>
+              </div>
+            </label>
+          </td>
+          <td class="px-3 py-4">
             <div class="flex items-center gap-2">
               <?php if ($event['status'] === 'active'): ?>
-              <span class="live-dot w-2 h-2 rounded-full bg-primary flex-shrink-0"></span>
+              <span class="live-dot w-2 h-2 rounded-full bg-primary shrink-0"></span>
               <?php endif; ?>
               <div>
                 <p class="font-semibold text-slate-900 dark:text-white text-sm"><?= e($event['title']) ?></p>
@@ -131,7 +175,7 @@ $statusBadge = function(string $status): string {
               <a href="<?= e($basePath) ?>/admin/payments" class="px-3 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg transition-colors">View Results</a>
               <?php endif; ?>
               <button
-                onclick="openEditAuction('<?= e(addslashes($event['slug'])) ?>','<?= e(addslashes($event['title'])) ?>','<?= e(addslashes($event['venue'] ?? '')) ?>','<?= e(addslashes($event['description'] ?? '')) ?>','<?= e(substr((string)($event['starts_at'] ?? ''), 0, 10)) ?>','<?= e(substr((string)($event['ends_at'] ?? ''), 0, 10)) ?>')"
+                onclick="openEditAuction('<?= e(addslashes($event['slug'])) ?>','<?= e(addslashes($event['title'])) ?>','<?= e(addslashes($event['venue'] ?? '')) ?>','<?= e(addslashes($event['description'] ?? '')) ?>','<?= e(substr((string)($event['starts_at'] ?? ''), 0, 16)) ?>','<?= e(substr((string)($event['ends_at'] ?? ''), 0, 16)) ?>','<?= e($event['status']) ?>')"
                 class="px-3 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg transition-colors">Edit</button>
             </div>
           </td>
@@ -157,9 +201,33 @@ $statusBadge = function(string $status): string {
   <?php endif; ?>
 </div>
 
+<!-- Confirm Delete Popover -->
+<div id="confirm-delete-popover" popover="manual" class="form-popover popover-sm rounded-2xl shadow-2xl p-0 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+  <div class="px-6 py-5">
+    <h3 class="text-base font-semibold text-slate-900 dark:text-white mb-2">Delete auctions?</h3>
+    <p class="text-sm text-slate-500 dark:text-slate-400 mb-2">This will permanently delete the selected auctions along with all their items, bids, and payment records.</p>
+    <p class="text-sm font-semibold text-red-600 dark:text-red-400 mb-6">This action cannot be undone.</p>
+    <div class="flex items-center justify-end gap-3">
+      <button onclick="document.getElementById('confirm-delete-popover').hidePopover()" class="px-4 py-2 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white border border-slate-200 dark:border-slate-600 rounded-lg transition-colors">Cancel</button>
+      <button onclick="submitBulkDelete()" class="px-4 py-2 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- Hidden bulk-delete form -->
+<form id="bulk-delete-form" method="POST" action="<?= e($basePath) ?>/admin/auctions/bulk-delete" class="hidden">
+  <input type="hidden" name="_csrf_token" value="<?= e($csrfToken) ?>" />
+</form>
+
+<!-- Hidden bulk-status form -->
+<form id="bulk-status-form" method="POST" action="<?= e($basePath) ?>/admin/auctions/bulk-status" class="hidden">
+  <input type="hidden" name="_csrf_token" value="<?= e($csrfToken) ?>" />
+  <input type="hidden" name="status" id="bulk-status-value" value="" />
+</form>
+
 <!-- Create Auction Popover -->
 <div id="create-event-popover" popover="manual" class="form-popover popover-xl rounded-2xl shadow-2xl p-0 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-  <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between flex-shrink-0">
+  <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between shrink-0">
     <h3 class="text-base font-semibold text-slate-900 dark:text-white">Create Auction</h3>
     <button type="button" onclick="document.getElementById('create-event-popover').hidePopover()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700">
       <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -207,7 +275,7 @@ $statusBadge = function(string $status): string {
 
 <!-- Edit Auction Popover -->
 <div id="edit-event-popover" popover="manual" class="form-popover popover-xl rounded-2xl shadow-2xl p-0 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-  <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between flex-shrink-0">
+  <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between shrink-0">
     <h3 class="text-base font-semibold text-slate-900 dark:text-white">Edit Auction</h3>
     <button type="button" onclick="document.getElementById('edit-event-popover').hidePopover()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700">
       <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -244,6 +312,16 @@ $statusBadge = function(string $status): string {
           <textarea id="edit-event-description" name="description" rows="3"
             class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none text-sm"></textarea>
         </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Status</label>
+          <select id="edit-event-status" name="status"
+            class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm">
+            <option value="draft">Draft (Unpublished)</option>
+            <option value="published">Published</option>
+            <option value="active">Active (Bidding Open)</option>
+            <option value="ended">Ended</option>
+          </select>
+        </div>
         <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-700/40">
           <button type="button" onclick="document.getElementById('edit-event-popover').hidePopover()" class="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white transition-colors">Cancel</button>
           <button type="submit" class="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-primary hover:bg-primary-hover rounded-xl shadow-sm transition-colors">Save Changes</button>
@@ -255,13 +333,76 @@ $statusBadge = function(string $status): string {
 
 <script>
 window._basePath = '<?= e($basePath) ?>';
-function openEditAuction(slug, name, venue, description, starts, ends) {
+
+function openEditAuction(slug, name, venue, description, starts, ends, status) {
   document.getElementById('edit-event-form').action = window._basePath + '/admin/auctions/' + slug + '/edit';
   document.getElementById('edit-event-name').value = name;
   document.getElementById('edit-event-venue').value = venue;
   document.getElementById('edit-event-description').value = description;
-  document.getElementById('edit-event-starts').value = starts ? starts + 'T00:00' : '';
-  document.getElementById('edit-event-ends').value = ends ? ends + 'T00:00' : '';
+  document.getElementById('edit-event-starts').value = starts || '';
+  document.getElementById('edit-event-ends').value = ends || '';
+  document.getElementById('edit-event-status').value = status;
   document.getElementById('edit-event-popover').showPopover();
+}
+
+// ── Batch selection (same pattern as items page) ─────────────────────────────
+function toggleSelectAll(master) {
+  const checks = document.querySelectorAll('.row-check');
+  checks.forEach(c => { c.checked = master.checked; });
+  updateBatchBar();
+}
+
+function handleRowCheck() {
+  const all = document.querySelectorAll('.row-check');
+  const checked = document.querySelectorAll('.row-check:checked');
+  document.getElementById('selectAll').checked = all.length === checked.length;
+  updateBatchBar();
+}
+
+function updateBatchBar() {
+  const count = document.querySelectorAll('.row-check:checked').length;
+  const bar = document.getElementById('batchBar');
+  document.getElementById('batchCount').textContent = count + ' selected';
+  if (count > 0) {
+    bar.style.display = '';
+  } else {
+    bar.style.display = 'none';
+  }
+}
+
+function clearSelection() {
+  document.querySelectorAll('.row-check, #selectAll').forEach(c => { c.checked = false; });
+  document.getElementById('batchBar').style.display = 'none';
+}
+
+function collectSlugs() {
+  const slugs = [];
+  document.querySelectorAll('.row-check:checked').forEach(cb => slugs.push(cb.dataset.slug));
+  return slugs;
+}
+
+function appendSlugsToForm(form, slugs) {
+  form.querySelectorAll('input[name="slugs[]"]').forEach(el => el.remove());
+  slugs.forEach(slug => {
+    const input = document.createElement('input');
+    input.type  = 'hidden';
+    input.name  = 'slugs[]';
+    input.value = slug;
+    form.appendChild(input);
+  });
+}
+
+function submitBulkDelete() {
+  document.getElementById('confirm-delete-popover').hidePopover();
+  const form = document.getElementById('bulk-delete-form');
+  appendSlugsToForm(form, collectSlugs());
+  form.submit();
+}
+
+function submitBulkStatus(status) {
+  const form = document.getElementById('bulk-status-form');
+  document.getElementById('bulk-status-value').value = status;
+  appendSlugsToForm(form, collectSlugs());
+  form.submit();
 }
 </script>

@@ -67,7 +67,7 @@ $filterQ        = $filters['q'] ?? '';
     <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Auction Lots</h1>
     <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5"><?= (int)$total ?> lot<?= $total !== 1 ? 's' : '' ?> across all events</p>
   </div>
-  <button onclick="document.getElementById('add-item-popover').showPopover()" class="flex-shrink-0 flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-primary hover:bg-primary-hover rounded-xl shadow-sm transition-colors">
+  <button onclick="document.getElementById('add-item-popover').showPopover()" class="shrink-0 flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-primary hover:bg-primary-hover rounded-xl shadow-sm transition-colors">
     <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
     Add Item
   </button>
@@ -111,7 +111,7 @@ $filterQ        = $filters['q'] ?? '';
 </div>
 
 <!-- Batch actions bar (hidden by default) -->
-<div id="batchBar" class="hidden fade-up mb-3 bg-slate-900 dark:bg-slate-700 rounded-xl px-4 py-3 flex items-center gap-3 flex-wrap">
+<div id="batchBar" style="display:none" class="fade-up mb-3 bg-slate-900 dark:bg-slate-700 rounded-xl px-4 py-3 flex items-center gap-3 flex-wrap">
   <span id="batchCount" class="text-xs font-bold text-slate-300 mr-1">0 selected</span>
 <button class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-amber-300 bg-amber-900/40 hover:bg-amber-900/70 rounded-lg transition-colors border border-amber-700/50">
     <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
@@ -140,7 +140,7 @@ $filterQ        = $filters['q'] ?? '';
           <th class="px-4 py-3 w-10">
             <label class="flex items-center cursor-pointer">
               <input type="checkbox" id="selectAll" onchange="toggleSelectAll(this)" class="toggle-input sr-only" />
-              <div class="toggle-track relative w-9 h-5 bg-slate-300 dark:bg-slate-600 rounded-full transition-colors duration-200 flex-shrink-0">
+              <div class="toggle-track relative w-9 h-5 bg-slate-300 dark:bg-slate-600 rounded-full transition-colors duration-200 shrink-0">
                 <span class="toggle-knob absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200"></span>
               </div>
             </label>
@@ -165,16 +165,16 @@ $filterQ        = $filters['q'] ?? '';
           <td class="px-4 py-3.5">
             <label class="flex items-center cursor-pointer">
               <input type="checkbox" onchange="handleRowCheck()" class="row-check toggle-input sr-only" data-slug="<?= e($item['slug']) ?>" />
-              <div class="toggle-track relative w-9 h-5 bg-slate-300 dark:bg-slate-600 rounded-full transition-colors duration-200 flex-shrink-0">
+              <div class="toggle-track relative w-9 h-5 bg-slate-300 dark:bg-slate-600 rounded-full transition-colors duration-200 shrink-0">
                 <span class="toggle-knob absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200"></span>
               </div>
             </label>
           </td>
           <td class="px-2 py-3.5">
             <?php if (!empty($item['image'])): ?>
-            <img src="<?= e('/uploads/' . $item['image']) ?>" alt="" class="w-10 h-10 rounded-lg object-cover flex-shrink-0 bg-slate-100 dark:bg-slate-700" />
+            <img src="<?= e('/uploads/' . $item['image']) ?>" alt="" class="w-10 h-10 rounded-lg object-cover shrink-0 bg-slate-100 dark:bg-slate-700" />
             <?php else: ?>
-            <div class="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-700 flex items-center justify-center flex-shrink-0">
+            <div class="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-700 flex items-center justify-center shrink-0">
               <svg class="w-4 h-4 text-slate-300 dark:text-slate-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
             </div>
             <?php endif; ?>
@@ -221,6 +221,9 @@ $filterQ        = $filters['q'] ?? '';
           </td>
           <td class="px-4 py-3.5">
             <div class="flex items-center justify-end gap-1.5">
+              <?php if ((int)($item['bid_count'] ?? 0) > 0): ?>
+              <button onclick="viewBids('<?= e(addslashes($item['slug'])) ?>')" class="px-2.5 py-1.5 text-xs font-semibold text-primary border border-primary/30 hover:bg-primary/5 dark:hover:bg-primary/10 rounded-lg transition-colors">Bids</button>
+              <?php endif; ?>
               <a href="<?= e($basePath) ?>/admin/items/<?= e($item['slug']) ?>/edit" class="px-2.5 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg transition-colors">Edit</a>
               <?php if (!empty($item['event_slug'])): ?>
               <a href="<?= e($basePath) ?>/auctions/<?= e($item['event_slug']) ?>/<?= e($item['slug']) ?>" target="_blank" class="px-2.5 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg transition-colors">View</a>
@@ -255,7 +258,7 @@ $filterQ        = $filters['q'] ?? '';
 <div id="confirm-delete-popover" popover="manual" class="form-popover popover-sm rounded-2xl shadow-2xl p-0 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
   <div class="p-6">
     <div class="flex items-start gap-4 mb-5">
-      <div class="flex-shrink-0 w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+      <div class="shrink-0 w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
         <svg class="w-5 h-5 text-red-600 dark:text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
       </div>
       <div>
@@ -265,14 +268,19 @@ $filterQ        = $filters['q'] ?? '';
     </div>
     <div class="flex items-center justify-end gap-3">
       <button onclick="document.getElementById('confirm-delete-popover').hidePopover()" class="px-4 py-2 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white border border-slate-200 dark:border-slate-600 rounded-lg transition-colors">Cancel</button>
-      <button onclick="document.getElementById('confirm-delete-popover').hidePopover()" class="px-4 py-2 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors">Delete</button>
+      <button onclick="submitBulkDelete()" class="px-4 py-2 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors">Delete</button>
     </div>
   </div>
 </div>
 
+<!-- Hidden bulk-delete form -->
+<form id="bulk-delete-form" method="POST" action="<?= e($basePath) ?>/admin/items/bulk-delete" class="hidden">
+  <input type="hidden" name="_csrf_token" value="<?= e($csrfToken) ?>" />
+</form>
+
 <!-- Add Item -->
 <div id="add-item-popover" popover="manual" class="form-popover popover-lg rounded-2xl shadow-2xl p-0 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-  <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-700 flex-shrink-0">
+  <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-700 shrink-0">
     <h2 class="text-base font-bold text-slate-900 dark:text-white">Add Auction Lot</h2>
     <button onclick="document.getElementById('add-item-popover').hidePopover()" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
       <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -332,12 +340,21 @@ $filterQ        = $filters['q'] ?? '';
         </div>
       </div>
     </div>
-    <div class="px-6 py-4 border-t border-slate-100 dark:border-slate-700 flex-shrink-0 flex justify-end gap-3">
+    <div class="px-6 py-4 border-t border-slate-100 dark:border-slate-700 shrink-0 flex justify-end gap-3">
       <button type="button" onclick="document.getElementById('add-item-popover').hidePopover()" class="px-4 py-2 text-sm font-semibold text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">Cancel</button>
       <button type="submit" class="px-4 py-2 text-sm font-semibold text-white bg-primary hover:bg-primary-hover rounded-lg transition-colors">Add Lot</button>
     </div>
   </form>
 </div>
+
+<!-- View Bids Popover -->
+<?php echo atom('popover-shell', [
+    'id'    => 'bids-popover',
+    'title' => 'Bids',
+    'width' => '36rem',
+    'body'  => '<p id="bids-popover-subtitle" class="text-xs text-slate-400 -mt-2 mb-3"></p>'
+             . '<div id="bids-popover-body"><p class="text-sm text-slate-400">Loading&hellip;</p></div>',
+]); ?>
 
 <script>
 // ── Status filter pills ──────────────────────────────────────────────────────
@@ -372,15 +389,96 @@ function updateBatchBar() {
   const bar = document.getElementById('batchBar');
   document.getElementById('batchCount').textContent = count + ' selected';
   if (count > 0) {
-    bar.classList.remove('hidden');
+    bar.style.display = '';
   } else {
-    bar.classList.add('hidden');
+    bar.style.display = 'none';
   }
 }
 
 function clearSelection() {
   document.querySelectorAll('.row-check, #selectAll').forEach(c => { c.checked = false; });
-  document.getElementById('batchBar').classList.add('hidden');
+  document.getElementById('batchBar').style.display = 'none';
+}
+
+function submitBulkDelete() {
+  document.getElementById('confirm-delete-popover').hidePopover();
+  const form = document.getElementById('bulk-delete-form');
+  form.querySelectorAll('input[name="slugs[]"]').forEach(el => el.remove());
+  document.querySelectorAll('.row-check:checked').forEach(function (cb) {
+    const input = document.createElement('input');
+    input.type  = 'hidden';
+    input.name  = 'slugs[]';
+    input.value = cb.dataset.slug;
+    form.appendChild(input);
+  });
+  form.submit();
+}
+
+// ── View Bids (AJAX) ─────────────────────────────────────────────────────────
+function viewBids(slug) {
+  const popover = document.getElementById('bids-popover');
+  const body  = document.getElementById('bids-popover-body');
+  const sub   = document.getElementById('bids-popover-subtitle');
+  const title = popover.querySelector('h2');
+
+  body.innerHTML = '<p class="text-sm text-slate-400">Loading&hellip;</p>';
+  title.textContent = 'Bids';
+  sub.textContent = '';
+  popover.showPopover();
+
+  fetch('<?= e($basePath) ?>/api/admin/v1/items/' + encodeURIComponent(slug) + '/bids', {
+    credentials: 'same-origin'
+  })
+  .then(r => r.json())
+  .then(json => {
+    if (json.error || !json.data) {
+      body.innerHTML = '<p class="text-sm text-red-500">' + escHtml(json.error || 'Error loading bids.') + '</p>';
+      return;
+    }
+
+    const bids = json.data;
+    const meta = json.meta || {};
+    title.textContent = meta.item_title || 'Bids';
+    sub.textContent = (meta.bid_count || bids.length) + ' bid' + ((meta.bid_count || bids.length) !== 1 ? 's' : '') + ' · Current: £' + Number(meta.current_bid || 0).toLocaleString();
+
+    if (!bids.length) {
+      body.innerHTML = '<p class="text-sm text-slate-400">No bids on this item.</p>';
+      return;
+    }
+
+    let html = '<table class="w-full text-sm">';
+    html += '<thead><tr class="border-b border-slate-100 dark:border-slate-700/40">';
+    html += '<th class="text-left text-xs font-semibold text-slate-400 uppercase tracking-wider py-2 pr-3">#</th>';
+    html += '<th class="text-left text-xs font-semibold text-slate-400 uppercase tracking-wider py-2 px-3">Bidder</th>';
+    html += '<th class="text-right text-xs font-semibold text-slate-400 uppercase tracking-wider py-2 px-3">Amount</th>';
+    html += '<th class="text-right text-xs font-semibold text-slate-400 uppercase tracking-wider py-2 pl-3">Time</th>';
+    html += '</tr></thead><tbody class="divide-y divide-slate-50 dark:divide-slate-700/30">';
+
+    bids.forEach(function (bid, i) {
+      const isTop = i === 0;
+      html += '<tr class="' + (isTop ? 'bg-green-50/50 dark:bg-green-900/10' : '') + '">';
+      html += '<td class="py-2.5 pr-3 text-xs text-slate-400">' + (i + 1) + '</td>';
+      html += '<td class="py-2.5 px-3"><div>';
+      html += '<p class="font-semibold text-slate-900 dark:text-white text-sm">' + escHtml(bid.bidder_name) + (isTop ? ' <span class="text-xs font-medium text-green-600 dark:text-green-400">★ Highest</span>' : '') + '</p>';
+      html += '<p class="text-xs text-slate-400">' + escHtml(bid.bidder_email) + '</p>';
+      html += '</div></td>';
+      html += '<td class="py-2.5 px-3 text-right font-bold ' + (isTop ? 'text-green-700 dark:text-green-400' : 'text-slate-700 dark:text-slate-300') + '">£' + Number(bid.amount).toLocaleString() + (bid.is_buy_now == 1 ? ' <span class="text-xs font-medium text-primary">BUY NOW</span>' : '') + '</td>';
+      html += '<td class="py-2.5 pl-3 text-right text-xs text-slate-400">' + escHtml(bid.time_ago) + '</td>';
+      html += '</tr>';
+    });
+
+    html += '</tbody></table>';
+    body.innerHTML = html;
+  })
+  .catch(() => {
+    body.innerHTML = '<p class="text-sm text-red-500">Failed to fetch bids.</p>';
+  });
+}
+
+function escHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str || '';
+  return div.innerHTML;
 }
 
 // ── Add item image drop zone ──────────────────────────────────────────────────
@@ -395,7 +493,6 @@ function clearSelection() {
     filename.classList.remove('hidden');
   }
 
-  // Browse-to-select also updates the label
   input.addEventListener('change', function () {
     if (input.files.length) showFile(input.files[0]);
   });

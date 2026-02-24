@@ -193,6 +193,8 @@ $router->get('/admin/dashboard',    [$adminController, 'dashboard']);
 $router->get('/admin/auctions',                    [$adminController, 'auctions']);
 $router->get('/admin/auctions/create',             [$adminController, 'createAuction']);
 $router->post('/admin/auctions',                   [$adminController, 'createAuction']);
+$router->post('/admin/auctions/bulk-delete',        [$adminController, 'bulkDeleteAuctions']);
+$router->post('/admin/auctions/bulk-status',        [$adminController, 'bulkUpdateAuctionStatus']);
 $router->get('/admin/auctions/:slug/edit',         [$adminController, 'editAuction']);
 $router->post('/admin/auctions/:slug/edit',        [$adminController, 'updateAuction']);
 $router->post('/admin/auctions/:slug/publish',     [$adminController, 'publishAuction']);
@@ -202,11 +204,13 @@ $router->post('/admin/auctions/:slug/end',         [$adminController, 'endAuctio
 // Admin — Items
 $router->get('/admin/items',                       [$adminController, 'items']);
 $router->post('/admin/items',                      [$adminController, 'storeItem']);
+$router->post('/admin/items/bulk-delete',          [$adminController, 'bulkDeleteItems']);
 $router->get('/admin/items/:slug/edit',            [$adminController, 'editItem']);
 $router->post('/admin/items/:slug/edit',           [$adminController, 'updateItem']);
 
 // Admin — Users
 $router->get('/admin/users',                       [$adminController, 'users']);
+$router->post('/admin/users/bulk-delete',          [$adminController, 'bulkDeleteUsers']);
 $router->get('/admin/users/:slug',                 [$adminController, 'showUser']);
 $router->post('/admin/users/:slug',                [$adminController, 'updateUser']);
 $router->post('/admin/users/:slug/delete',         [$adminController, 'deleteUser']);
@@ -254,6 +258,7 @@ $router->post('/api/admin/v1/auctions/:slug/open',        [$adminApiController, 
 $router->post('/api/admin/v1/auctions/:slug/end',         [$adminApiController, 'endAuction']);
 
 $router->get('/api/admin/v1/items',                       [$adminApiController, 'listItems']);
+$router->get('/api/admin/v1/items/:slug/bids',            [$adminApiController, 'itemBids']);
 $router->get('/api/admin/v1/items/:slug',                 [$adminApiController, 'showItem']);
 $router->put('/api/admin/v1/items/:slug',                 [$adminApiController, 'updateItem']);
 

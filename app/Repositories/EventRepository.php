@@ -199,4 +199,36 @@ class EventRepository
     {
         return uniqueSlug('events', $text, $this->db);
     }
+
+    /**
+     * Delete events by their IDs.
+     */
+    public function deleteByIds(array $ids): void
+    {
+        if (empty($ids)) {
+            return;
+        }
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+        $this->db->execute(
+            'DELETE FROM events WHERE id IN (' . $placeholders . ')',
+            $ids
+        );
+    }
+
+    /**
+     * Return IDs of all items belonging to the given event IDs.
+     * Used as a cascade helper before deleting events.
+     */
+    public function itemIdsByEventIds(array $eventIds): array
+    {
+        if (empty($eventIds)) {
+            return [];
+        }
+        $placeholders = implode(',', array_fill(0, count($eventIds), '?'));
+        $rows = $this->db->query(
+            'SELECT id FROM items WHERE event_id IN (' . $placeholders . ')',
+            $eventIds
+        );
+        return array_map(fn($r) => (int)$r['id'], $rows);
+    }
 }

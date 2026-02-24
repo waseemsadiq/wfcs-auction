@@ -116,6 +116,27 @@ class EventService
         $this->events->updateStatus($eventId, $newStatus);
     }
 
+    /**
+     * Admin-only: set an event's status directly, bypassing strict transitions.
+     * Valid targets: draft (unpublish), published, active, ended.
+     *
+     * @throws \RuntimeException on event not found or invalid status
+     */
+    public function adminSetStatus(int $eventId, string $newStatus): void
+    {
+        $valid = ['draft', 'published', 'active', 'ended', 'closed'];
+        if (!in_array($newStatus, $valid, true)) {
+            throw new \RuntimeException("Invalid status: '{$newStatus}'.");
+        }
+
+        $event = $this->events->findById($eventId);
+        if ($event === null) {
+            throw new \RuntimeException('Event not found.');
+        }
+
+        $this->events->updateStatus($eventId, $newStatus);
+    }
+
     // -------------------------------------------------------------------------
     // Listings
     // -------------------------------------------------------------------------

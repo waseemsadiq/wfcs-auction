@@ -65,12 +65,18 @@ class AuthController extends Controller
         $remember = !empty($_POST['remember']);
 
         try {
-            $payload = $this->authService->login($email, $password);
-            $user    = (new \App\Repositories\UserRepository())->findByEmail($email);
+            $this->authService->login($email, $password);
+            $user = (new \App\Repositories\UserRepository())->findByEmail($email);
 
             if ($user === null) {
                 flash('Login failed. Please try again.', 'error');
                 $this->redirect($basePath . '/login');
+            }
+
+            // Block unverified users
+            if (empty($user['email_verified_at'])) {
+                flash('Please verify your email address before signing in. Check your inbox for the verification link.', 'error');
+                $this->redirect($basePath . '/verify-email?pending=1');
             }
 
             $token = $this->authService->generateToken($user);
@@ -86,7 +92,7 @@ class AuthController extends Controller
             // Clear rate limit on successful login
             (new RateLimitService())->clear($ip, 'login');
 
-            flash('Welcome back, ' . ($payload['name'] ?: $email) . '!', 'success');
+            flash('Welcome back, ' . ($user['name'] ?: $email) . '!', 'success');
 
             $redirect = $_GET['redirect'] ?? '';
             if ($redirect && str_starts_with($redirect, '/')) {
@@ -208,17 +214,7 @@ class AuthController extends Controller
                 $userRepo->updateProfile((int)$user['id'], ['phone' => $phone]);
             }
 
-            $token = $this->authService->generateToken($user);
-
-            setcookie('auth_token', $token, [
-                'expires'  => time() + 7200,
-                'path'     => '/',
-                'httponly' => true,
-                'secure'   => isset($_SERVER['HTTPS']),
-                'samesite' => 'Strict',
-            ]);
-
-            flash('Account created! Please check your email to verify your address.', 'success');
+            flash('Account created! Please check your email to verify your address before signing in.', 'success');
             $this->redirect($basePath . '/verify-email?pending=1');
 
         } catch (\RuntimeException $e) {
@@ -265,6 +261,7 @@ class AuthController extends Controller
         $content = $this->renderView('auth/verify-email', [
             'pending'     => $pending,
             'verifyError' => $verifyError,
+            'authUser'    => getAuthUser(),
         ]);
 
         $this->view('layouts/public', [

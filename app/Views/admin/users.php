@@ -37,6 +37,15 @@ $roleBadge = function(string $role): string {
   .stat-card { transition: box-shadow 0.2s ease; }
   .stat-card:hover { box-shadow: 0 3px 8px -2px rgba(0,0,0,.07); }
   .dark .stat-card:hover { box-shadow: 0 3px 8px -2px rgba(0,0,0,.20); }
+
+  .form-popover::backdrop { background: rgba(15,23,42,0.4); backdrop-filter: blur(4px); }
+  .form-popover:popover-open { display: flex; flex-direction: column; }
+  .popover-sm { position: fixed; inset: 0; width: min(28rem, calc(100% - 2rem)); height: fit-content; max-height: 90vh; margin: auto; overflow: hidden; }
+
+  /* Toggle switch */
+  .toggle-input ~ .toggle-track .toggle-knob { transform: translateX(0); }
+  .toggle-input:checked ~ .toggle-track { background-color: #45a2da; }
+  .toggle-input:checked ~ .toggle-track .toggle-knob { transform: translateX(16px); }
 </style>
 
 <!-- Page header -->
@@ -87,6 +96,16 @@ $roleBadge = function(string $role): string {
   </div>
 </div>
 
+<!-- Batch actions bar (hidden by default) -->
+<div id="batchBar" style="display:none" class="fade-up mb-3 bg-slate-900 dark:bg-slate-700 rounded-xl px-4 py-3 flex items-center gap-3 flex-wrap">
+  <span id="batchCount" class="text-xs font-bold text-slate-300 mr-1">0 selected</span>
+  <button popovertarget="confirm-delete-popover" class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-red-300 bg-red-900/40 hover:bg-red-900/70 rounded-lg transition-colors border border-red-700/50">
+    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+    Delete Selected
+  </button>
+  <button onclick="clearSelection()" class="ml-auto text-xs font-medium text-slate-400 hover:text-slate-200 transition-colors">Clear</button>
+</div>
+
 <!-- Users table -->
 <div class="fade-up delay-2 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700/40 overflow-hidden mb-8">
   <?php if (empty($users)): ?>
@@ -99,7 +118,15 @@ $roleBadge = function(string $role): string {
     <table class="w-full text-sm min-w-[820px]">
       <thead>
         <tr class="border-b border-slate-100 dark:border-slate-700/40">
-          <th class="text-left text-xs font-semibold text-slate-400 uppercase tracking-wider px-5 py-3">User</th>
+          <th class="px-4 py-3 w-10">
+            <label class="flex items-center cursor-pointer">
+              <input type="checkbox" id="selectAll" onchange="toggleSelectAll(this)" class="toggle-input sr-only" />
+              <div class="toggle-track relative w-9 h-5 bg-slate-300 dark:bg-slate-600 rounded-full transition-colors duration-200 shrink-0">
+                <span class="toggle-knob absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200"></span>
+              </div>
+            </label>
+          </th>
+          <th class="text-left text-xs font-semibold text-slate-400 uppercase tracking-wider px-3 py-3">User</th>
           <th class="text-left text-xs font-semibold text-slate-400 uppercase tracking-wider px-4 py-3">Role</th>
           <th class="text-left text-xs font-semibold text-slate-400 uppercase tracking-wider px-4 py-3">Verified</th>
           <th class="text-center text-xs font-semibold text-slate-400 uppercase tracking-wider px-4 py-3">Bids</th>
@@ -109,10 +136,21 @@ $roleBadge = function(string $role): string {
       </thead>
       <tbody class="divide-y divide-slate-50 dark:divide-slate-700/30">
         <?php foreach ($users as $u): ?>
+        <?php $isSuperAdmin = roleLevel($u['role'] ?? '') >= 3; ?>
         <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
-          <td class="px-5 py-3.5">
+          <td class="px-4 py-3.5">
+            <?php if (!$isSuperAdmin): ?>
+            <label class="flex items-center cursor-pointer">
+              <input type="checkbox" onchange="handleRowCheck()" class="row-check toggle-input sr-only" data-slug="<?= e($u['slug']) ?>" />
+              <div class="toggle-track relative w-9 h-5 bg-slate-300 dark:bg-slate-600 rounded-full transition-colors duration-200 shrink-0">
+                <span class="toggle-knob absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200"></span>
+              </div>
+            </label>
+            <?php endif; ?>
+          </td>
+          <td class="px-3 py-3.5">
             <div class="flex items-center gap-3">
-              <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+              <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                 <span class="text-xs font-bold text-primary"><?= e(strtoupper(substr((string)($u['name'] ?? 'U'), 0, 1))) ?></span>
               </div>
               <div>
@@ -142,39 +180,14 @@ $roleBadge = function(string $role): string {
             <?= e(date('j M Y', strtotime((string)($u['created_at'] ?? 'now')))) ?>
           </td>
           <td class="px-5 py-3.5 text-right">
-            <div class="inline-flex items-center gap-2">
-              <a href="<?= e($basePath) ?>/admin/users/<?= e($u['slug']) ?>"
-                 class="px-3 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg transition-colors">View</a>
-              <?php if (roleLevel($u['role'] ?? '') < 3 && (roleLevel($u['role'] ?? '') < 2 || roleLevel($user['role'] ?? '') >= 3)): ?>
-              <button
-                type="button"
-                popovertarget="del-<?= e($u['slug']) ?>"
-                class="px-3 py-1.5 text-xs font-semibold text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-              >Delete</button>
-              <?php endif; ?>
-            </div>
+            <a href="<?= e($basePath) ?>/admin/users/<?= e($u['slug']) ?>"
+               class="px-3 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg transition-colors">View</a>
           </td>
         </tr>
         <?php endforeach; ?>
       </tbody>
     </table>
   </div>
-
-  <?php foreach ($users as $u): ?>
-  <?php if (roleLevel($u['role'] ?? '') < 3 && (roleLevel($u['role'] ?? '') < 2 || roleLevel($user['role'] ?? '') >= 3)): ?>
-  <?php echo atom('popover-shell', [
-      'id'     => 'del-' . ($u['slug'] ?? ''),
-      'title'  => 'Delete ' . ($u['name'] ?? '') . '?',
-      'width'  => '28rem',
-      'body'   => '<p class="text-sm text-slate-600 dark:text-slate-300">This will permanently remove <strong>' . e($u['name']) . '</strong> (' . e($u['email']) . ') and all their data — bids, donations, and payment records.</p>'
-                . '<p class="text-sm font-semibold text-red-600 dark:text-red-400 mt-3">This action cannot be undone.</p>',
-      'footer' => '<button type="button" popovertarget="del-' . e($u['slug']) . '" class="px-4 py-2 text-sm font-semibold text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg transition-colors">Cancel</button>'
-                . '<form method="POST" action="' . e($basePath) . '/admin/users/' . e($u['slug']) . '/delete?_csrf_token=' . e($csrfToken) . '" class="inline">'
-                . '<button type="submit" class="px-4 py-2 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors">Yes, delete permanently</button>'
-                . '</form>',
-  ]); ?>
-  <?php endif; ?>
-  <?php endforeach; ?>
 
   <?php if ($totalPages > 1): ?>
   <div class="px-5 py-4 border-t border-slate-100 dark:border-slate-700/40 flex items-center justify-between">
@@ -192,3 +205,67 @@ $roleBadge = function(string $role): string {
   <?php endif; ?>
   <?php endif; ?>
 </div>
+
+<!-- Confirm Delete Popover -->
+<div id="confirm-delete-popover" popover="manual" class="form-popover popover-sm rounded-2xl shadow-2xl p-0 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+  <div class="px-6 py-5">
+    <h3 class="text-base font-semibold text-slate-900 dark:text-white mb-2">Delete users?</h3>
+    <p class="text-sm text-slate-500 dark:text-slate-400 mb-2">This will permanently delete the selected users and all their data — bids, donations, and payment records.</p>
+    <p class="text-sm font-semibold text-red-600 dark:text-red-400 mb-6">This action cannot be undone.</p>
+    <div class="flex items-center justify-end gap-3">
+      <button onclick="document.getElementById('confirm-delete-popover').hidePopover()" class="px-4 py-2 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white border border-slate-200 dark:border-slate-600 rounded-lg transition-colors">Cancel</button>
+      <button onclick="submitBulkDelete()" class="px-4 py-2 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- Hidden bulk-delete form -->
+<form id="bulk-delete-form" method="POST" action="<?= e($basePath) ?>/admin/users/bulk-delete" class="hidden">
+  <input type="hidden" name="_csrf_token" value="<?= e($csrfToken) ?>" />
+</form>
+
+<script>
+// ── Batch selection (same pattern as items/auctions) ─────────────────────────
+function toggleSelectAll(master) {
+  const checks = document.querySelectorAll('.row-check');
+  checks.forEach(c => { c.checked = master.checked; });
+  updateBatchBar();
+}
+
+function handleRowCheck() {
+  const all = document.querySelectorAll('.row-check');
+  const checked = document.querySelectorAll('.row-check:checked');
+  document.getElementById('selectAll').checked = all.length === checked.length;
+  updateBatchBar();
+}
+
+function updateBatchBar() {
+  const count = document.querySelectorAll('.row-check:checked').length;
+  const bar = document.getElementById('batchBar');
+  document.getElementById('batchCount').textContent = count + ' selected';
+  if (count > 0) {
+    bar.style.display = '';
+  } else {
+    bar.style.display = 'none';
+  }
+}
+
+function clearSelection() {
+  document.querySelectorAll('.row-check, #selectAll').forEach(c => { c.checked = false; });
+  document.getElementById('batchBar').style.display = 'none';
+}
+
+function submitBulkDelete() {
+  document.getElementById('confirm-delete-popover').hidePopover();
+  const form = document.getElementById('bulk-delete-form');
+  form.querySelectorAll('input[name="slugs[]"]').forEach(el => el.remove());
+  document.querySelectorAll('.row-check:checked').forEach(function (cb) {
+    const input = document.createElement('input');
+    input.type  = 'hidden';
+    input.name  = 'slugs[]';
+    input.value = cb.dataset.slug;
+    form.appendChild(input);
+  });
+  form.submit();
+}
+</script>

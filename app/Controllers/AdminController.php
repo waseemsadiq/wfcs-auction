@@ -192,6 +192,13 @@ class AdminController extends Controller
         try {
             $eventService = new EventService();
             $eventService->update((int)$event['id'], $_POST);
+
+            // Handle status change if provided
+            $newStatus = trim($_POST['status'] ?? '');
+            if ($newStatus !== '' && $newStatus !== $event['status']) {
+                $eventService->adminSetStatus((int)$event['id'], $newStatus);
+            }
+
             flash('Auction updated.');
         } catch (\RuntimeException $e) {
             flash($e->getMessage(), 'error');
@@ -282,6 +289,96 @@ class AdminController extends Controller
         $this->redirect($basePath . '/admin/auctions');
     }
 
+    /**
+     * POST /admin/auctions/bulk-delete
+     */
+    public function bulkDeleteAuctions(): void
+    {
+        global $basePath;
+        requireAdmin();
+        validateCsrf();
+
+        $slugs = array_filter(array_map('trim', (array)($_POST['slugs'] ?? [])));
+
+        if (!empty($slugs)) {
+            $eventRepo = new EventRepository();
+
+            // Resolve slugs → event IDs
+            $eventIds = [];
+            foreach ($slugs as $slug) {
+                $event = $eventRepo->findBySlug($slug);
+                if ($event !== null) {
+                    $eventIds[] = (int)$event['id'];
+                }
+            }
+
+            if (!empty($eventIds)) {
+                // Get all item IDs that belong to these events
+                $itemIds = $eventRepo->itemIdsByEventIds($eventIds);
+
+                // Cascade: bids → payments → items → events
+                $bidRepo     = new BidRepository();
+                $paymentRepo = new PaymentRepository();
+                $itemRepo    = new ItemRepository();
+
+                if (!empty($itemIds)) {
+                    $bidRepo->deleteByItems($itemIds);
+                    $paymentRepo->deleteByItems($itemIds);
+                    $itemRepo->deleteByIds($itemIds);
+                }
+
+                $eventRepo->deleteByIds($eventIds);
+                $count = count($eventIds);
+                flash($count . ' auction' . ($count !== 1 ? 's' : '') . ' deleted.');
+            }
+        }
+
+        $this->redirect($basePath . '/admin/auctions');
+    }
+
+    /**
+     * POST /admin/auctions/bulk-status
+     */
+    public function bulkUpdateAuctionStatus(): void
+    {
+        global $basePath;
+        requireAdmin();
+        validateCsrf();
+
+        $slugs  = array_filter(array_map('trim', (array)($_POST['slugs'] ?? [])));
+        $status = trim($_POST['status'] ?? '');
+
+        if (!empty($slugs) && $status !== '') {
+            $eventRepo    = new EventRepository();
+            $eventService = new EventService();
+            $count = 0;
+
+            foreach ($slugs as $slug) {
+                $event = $eventRepo->findBySlug($slug);
+                if ($event === null) continue;
+                try {
+                    $eventService->adminSetStatus((int)$event['id'], $status);
+                    $count++;
+                } catch (\RuntimeException $e) {
+                    error_log('bulkUpdateAuctionStatus: ' . $e->getMessage());
+                }
+            }
+
+            if ($count > 0) {
+                $label = match($status) {
+                    'draft'     => 'unpublished',
+                    'published' => 'published',
+                    'active'    => 'activated',
+                    'ended'     => 'ended',
+                    default     => 'updated',
+                };
+                flash($count . ' auction' . ($count !== 1 ? 's' : '') . ' ' . $label . '.');
+            }
+        }
+
+        $this->redirect($basePath . '/admin/auctions');
+    }
+
     // -------------------------------------------------------------------------
     // Items
     // -------------------------------------------------------------------------
@@ -359,6 +456,41 @@ class AdminController extends Controller
             flash('Item created.');
         } catch (\RuntimeException $e) {
             flash($e->getMessage(), 'error');
+        }
+
+        $this->redirect($basePath . '/admin/items');
+    }
+
+    /**
+     * POST /admin/items/bulk-delete
+     */
+    public function bulkDeleteItems(): void
+    {
+        global $basePath;
+        requireAdmin();
+        validateCsrf();
+
+        $slugs = array_filter(array_map('trim', (array)($_POST['slugs'] ?? [])));
+
+        if (!empty($slugs)) {
+            $itemRepo = new ItemRepository();
+            // Resolve slugs to IDs
+            $ids = [];
+            foreach ($slugs as $slug) {
+                $item = $itemRepo->findBySlug($slug);
+                if ($item !== null) {
+                    $ids[] = (int)$item['id'];
+                }
+            }
+            if (!empty($ids)) {
+                $bidRepo     = new BidRepository();
+                $paymentRepo = new PaymentRepository();
+                $bidRepo->deleteByItems($ids);
+                $paymentRepo->deleteByItems($ids);
+                $itemRepo->deleteByIds($ids);
+                $count = count($ids);
+                flash($count . ' item' . ($count !== 1 ? 's' : '') . ' deleted.');
+            }
         }
 
         $this->redirect($basePath . '/admin/items');
@@ -570,6 +702,53 @@ class AdminController extends Controller
         }
 
         flash(e($profile['name']) . ' has been permanently deleted.', 'success');
+        $this->redirect($basePath . '/admin/users');
+    }
+
+    /**
+     * POST /admin/users/bulk-delete
+     */
+    public function bulkDeleteUsers(): void
+    {
+        global $basePath;
+        $actingAdmin = requireAdmin();
+        validateCsrf();
+
+        $slugs = array_filter(array_map('trim', (array)($_POST['slugs'] ?? [])));
+        $deleted = 0;
+
+        if (!empty($slugs)) {
+            $userRepo = new UserRepository();
+            $service  = new UserService(
+                $userRepo,
+                new BidRepository(),
+                new ItemRepository(),
+                new PaymentRepository()
+            );
+
+            foreach ($slugs as $slug) {
+                $profile = $userRepo->findBySlug($slug);
+                if ($profile === null) continue;
+
+                // Skip super admins entirely
+                if (roleLevel($profile['role'] ?? '') >= 3) continue;
+
+                // Regular admins can't delete other admins
+                if (roleLevel($profile['role'] ?? '') >= 2 && roleLevel($actingAdmin['role'] ?? '') < 3) continue;
+
+                try {
+                    $service->deleteUser($profile, (int)$actingAdmin['id']);
+                    $deleted++;
+                } catch (\RuntimeException $e) {
+                    // Skip failed deletions silently
+                    error_log('bulkDeleteUsers: ' . $e->getMessage());
+                }
+            }
+        }
+
+        if ($deleted > 0) {
+            flash($deleted . ' user' . ($deleted !== 1 ? 's' : '') . ' deleted.');
+        }
         $this->redirect($basePath . '/admin/users');
     }
 

@@ -41,6 +41,29 @@ class BidRepository
     }
 
     /**
+     * Get all bids for an item, newest first — admin version (full names, not masked).
+     */
+    public function byItemAdmin(int $itemId, int $limit = 50): array
+    {
+        $rows = $this->db->query(
+            'SELECT bids.*, u.name AS bidder_name, u.email AS bidder_email, u.slug AS bidder_slug
+             FROM bids
+             JOIN users u ON u.id = bids.user_id
+             WHERE bids.item_id = ?
+             ORDER BY bids.amount DESC, bids.created_at DESC
+             LIMIT ' . (int)$limit,
+            [$itemId]
+        );
+
+        foreach ($rows as &$row) {
+            $row['time_ago'] = $this->timeAgo((string)($row['created_at'] ?? ''));
+        }
+        unset($row);
+
+        return $rows;
+    }
+
+    /**
      * Get all bids by a user (with item + event joins).
      */
     public function byUser(int $userId, int $limit = 50, int $offset = 0): array

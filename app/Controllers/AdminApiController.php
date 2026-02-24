@@ -296,6 +296,31 @@ class AdminApiController extends ApiController
         $this->apiSuccess($items->findBySlug($slug));
     }
 
+    /**
+     * GET /api/admin/v1/items/:slug/bids
+     */
+    public function itemBids(string $slug): void
+    {
+        $this->requireAdmin();
+
+        $items = new ItemRepository();
+        $item  = $items->findBySlug($slug);
+
+        if (!$item) {
+            $this->apiError('Item not found.', 404);
+        }
+
+        $bids = new BidRepository();
+        $rows = $bids->byItemAdmin((int)$item['id']);
+
+        $this->apiSuccess($rows, [
+            'item_title'  => $item['title'],
+            'item_slug'   => $item['slug'],
+            'current_bid' => $item['current_bid'],
+            'bid_count'   => (int)($item['bid_count'] ?? count($rows)),
+        ]);
+    }
+
     // -------------------------------------------------------------------------
     // Users
     // -------------------------------------------------------------------------

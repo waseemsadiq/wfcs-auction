@@ -12,6 +12,7 @@ global $basePath, $csrfToken;
 
 $pending     = !empty($pending)     ? $pending     : (!empty($_GET['pending']));
 $verifyError = $verifyError ?? null;
+$authUser    = $authUser ?? null;
 ?>
 
 <div class="flex items-center justify-center py-8">
@@ -29,7 +30,7 @@ $verifyError = $verifyError ?? null;
           <a href="<?= e($basePath) ?>/login" class="w-full flex items-center justify-center gap-2 px-6 py-3 text-sm font-semibold text-white bg-primary hover:bg-primary-hover rounded-xl transition-colors">
             Back to sign in
           </a>
-          <?php $authUser = getAuthUser(); if ($authUser): ?>
+          <?php if ($authUser): ?>
             <form method="POST" action="<?= e($basePath) ?>/resend-verification">
               <input type="hidden" name="_csrf_token" value="<?= e($csrfToken) ?>" />
               <button type="submit" class="w-full px-6 py-3 text-sm font-semibold text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors">
@@ -58,18 +59,24 @@ $verifyError = $verifyError ?? null;
           </ul>
         </div>
 
-        <form method="POST" action="<?= e($basePath) ?>/resend-verification">
-          <input type="hidden" name="_csrf_token" value="<?= e($csrfToken) ?>" />
-          <button type="submit" class="w-full flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-semibold text-white bg-primary hover:bg-primary-hover rounded-xl shadow-md transition-colors">
-            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-.18-3.89"/></svg>
-            Resend verification email
-          </button>
-        </form>
+        <?php if ($authUser): ?>
+          <form method="POST" action="<?= e($basePath) ?>/resend-verification">
+            <input type="hidden" name="_csrf_token" value="<?= e($csrfToken) ?>" />
+            <button type="submit" class="w-full flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-semibold text-white bg-primary hover:bg-primary-hover rounded-xl shadow-md transition-colors">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-.18-3.89"/></svg>
+              Resend verification email
+            </button>
+          </form>
 
-        <p class="mt-6 text-center text-xs text-slate-400 dark:text-slate-600">
-          Wrong account?
-          <a href="<?= e($basePath) ?>/logout" class="underline hover:text-primary transition-colors">Sign out</a>
-        </p>
+          <p class="mt-6 text-center text-xs text-slate-400 dark:text-slate-600">
+            Wrong account?
+            <a href="<?= e($basePath) ?>/logout" class="underline hover:text-primary transition-colors">Sign out</a>
+          </p>
+        <?php else: ?>
+          <a href="<?= e($basePath) ?>/login" class="w-full flex items-center justify-center gap-2 px-6 py-3 text-sm font-semibold text-white bg-primary hover:bg-primary-hover rounded-xl transition-colors">
+            Back to sign in
+          </a>
+        <?php endif; ?>
       </div>
 
     <?php else: ?>
